@@ -12,7 +12,7 @@ def build_cache():
 
     # Prevalence
     for loc in LOCATIONS:
-        for id in [300, 634, 946, 947, 948, 949, 950, 954]:
+        for id in [300, 934, 946, 947, 948, 949, 950, 954]:
             entity = [c for c in gbd_mapping.causes if c.gbd_id == id][0]
             logger.info(f"Pulling prevalence data for id={id}, {entity.name} "
                         f"for {loc}")
