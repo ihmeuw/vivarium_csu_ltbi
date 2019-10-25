@@ -111,6 +111,23 @@ def compute_prevalence(art, data):
     write(art, f'state.{ACTTB_PLUS_HIV}.prevalence', state_act_tb_hiv_plus)
 
 
+def compute_excess_mortality(art, data):
+    logger.info('Computing excess_mortality...')
+
+    state_act_tb_sus_hiv = ((data.csmr_934 + data.csmr_946 + data.csmr_947)
+                           / (data.prev_934 + data.prev_946 + data.prev_947))
+    write(art, f'state.{ACTTB_SUS_HIV}.excess_mortality', state_act_tb_sus_hiv)
+
+    emr_300 = data.csmr_300 / data.prev_300
+    write(art, f'state.{REC_LTBI_PLUS_HIV}.excess_mortality', emr_300)
+    write(art, f'state.{SUS_TB_PLUS_HIV}.excess_mortality', emr_300)
+    write(art, f'state.{LTBI_PLUS_HIV}.excess_mortality', emr_300)
+
+    state_act_tb_plus_hiv = ((data.csmr_948 + data.csmr_949 + data.csmr_950)
+                            / (data.prev_948 + data.prev_949 + data.prev_950))
+    write(art, f'state.{ACTTB_PLUS_HIV}.excess_mortality', state_act_tb_plus_hiv)
+
+
 def create_new_artifact(path: str, location: str) -> Artifact:
     if Path(path).is_file():
         Path(path).unlink()
@@ -131,7 +148,7 @@ def build_artifact(loc):
     art = create_new_artifact(f'{DEFAULT_PATH}/{loc}.hdf', loc)
     #art = create_new_artifact(f'/ihme/homes/kjells/artifacts/{loc}.hdf', loc)
     compute_prevalence(art, data)
-
+    compute_excess_mortality(art, data)
 
 build_artifact('Ethiopia')
 
