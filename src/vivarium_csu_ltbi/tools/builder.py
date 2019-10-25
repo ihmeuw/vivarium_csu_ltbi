@@ -6,8 +6,11 @@ from gbd_mapping import causes
 from vivarium_public_health.dataset_manager import Artifact, EntityKey, get_location_term
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs import get_measure, utilities, globals, utility_data, core
+from vivarium_gbd_access.gbd import ARTIFACT_FOLDER
 
-DEFAULT_PATH = '/ihme/homes/kjells/artifacts'
+
+PROJ_NAME = 'vivarium_csu_ltbi'
+DEFAULT_PATH = ARTIFACT_FOLDER / PROJ_NAME
 
 cause_latent_tuberculosis_infection_954 = 954
 cause_drug_sus_tb_934 = 934
