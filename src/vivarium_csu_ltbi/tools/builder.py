@@ -3,9 +3,9 @@ from loguru import logger
 
 
 from gbd_mapping import causes
-from vivarium_public_health.dataset_manager import Artifact, EntityKey, get_location_term
+from vivarium_public_health.dataset_manager import Artifact, get_location_term
 from vivarium_inputs.data_artifact.utilities import split_interval
-from vivarium_inputs import get_measure, utilities, globals, utility_data, core
+from vivarium_inputs import get_measure
 from vivarium_gbd_access.gbd import ARTIFACT_FOLDER
 
 
@@ -34,37 +34,81 @@ LTBI_PLUS_HIV = 'ltbi_plus_hiv'
 ACTTB_PLUS_HIV = 'acttb_plus_hiv'
 
 
+class DataRepo:
+
+    def __init__(self):
+        pass
+
+    def pull_data(self, loc):
+        logger.info('Pulling cause_specific_mortality data')
+        self.csmr_297 = get_measure(entity_from_id(297), 'cause_specific_mortality', loc)
+        self.csmr_298 = get_measure(entity_from_id(298), 'cause_specific_mortality', loc)
+        self.csmr_300 = get_measure(entity_from_id(300), 'cause_specific_mortality', loc)
+        self.csmr_934 = get_measure(entity_from_id(934), 'cause_specific_mortality', loc)
+        self.csmr_946 = get_measure(entity_from_id(946), 'cause_specific_mortality', loc)
+        self.csmr_947 = get_measure(entity_from_id(947), 'cause_specific_mortality', loc)
+        self.csmr_948 = get_measure(entity_from_id(948), 'cause_specific_mortality', loc)
+        self.csmr_949 = get_measure(entity_from_id(949), 'cause_specific_mortality', loc)
+        self.csmr_950 = get_measure(entity_from_id(950), 'cause_specific_mortality', loc)
+        # vivarium_inputs.globals.InvalidQueryError: Deaths data is not expected to exist for cause
+        #  latent_tuberculosis_infection.
+        #self.csmr_954 = get_measure(entity_from_id(954), 'cause_specific_mortality', loc)
+
+        # self.emr_300 = get_measure(entity_from_id(), '', loc)
+
+        logger.info('Pulling incidence data')
+        self.i_300 = get_measure(entity_from_id(300), 'incidence', loc)
+        self.i_934 = get_measure(entity_from_id(934), 'incidence', loc)
+        self.i_946 = get_measure(entity_from_id(946), 'incidence', loc)
+        self.i_947 = get_measure(entity_from_id(947), 'incidence', loc)
+        self.i_948 = get_measure(entity_from_id(948), 'incidence', loc)
+        self.i_949 = get_measure(entity_from_id(949), 'incidence', loc)
+        self.i_950 = get_measure(entity_from_id(950), 'incidence', loc)
+        # DataDoesNotExistError: Data contains no non-missing, non-zero values.
+        #self.i_954 = get_measure(entity_from_id(954), 'incidence', loc)
+
+        logger.info('Pulling prevalence data')
+        self.prev_297 = get_measure(entity_from_id(297), 'prevalence', loc)
+        self.prev_298 = get_measure(entity_from_id(298), 'prevalence', loc)
+        self.prev_300 = get_measure(entity_from_id(300), 'prevalence', loc)
+        self.prev_934 = get_measure(entity_from_id(934), 'prevalence', loc)
+        self.prev_946 = get_measure(entity_from_id(946), 'prevalence', loc)
+        self.prev_947 = get_measure(entity_from_id(947), 'prevalence', loc)
+        self.prev_948 = get_measure(entity_from_id(948), 'prevalence', loc)
+        self.prev_949 = get_measure(entity_from_id(949), 'prevalence', loc)
+        self.prev_950 = get_measure(entity_from_id(950), 'prevalence', loc)
+        self.prev_954 = get_measure(entity_from_id(954), 'prevalence', loc)
+
+        #self.sequelae_300 = get_measure(entity_from_id(300), '', loc)
+
+        #self.ylds_297 = get_measure(entity_from_id(), '', loc)
+        #self.ylds_298 = get_measure(entity_from_id(), '', loc)
+
+
 def entity_from_id(id):
     return [c for c in causes if c.gbd_id == id][0]
 
-def get_prevalence_data(art, loc):
-    df_954 = get_measure(entity_from_id(cause_latent_tuberculosis_infection_954), 'prevalence', loc)
-    df_300 = get_measure(entity_from_id(hiv_all_other_300), 'prevalence', loc)
-    state_df_ltbi_s_hiv = df_954 * (1 - df_300)
+
+def compute_prevalence(art, data):
+    logger.info('Computing prevalence...')
+
+    state_sus_tb_sus_hiv = 1 - ((data.prev_297 + data.prev_298) - (data.prev_954 * data.prev_300))
+    write(art, f'state.{SUS_TB_SUS_HIV}.prevalence', state_sus_tb_sus_hiv)
+
+    state_df_ltbi_s_hiv = data.prev_954 * (1 - data.prev_300)
     write(art, f'state.{LTBI_SUS_HIV}.prevalence', state_df_ltbi_s_hiv)
 
-    df_934 = get_measure(entity_from_id(cause_drug_sus_tb_934), 'prevalence', loc)
-    df_946 = get_measure(entity_from_id(cause_m_drug_res_tb_946), 'prevalence', loc)
-    df_947 = get_measure(entity_from_id(cause_ext_d_res_tb_947), 'prevalence', loc)
-    state_act_tb_sus_hiv = df_934 + df_946 + df_947
+    state_act_tb_sus_hiv = data.prev_934 + data.prev_946 + data.prev_947
     write(art, f'state.{ACTTB_SUS_HIV}.prevalence', state_act_tb_sus_hiv)
 
-    state_sus_tb_hiv_plus = (1 - df_954) * df_300
-    write(art, f'state.{SUS_TB_PLUS_HIV}.prevalence', state_act_tb_sus_hiv)
+    state_sus_tb_hiv_plus = (1 - data.prev_954) * data.prev_300
+    write(art, f'state.{SUS_TB_PLUS_HIV}.prevalence', state_sus_tb_hiv_plus)
 
-    state_ltbi_hiv_plus = df_954 * df_300
-    write(art, f'state.{LTBI_PLUS_HIV}.prevalence', state_act_tb_sus_hiv)
-
-    df_948 = get_measure(entity_from_id(hiv_d_sus_tb_948), 'prevalence', loc)
-    df_949 = get_measure(entity_from_id(hiv_m_d_res_tb_949), 'prevalence', loc)
-    df_950 = get_measure(entity_from_id(hiv_ext_d_res_tb_950), 'prevalence', loc)
-    state_act_tb_hiv_plus = df_948 + df_949 + df_950
-    write(art, f'state.{ACTTB_PLUS_HIV}.prevalence', state_act_tb_sus_hiv)
-
-    df_297 = get_measure(entity_from_id(tb_297), 'prevalence', loc)
-    df_298 = get_measure(entity_from_id(hiv_298), 'prevalence', loc)
-    state_sus_tb_sus_hiv = 1 - ((df_297 + df_298) - (df_954 * df_300))
-    write(art, f'state.{SUS_TB_SUS_HIV}.prevalence', state_sus_tb_sus_hiv)
+    state_ltbi_hiv_plus = data.prev_954 * data.prev_300
+    write(art, f'state.{LTBI_PLUS_HIV}.prevalence', state_ltbi_hiv_plus)
+    
+    state_act_tb_hiv_plus = data.prev_948 + data.prev_949 + data.prev_950
+    write(art, f'state.{ACTTB_PLUS_HIV}.prevalence', state_act_tb_hiv_plus)
 
 
 def create_new_artifact(path: str, location: str) -> Artifact:
@@ -80,9 +124,13 @@ def write(artifact, key, data):
     data = split_interval(data, interval_column='year', split_column_prefix='year')
     artifact.write(key, data)
 
+
 def build_artifact(loc):
-    art = create_new_artifact(f'{DEFAULT_PATH}/kjells.hdf', 'Ethiopia')
-    get_prevalence_data(art, 'Ethiopia')
+    data = DataRepo()
+    data.pull_data(loc)
+    art = create_new_artifact(f'{DEFAULT_PATH}/{loc}.hdf', loc)
+    #art = create_new_artifact(f'/ihme/homes/kjells/artifacts/{loc}.hdf', loc)
+    compute_prevalence(art, data)
 
 
 build_artifact('Ethiopia')
