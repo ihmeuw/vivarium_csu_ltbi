@@ -2,7 +2,6 @@ from pathlib import Path
 from loguru import logger
 import pandas as pd
 
-
 from gbd_mapping import causes
 from vivarium_public_health.dataset_manager import Artifact, get_location_term
 from vivarium_inputs.data_artifact.utilities import split_interval
@@ -13,17 +12,6 @@ from vivarium_gbd_access import gbd
 
 PROJ_NAME = 'vivarium_csu_ltbi'
 DEFAULT_PATH = gbd.ARTIFACT_FOLDER / PROJ_NAME
-
-cause_latent_tuberculosis_infection_954 = 954
-cause_drug_sus_tb_934 = 934
-cause_m_drug_res_tb_946 = 946
-cause_ext_d_res_tb_947 = 947
-hiv_d_sus_tb_948 = 948
-hiv_m_d_res_tb_949 = 949
-hiv_ext_d_res_tb_950 = 950
-hiv_all_other_300 = 300
-tb_297 = 297
-hiv_298 = 298
 
 #  state names
 ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'
@@ -225,20 +213,12 @@ def compute_transition_rates(art, data):
           (data.i_934 + data.i_946 + data.i_947) / (data.prev_954 * (1 - data.prev_300)))
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.i_300)
-
-    # TODO - missing in spec
-    # regardless of HIV status, the duration of TB is uniform(6mo-3yr) for all population
     write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
           data.get_zeros())
-
     write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV}.transition_rate',
           data.i_300)
-
-    # TODO - missing in spec
-    # regardless of HIV status, the duration of TB is uniform(6mo-3yr) for all population
     write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.get_zeros())
-
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.get_filled_with(0.01))
     write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV}.transition_rate',
@@ -267,18 +247,17 @@ def write(artifact, key, data):
     artifact.write(key, data)
 
 
-def build_artifact(loc):
+def build_ltbi_artifact(loc, output_dir=None):
     data = DataRepo()
     data.pull_data(loc)
-    art = create_new_artifact(f'{DEFAULT_PATH}/{loc}.hdf', loc)
+    out_path = f'{output_dir}/{loc}.hdf' if output_dir else f'{DEFAULT_PATH}/{loc}.hdf'
+    art = create_new_artifact(out_path, loc)
     #art = create_new_artifact(f'/ihme/homes/kjells/artifacts/{loc}.hdf', loc)
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
     logger.info('Done !!!')
-
-build_artifact('Ethiopia')
 
 
 
