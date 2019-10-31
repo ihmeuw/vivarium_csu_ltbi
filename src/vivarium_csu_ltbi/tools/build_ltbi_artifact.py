@@ -10,7 +10,6 @@ PROJECT_NAME = 'vivarium_csu_ltbi'
 @click.command()
 @click.option('-l', '--location',
               required=True,
-              type=click.Path(dir_okay=False),
               help=('The location for which to build an artifact'))
 @click.option('-o', '--output-dir',
               default=f'/share/costeffectiveness/artifacts/{PROJECT_NAME}/',

@@ -3,8 +3,9 @@ from loguru import logger
 import pandas as pd
 
 from gbd_mapping import causes
-from vivarium_public_health.dataset_manager import Artifact, get_location_term
+from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
+from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data
 
 from vivarium_gbd_access import gbd
@@ -55,29 +56,29 @@ class DataRepo:
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
-        self.csmr_297 = get_measure(entity_from_id(297), 'cause_specific_mortality', loc)
-        self.csmr_298 = get_measure(entity_from_id(298), 'cause_specific_mortality', loc)
-        self.csmr_300 = get_measure(entity_from_id(300), 'cause_specific_mortality', loc)
-        self.csmr_934 = get_measure(entity_from_id(934), 'cause_specific_mortality', loc)
-        self.csmr_946 = get_measure(entity_from_id(946), 'cause_specific_mortality', loc)
-        self.csmr_947 = get_measure(entity_from_id(947), 'cause_specific_mortality', loc)
-        self.csmr_948 = get_measure(entity_from_id(948), 'cause_specific_mortality', loc)
-        self.csmr_949 = get_measure(entity_from_id(949), 'cause_specific_mortality', loc)
-        self.csmr_950 = get_measure(entity_from_id(950), 'cause_specific_mortality', loc)
+        self.csmr_297 = get_measure(entity_from_id(297), 'cause_specific_mortality_rate', loc)
+        self.csmr_298 = get_measure(entity_from_id(298), 'cause_specific_mortality_rate', loc)
+        self.csmr_300 = get_measure(entity_from_id(300), 'cause_specific_mortality_rate', loc)
+        self.csmr_934 = get_measure(entity_from_id(934), 'cause_specific_mortality_rate', loc)
+        self.csmr_946 = get_measure(entity_from_id(946), 'cause_specific_mortality_rate', loc)
+        self.csmr_947 = get_measure(entity_from_id(947), 'cause_specific_mortality_rate', loc)
+        self.csmr_948 = get_measure(entity_from_id(948), 'cause_specific_mortality_rate', loc)
+        self.csmr_949 = get_measure(entity_from_id(949), 'cause_specific_mortality_rate', loc)
+        self.csmr_950 = get_measure(entity_from_id(950), 'cause_specific_mortality_rate', loc)
         # vivarium_inputs.globals.InvalidQueryError: Deaths data is not expected to exist for cause
         #  latent_tuberculosis_infection.
         #self.csmr_954 = get_measure(entity_from_id(954), 'cause_specific_mortality', loc)
 
         # self.emr_300 = get_measure(entity_from_id(), '', loc)
 
-        logger.info('Pulling incidence data')
-        self.i_300 = get_measure(entity_from_id(300), 'incidence', loc)
-        self.i_934 = get_measure(entity_from_id(934), 'incidence', loc)
-        self.i_946 = get_measure(entity_from_id(946), 'incidence', loc)
-        self.i_947 = get_measure(entity_from_id(947), 'incidence', loc)
-        self.i_948 = get_measure(entity_from_id(948), 'incidence', loc)
-        self.i_949 = get_measure(entity_from_id(949), 'incidence', loc)
-        self.i_950 = get_measure(entity_from_id(950), 'incidence', loc)
+        logger.info('Pulling incidence_rate data')
+        self.i_300 = get_measure(entity_from_id(300), 'incidence_rate', loc)
+        self.i_934 = get_measure(entity_from_id(934), 'incidence_rate', loc)
+        self.i_946 = get_measure(entity_from_id(946), 'incidence_rate', loc)
+        self.i_947 = get_measure(entity_from_id(947), 'incidence_rate', loc)
+        self.i_948 = get_measure(entity_from_id(948), 'incidence_rate', loc)
+        self.i_949 = get_measure(entity_from_id(949), 'incidence_rate', loc)
+        self.i_950 = get_measure(entity_from_id(950), 'incidence_rate', loc)
         # DataDoesNotExistError: Data contains no non-missing, non-zero values.
         #self.i_954 = get_measure(entity_from_id(954), 'incidence', loc)
 
@@ -118,6 +119,24 @@ class DataRepo:
 
 def entity_from_id(id):
     return [c for c in causes if c.gbd_id == id][0]
+
+
+def get_load(location):
+    return lambda key: loader(EntityKey(key), location, set())
+
+
+def write_demographic_data(artifact, location):
+    logger.info('Writing demographic data...')
+    load = get_load(location)
+
+    prefix = 'population.'
+    measures = ["structure", "age_bins", "theoretical_minimum_risk_life_expectancy", "demographic_dimensions"]
+    for m in measures:
+        key = prefix + m
+        write(artifact, key, load(key))
+
+    key = 'cause.all_causes.cause_specific_mortality_rate'
+    write(artifact, key, load(key))
 
 
 def compute_prevalence(art, data):
@@ -191,7 +210,7 @@ def compute_disability_weight(art, data):
 def load_em_from_meid(meid, location):
     location_id = utility_data.get_location_id(location)
     data = gbd.get_modelable_entity_draws(meid, location_id)
-    data = data[data.measure_id == globals.MEASURES['Remission']]
+    data = data[data.measure_id == globals.MEASURES['Remission rate']]
     data = utilities.normalize(data, fill_value=0)
     data = data.filter(globals.DEMOGRAPHIC_COLUMNS + globals.DRAW_COLUMNS)
     data = utilities.reshape(data)
@@ -253,6 +272,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     out_path = f'{output_dir}/{loc}.hdf' if output_dir else f'{DEFAULT_PATH}/{loc}.hdf'
     art = create_new_artifact(out_path, loc)
     #art = create_new_artifact(f'/ihme/homes/kjells/artifacts/{loc}.hdf', loc)
+    write_demographic_data(art, loc)
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
