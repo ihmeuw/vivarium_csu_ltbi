@@ -14,6 +14,7 @@ components:
             - MortalityObserver()
 
     vivarium_csu_ltbi.components:
+        - susceptible_tb_susceptible_hiv()
 
 configuration:
     input_data:

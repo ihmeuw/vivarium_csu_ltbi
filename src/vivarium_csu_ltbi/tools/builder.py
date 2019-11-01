@@ -7,38 +7,12 @@ from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data
-
 from vivarium_gbd_access import gbd
+from ..components.names import *
 
 
 PROJ_NAME = 'vivarium_csu_ltbi'
 DEFAULT_PATH = gbd.ARTIFACT_FOLDER / PROJ_NAME
-
-#  state names
-ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'
-ACTIVETB_SUSCEPTIBLE_HIV = 'activetb_susceptible_hiv'
-LTBI_SUSCEPTIBLE_HIV = 'ltbi_susceptible_hiv'
-LTBI_POSITIVE_HIV = 'ltbi_positive_hiv'
-RECOVERED_LTBI_SUSCEPTIBLE_HIV = 'recovered_ltbi_susceptible_hiv'
-RECOVERED_LTBI_POSITIVE_HIV = 'recovered_ltbi_positive_hiv'
-SUSCEPTIBLE_TB_POSITIVE_HIV = 'susceptible_tb_positive_hiv'
-SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV = 'susceptible_tb_susceptible_hiv'
-
-# transition names (from, to)
-ACTIVETB_SUSCEPTIBLE_HIV_TO_ACTIVETB_POSITIVE_HIV = 'activetb_susceptible_hiv_to_activetb_positive_hiv'
-ACTIVETB_SUSCEPTIBLE_HIV_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV = 'activetb_susceptible_hiv_susceptible_tb_susceptible_hiv'
-ACTIVETB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV = 'activetb_positive_hiv_to_susceptible_tb_positive_hiv'
-LTBI_SUSCEPTIBLE_HIV_TO_RECOVERED_LTBI_SUSCEPTIBLE_HIV = 'ltbi_susceptible_hiv_to_recovered_ltbi_susceptible_hiv'
-LTBI_SUSCEPTIBLE_HIV_TO_ACTIVETB_SUSCEPTIBLE_HIV = 'ltbi_susceptible_hiv_to_activetb_susceptible_hiv'
-LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV = 'ltbi_susceptible_hiv_to_ltbi_positive_hiv'
-LTBI_POSITIVE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV = 'ltbi_positive_hiv_to_recovered_ltbi_positive_hiv'
-LTBI_POSITIVE_HIV_ACTIVETB_POSITIVE_HIV = 'ltbi_positive_hiv_activetb_positive_hiv'
-SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV = 'susceptible_tb_positive_hiv_to_ltbi_positive_hiv'
-SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_LTBI_SUSCEPTIBLE_HIV = 'susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv'
-SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV = 'susceptible_tb_susceptible_hiv_to_susceptible_tb_positive_hiv'
-RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV = 'recovered_ltbi_susceptible_hiv_to_susceptible_tb_susceptible_hiv'
-RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV = 'recovered_ltbi_susceptible_hiv_to_recovered_ltbi_positive_hiv'
-RECOVERED_LTBI_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV = 'recovered_ltbi_positive_hiv_to_susceptible_tb_positive_hiv'
 
 
 class DataRepo:
@@ -51,7 +25,7 @@ class DataRepo:
         return self.df_zero
 
     def get_filled_with(self, fill_value):
-        return pd.DataFrame().reindex_like(self._df_template).fillna(fill_value)
+        return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
 
     def pull_data(self, loc):
@@ -107,9 +81,9 @@ class DataRepo:
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
 
         # template and zero-filled dataframes
-        self._df_template = pd.DataFrame().reindex_like(self.dw_300)
+        self._df_template = pd.DataFrame().reindex_like(self.dw_300.copy(deep='all'))
         self.df_zero = self.get_filled_with(0.0)
-
+        logger.info(f'Zero DF looks like  = {self.df_zero.head()}')
 
         #self.sequelae_300 = get_measure(entity_from_id(300), '', loc)
 
@@ -123,6 +97,14 @@ def entity_from_id(id):
 
 def get_load(location):
     return lambda key: loader(EntityKey(key), location, set())
+
+
+def write_metadata(artifact, location):
+    load = get_load(location)
+    key = f'cause.{LATENT_TUBERCULOSIS_INFECTION}.sequelae'
+    write(artifact, key, load(key))
+    key = f'cause.{LATENT_TUBERCULOSIS_INFECTION}.restrictions'
+    write(artifact, key, load(key))
 
 
 def write_demographic_data(artifact, location):
@@ -150,6 +132,9 @@ def compute_prevalence(art, data):
 
     state_act_tb_sus_hiv = data.prev_934 + data.prev_946 + data.prev_947
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.prevalence', state_act_tb_sus_hiv)
+
+    write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV}.prevalence', data.get_zeros())
+    write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV}.prevalence', data.get_zeros())
 
     state_sus_tb_hiv_plus = (1 - data.prev_954) * data.prev_300
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.prevalence', state_sus_tb_hiv_plus)
@@ -261,9 +246,12 @@ def create_new_artifact(path: str, location: str) -> Artifact:
 
 
 def write(artifact, key, data):
-    data = split_interval(data, interval_column='age', split_column_prefix='age')
-    data = split_interval(data, interval_column='year', split_column_prefix='year')
-    artifact.write(key, data)
+    tmp = data.copy(deep='all') if isinstance(data, pd.core.frame.DataFrame) else data
+    tmp = split_interval(tmp, interval_column='age', split_column_prefix='age')
+    tmp = split_interval(tmp, interval_column='year', split_column_prefix='year')
+    if isinstance(tmp, pd.core.frame.DataFrame):
+        assert 'age_end' in tmp.index.names
+    artifact.write(key, tmp)
 
 
 def build_ltbi_artifact(loc, output_dir=None):
@@ -271,13 +259,13 @@ def build_ltbi_artifact(loc, output_dir=None):
     data.pull_data(loc)
     out_path = f'{output_dir}/{loc}.hdf' if output_dir else f'{DEFAULT_PATH}/{loc}.hdf'
     art = create_new_artifact(out_path, loc)
-    #art = create_new_artifact(f'/ihme/homes/kjells/artifacts/{loc}.hdf', loc)
     write_demographic_data(art, loc)
+    write_metadata(art, loc)
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
-    logger.info('Done !!!')
+    logger.info('!!! Done !!!')
 
 
 
