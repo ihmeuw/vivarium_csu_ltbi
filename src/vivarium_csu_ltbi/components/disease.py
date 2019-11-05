@@ -1,4 +1,3 @@
-#from vivarium.framework.state_machine import Trigger, Transition
 from vivarium_public_health.disease import DiseaseState, DiseaseModel, SusceptibleState, RateTransition
 from .names import *
 
