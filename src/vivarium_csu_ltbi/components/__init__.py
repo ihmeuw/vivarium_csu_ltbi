@@ -1,1 +1,1 @@
-from .disease import susceptible_tb_susceptible_hiv
+from .disease import TuberculosisAndHIV

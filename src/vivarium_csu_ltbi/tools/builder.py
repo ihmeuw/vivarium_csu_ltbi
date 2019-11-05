@@ -101,13 +101,11 @@ def get_load(location):
 
 def write_metadata(artifact, location):
     load = get_load(location)
-    key = f'cause.{LATENT_TUBERCULOSIS_INFECTION}.sequelae'
-    write(artifact, key, load(key))
-    key = f'cause.{LATENT_TUBERCULOSIS_INFECTION}.restrictions'
-    write(artifact, key, load(key))
+    key = f'cause.{TUBERCULOSIS_AND_HIV}.restrictions'
+    write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
-def write_demographic_data(artifact, location):
+def write_demographic_data(artifact, location, data):
     logger.info('Writing demographic data...')
     load = get_load(location)
 
@@ -119,6 +117,10 @@ def write_demographic_data(artifact, location):
 
     key = 'cause.all_causes.cause_specific_mortality_rate'
     write(artifact, key, load(key))
+
+    # TODO - placeholder
+    key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
+    write(artifact, key, data.csmr_300)
 
 
 def compute_prevalence(art, data):
@@ -133,8 +135,8 @@ def compute_prevalence(art, data):
     state_act_tb_sus_hiv = data.prev_934 + data.prev_946 + data.prev_947
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.prevalence', state_act_tb_sus_hiv)
 
-    write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV}.prevalence', data.get_zeros())
-    write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV}.prevalence', data.get_zeros())
+    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.prevalence', data.get_zeros())
+    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.prevalence', data.get_zeros())
 
     state_sus_tb_hiv_plus = (1 - data.prev_954) * data.prev_300
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.prevalence', state_sus_tb_hiv_plus)
@@ -149,18 +151,22 @@ def compute_prevalence(art, data):
 def compute_excess_mortality(art, data):
     logger.info('Computing excess_mortality...')
 
+    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
+
     state_act_tb_sus_hiv = ((data.csmr_934 + data.csmr_946 + data.csmr_947)
                            / (data.prev_934 + data.prev_946 + data.prev_947))
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.excess_mortality', state_act_tb_sus_hiv)
+    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.excess_mortality_rate', state_act_tb_sus_hiv)
 
     emr_300 = data.csmr_300 / data.prev_300
-    write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV}.excess_mortality', emr_300)
-    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.excess_mortality', emr_300)
-    write(art, f'sequela.{LTBI_POSITIVE_HIV}.excess_mortality', emr_300)
+    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
+    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
+    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
+    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
+    write(art, f'sequela.{LTBI_POSITIVE_HIV}.excess_mortality_rate', emr_300)
 
     state_act_tb_plus_hiv = ((data.csmr_948 + data.csmr_949 + data.csmr_950)
                             / (data.prev_948 + data.prev_949 + data.prev_950))
-    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.excess_mortality', state_act_tb_plus_hiv)
+    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.excess_mortality_rate', state_act_tb_plus_hiv)
 
 
 def get_total_disability_weight(prevs, weights):
@@ -180,8 +186,8 @@ def compute_disability_weight(art, data):
     logger.info(f'Disability wt. = {total_disability_weight.head()}')
 
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.disability_weight', total_disability_weight)
-    write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV}.disability_weight', data.dw_300)
-    write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV}.disability_weight', data.dw_300)
+    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.disability_weight', data.dw_300)
+    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
     write(art, f'sequela.{LTBI_POSITIVE_HIV}.disability_weight', data.dw_300)
 
@@ -211,29 +217,29 @@ def compute_transition_rates(art, data):
           data.get_filled_with(0.01))
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_RECOVERED_LTBI_SUSCEPTIBLE_HIV}.transition_rate',
-          data.get_zeros())
+    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_PROTECTED_TB_SUSCEPTIBLE_HIV}.transition_rate',
+                data.get_zeros())
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_ACTIVETB_SUSCEPTIBLE_HIV}.transition_rate',
           (data.i_934 + data.i_946 + data.i_947) / (data.prev_954 * (1 - data.prev_300)))
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
+    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
           data.get_zeros())
-    write(art, f'sequela.{RECOVERED_LTBI_SUSCEPTIBLE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV_TO_PROTECTED_TB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{RECOVERED_LTBI_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.get_zeros())
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.get_filled_with(0.01))
-    write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_RECOVERED_LTBI_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_PROTECTED_TB_POSITIVE_HIV}.transition_rate',
           data.get_zeros())
-    write(art, f'sequela.{LTBI_POSITIVE_HIV_ACTIVETB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
           (data.i_948 + data.i_949 + data.i_950) / (data.prev_954 * data.prev_300))
     write(art, f'sequela.{ACTIVETB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.dismod_9422_remission)
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
+    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
           data.dismod_9422_remission)
 
 
@@ -259,7 +265,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     data.pull_data(loc)
     out_path = f'{output_dir}/{loc}.hdf' if output_dir else f'{DEFAULT_PATH}/{loc}.hdf'
     art = create_new_artifact(out_path, loc)
-    write_demographic_data(art, loc)
+    write_demographic_data(art, loc, data)
     write_metadata(art, loc)
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
