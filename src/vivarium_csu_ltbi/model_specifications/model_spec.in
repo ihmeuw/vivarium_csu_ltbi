@@ -1,20 +1,15 @@
-plugins:
-    optional:
-        data:
-            controller: "vivarium_public_health.dataset_manager.ArtifactManager"
-            builder_interface: "vivarium_public_health.dataset_manager.ArtifactManagerInterface"
-
 components:
     vivarium_public_health:
         population:
             - BasePopulation()
             - Mortality()
+
         metrics:
-            - Disability()
+            - DisabilityObserver()
             - MortalityObserver()
 
     vivarium_csu_ltbi.components:
-        - susceptible_tb_susceptible_hiv()
+        - TuberculosisAndHIV()
 
 configuration:
     input_data:
@@ -45,10 +40,10 @@ configuration:
 
     metrics:
         disability:
-            by_age: False
-            by_sex: False
+            by_age: True
+            by_sex: True
             by_year: False
         mortality:
-            by_age: False
-            by_sex: False
+            by_age: True
+            by_sex: True
             by_year: False

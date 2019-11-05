@@ -19,8 +19,6 @@ def get_disease_state(id):
 
 class BetterDiseaseState(DiseaseState):
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
-        # if source_data_type != 'rate':
-        #     raise ValueError
         if get_data_functions == None:
             get_data_functions = {'transition_rate': lambda cause, builder: builder.data.load(
                 f'sequela.{self.cause}_to_{cause}.transition_rate')}
