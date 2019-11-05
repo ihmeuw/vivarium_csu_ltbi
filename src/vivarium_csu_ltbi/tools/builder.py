@@ -39,11 +39,6 @@ class DataRepo:
         self.csmr_948 = get_measure(entity_from_id(948), 'cause_specific_mortality_rate', loc)
         self.csmr_949 = get_measure(entity_from_id(949), 'cause_specific_mortality_rate', loc)
         self.csmr_950 = get_measure(entity_from_id(950), 'cause_specific_mortality_rate', loc)
-        # vivarium_inputs.globals.InvalidQueryError: Deaths data is not expected to exist for cause
-        #  latent_tuberculosis_infection.
-        #self.csmr_954 = get_measure(entity_from_id(954), 'cause_specific_mortality', loc)
-
-        # self.emr_300 = get_measure(entity_from_id(), '', loc)
 
         logger.info('Pulling incidence_rate data')
         self.i_300 = get_measure(entity_from_id(300), 'incidence_rate', loc)
@@ -53,8 +48,6 @@ class DataRepo:
         self.i_948 = get_measure(entity_from_id(948), 'incidence_rate', loc)
         self.i_949 = get_measure(entity_from_id(949), 'incidence_rate', loc)
         self.i_950 = get_measure(entity_from_id(950), 'incidence_rate', loc)
-        # DataDoesNotExistError: Data contains no non-missing, non-zero values.
-        #self.i_954 = get_measure(entity_from_id(954), 'incidence', loc)
 
         logger.info('Pulling prevalence data')
         self.prev_297 = get_measure(entity_from_id(297), 'prevalence', loc)
@@ -77,18 +70,12 @@ class DataRepo:
         self.dw_949 = get_measure(entity_from_id(949), 'disability_weight', loc)
         self.dw_950 = get_measure(entity_from_id(950), 'disability_weight', loc)
 
-        # likely a stand-in that will change
+        # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
 
         # template and zero-filled dataframes
         self._df_template = pd.DataFrame().reindex_like(self.dw_300.copy(deep='all'))
         self.df_zero = self.get_filled_with(0.0)
-        logger.info(f'Zero DF looks like  = {self.df_zero.head()}')
-
-        #self.sequelae_300 = get_measure(entity_from_id(300), '', loc)
-
-        #self.ylds_297 = get_measure(entity_from_id(), '', loc)
-        #self.ylds_298 = get_measure(entity_from_id(), '', loc)
 
 
 def entity_from_id(id):
@@ -118,9 +105,8 @@ def write_demographic_data(artifact, location, data):
     key = 'cause.all_causes.cause_specific_mortality_rate'
     write(artifact, key, load(key))
 
-    # TODO - placeholder
     key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
-    write(artifact, key, data.csmr_300)
+    write(artifact, key, (data.csmr_298 + data.csmr_297))
 
 
 def compute_prevalence(art, data):
@@ -183,7 +169,6 @@ def compute_disability_weight(art, data):
 
     total_disability_weight = get_total_disability_weight(
         [data.prev_934, data.prev_946, data.prev_947], [data.dw_934, data.dw_946, data.dw_947])
-    logger.info(f'Disability wt. = {total_disability_weight.head()}')
 
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.disability_weight', total_disability_weight)
     write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.disability_weight', data.dw_300)
@@ -193,7 +178,6 @@ def compute_disability_weight(art, data):
 
     total_disability_weight = get_total_disability_weight(
         [data.prev_948, data.prev_949, data.prev_950], [data.dw_948, data.dw_949, data.dw_950])
-    logger.info(f'Disability wt. = {total_disability_weight.head()}')
 
     write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.disability_weight', total_disability_weight)
 
@@ -212,7 +196,6 @@ def load_em_from_meid(meid, location):
 def compute_transition_rates(art, data):
     logger.info('Computing transition_rates...')
 
-    # TODO - names acceptable???
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_LTBI_SUSCEPTIBLE_HIV}.transition_rate',
           data.get_filled_with(0.01))
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
