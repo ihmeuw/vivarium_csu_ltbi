@@ -1,1 +1,4 @@
+dismod_mr
+pymc
 drmaa
+networkx==2.3
