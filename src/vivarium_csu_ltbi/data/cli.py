@@ -36,7 +36,7 @@ def get_ltbi_incidence_input_data():
         logger.info("Pulling data.")
         p_ltbi, f_ltbi, csmr_all = load_data(country)
 
-        logger.info(f"Writing data to {art}.")
+        logger.info(f"Writing data to {input_artifact_path}.")
         art.write('cause.latent_tuberculosis_infection.prevalence', p_ltbi)
         art.write('cause.latent_tuberculosis_infection.excess_mortality', f_ltbi)
         art.write('cause.all_causes.cause_specific_mortality_rate', csmr_all)
