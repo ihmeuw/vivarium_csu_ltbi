@@ -20,7 +20,7 @@ def estimate_ltbi_incidence(country, draw):
     art = Artifact(str(input_artifact_path))
     p_ltbi = art.load('cause.latent_tuberculosis_infection.prevalence')
     f_ltbi = art.load('cause.latent_tuberculosis_infection.excess_mortality')
-    csmr_all = art.load('cause.ltbi_hiv.cause_specific_mortality_rate')
+    csmr_all = art.load('cause.all_causes.cause_specific_mortality_rate')
 
     output = []
     for sex in ['Female', 'Male']:
