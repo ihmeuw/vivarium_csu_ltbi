@@ -8,7 +8,8 @@ from vivarium_public_health.dataset_manager.artifact import Artifact
 from vivarium_cluster_tools.psimulate.utilities import get_drmaa
 
 from vivarium_csu_ltbi.data.ltbi_incidence_model import load_data
-from vivarium_csu_ltbi.data.ltbi_incidence_paths import get_input_artifact_path
+from vivarium_csu_ltbi.data.ltbi_incidence_paths import (get_input_artifact_path, get_intermediate_output_dir_path,
+                                                         get_output_artifact_path)
 import vivarium_csu_ltbi.data.ltbi_incidence_scripts as script
 
 drmaa = get_drmaa()
@@ -22,11 +23,14 @@ def get_ltbi_incidence_input_data():
     it to an Artifact. This severs our database dependency and avoids
     num_countries * 1k simultaneous requests."""
     for country in COUNTRIES:
-        logger.info(f"Processing {country}.")
+        logger.info(f"Removing old results for {country}.")  # to avoid stale data
         input_artifact_path = get_input_artifact_path(country)
         if input_artifact_path.is_file():
             input_artifact_path.unlink()
 
+    for country in COUNTRIES:
+        logger.info(f"Processing {country}.")
+        input_artifact_path = get_input_artifact_path(country)
         art = Artifact(str(input_artifact_path))
 
         logger.info("Pulling data.")
@@ -44,6 +48,14 @@ def get_ltbi_incidence_parallel(country):
     """Launch jobs to calculate 1k draws of ltbi incidence for a country and
     collect it in a single artifact.
     """
+    logger.info(f"Removing old results for {country}.")  # to avoid stale data
+    intermediate_output_path = get_intermediate_output_dir_path(country)
+    for f in intermediate_output_path.iterdir():
+        f.unlink()
+    output_artifact_path = get_output_artifact_path(country)
+    if output_artifact_path.is_file():
+        output_artifact_path.unlink()
+
     with drmaa.Session() as s:
         jt = s.createJobTemplate()
         jt.remoteCommand = shutil.which('python')
