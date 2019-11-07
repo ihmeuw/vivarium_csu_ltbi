@@ -64,7 +64,7 @@ def get_ltbi_incidence_parallel(country):
                                   "-N get_ltbi_incidence")
         jids = s.runBulkJobs(jt, 1, 1000, 1)
         parent_jid = jids[0].split('.')[0]
-        logger.info(f"Submitted array job ({parent_jid}) for calculating LTBI incidence.")
+        logger.info(f"Submitted array job ({parent_jid}) for calculating LTBI incidence in {country}.")
         jt.delete()
 
         jt = s.createJobTemplate()
@@ -74,5 +74,5 @@ def get_ltbi_incidence_parallel(country):
         jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=3:00:00 "
                                   f"-N collect_ltbi_incidence -hold_jid {parent_jid}")
         jid = s.runJob(jt)
-        logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence.")
+        logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {country}.")
         jt.delete()
