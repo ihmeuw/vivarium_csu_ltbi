@@ -60,8 +60,8 @@ def get_ltbi_incidence_parallel(country):
         jt = s.createJobTemplate()
         jt.remoteCommand = shutil.which('python')
         jt.args = [script.__file__, "estimate_ltbi_incidence", country]
-        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=1G -l fthread=1 -l h_rt=3:00:00 "
-                                  "-N get_ltbi_incidence")
+        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=1G -l fthread=1 -l h_rt=5:00:00 "
+                                  f"-N {country}_gltbi_inc")
         jids = s.runBulkJobs(jt, 1, 1000, 1)
         parent_jid = jids[0].split('.')[0]
         logger.info(f"Submitted array job ({parent_jid}) for calculating LTBI incidence in {country}.")
@@ -71,8 +71,8 @@ def get_ltbi_incidence_parallel(country):
         jt.workingDirectory = os.getcwd()
         jt.remoteCommand = shutil.which('python')
         jt.args = [script.__file__, "collect_ltbi_incidence", country]
-        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=3:00:00 "
-                                  f"-N collect_ltbi_incidence -hold_jid {parent_jid}")
+        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=5:00:00 "
+                                  f"-N {country}_cltbi_inc -hold_jid {parent_jid}")
         jid = s.runJob(jt)
         logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {country}.")
         jt.delete()
