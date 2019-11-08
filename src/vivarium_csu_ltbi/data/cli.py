@@ -84,10 +84,10 @@ def restart_ltbi_incidence_parallel(country):
     """Examine existing LTBI incidence data for `country` and submit jobs for
     any missing draws that may be present."""
 
-    output_artifact_path = get_output_artifact_path(country)
-    logger.info(f"Looking for missing draws in {output_artifact_path}.")
+    intermediate_output_path = get_intermediate_output_dir_path(country)
+    logger.info(f"Looking for missing draws in {intermediate_output_path}.")
 
-    exists = [int(f.split('.')[0]) for f in output_artifact_path.iterdir()]
+    exists = [int(f.stem.split('.')[0]) for f in intermediate_output_path.iterdir()]
     should = list(range(1000))
     missing = set(should).difference(set(exists))
 
@@ -95,7 +95,7 @@ def restart_ltbi_incidence_parallel(country):
         logger.info("No missing draws found. Existing now.")
         return
 
-    logger.info(f"Missing draws identified: {{missing}}.")
+    logger.info(f"Missing draws identified: {missing}.")
     with drmaa.Session() as s:
         jids = []
 
