@@ -103,7 +103,7 @@ def restart_ltbi_incidence_parallel(country):
         jt.remoteCommand = shutil.which('python')
         jt.args = [script.__file__, "estimate_ltbi_incidence", country]
         for draw in missing:
-            jt.nativeSpecification = (f"-v SGE_TASK_ID={int(draw)+1} -b y -P proj_cost_effect -q all.q -l fmem=1G "
+            jt.nativeSpecification = (f"-v TASK_ID={int(draw)+1} -b y -P proj_cost_effect -q all.q -l fmem=1G "
                                       f"-l fthread=1 -l h_rt=5:00:00 -N {country}_gltbi_inc")
             jid = s.runJob(jt)
             jids.append(jid)
