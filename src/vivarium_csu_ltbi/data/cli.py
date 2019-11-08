@@ -45,7 +45,7 @@ def get_ltbi_incidence_input_data():
 @click.command()
 @click.argument("country", type=click.Choice(COUNTRIES))
 def get_ltbi_incidence_parallel(country):
-    """Launch jobs to calculate 1k draws of ltbi incidence for a country and
+    """Launch jobs to calculate 1k draws of LTBI incidence for `country`` and
     collect it in a single artifact.
     """
     logger.info(f"Removing old results for {country}.")  # to avoid stale data
@@ -73,6 +73,49 @@ def get_ltbi_incidence_parallel(country):
         jt.args = [script.__file__, "collect_ltbi_incidence", country]
         jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=5:00:00 "
                                   f"-N {country}_cltbi_inc -hold_jid {parent_jid}")
+        jid = s.runJob(jt)
+        logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {country}.")
+        jt.delete()
+
+
+@click.command()
+@click.argument("country", type=click.Choice(COUNTRIES))
+def restart_ltbi_incidence_parallel(country):
+    """Examine existing LTBI incidence data for `country` and submit jobs for
+    any missing draws that may be present."""
+
+    output_artifact_path = get_output_artifact_path(country)
+    logger.info(f"Looking for missing draws in {output_artifact_path}.")
+
+    exists = [int(f.split('.')[0]) for f in output_artifact_path.iterdir()]
+    should = list(range(1000))
+    missing = set(should).difference(set(exists))
+
+    if not missing:
+        logger.info("No missing draws found. Existing now.")
+        return
+
+    logger.info(f"Missing draws identified: {{missing}}.")
+    with drmaa.Session() as s:
+        jids = []
+
+        jt = s.createJobTemplate()
+        jt.remoteCommand = shutil.which('python')
+        jt.args = [script.__file__, "estimate_ltbi_incidence", country]
+        for draw in missing:
+            jt.nativeSpecification = (f"-v SGE_TASK_ID={int(draw)+1} -b y -P proj_cost_effect -q all.q -l fmem=1G "
+                                      f"-l fthread=1 -l h_rt=5:00:00 -N {country}_gltbi_inc")
+            jid = s.runJob(jt)
+            jids.append(jid)
+            logger.info(f"Submitted job ({jid}) for calculating LTBI incidence for draw {draw} in {country}.")
+        jt.delete()
+
+        jt = s.createJobTemplate()
+        jt.workingDirectory = os.getcwd()
+        jt.remoteCommand = shutil.which('python')
+        jt.args = [script.__file__, "collect_ltbi_incidence", country]
+        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=5:00:00 "
+                                  f"-N {country}_cltbi_inc -hold_jid {','.join(jids)}")
         jid = s.runJob(jt)
         logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {country}.")
         jt.delete()
