@@ -44,7 +44,6 @@ def collect_ltbi_incidence(country):
     data = []
     for f in intermediate_output_path.iterdir():
         data.append(pd.read_hdf(f))
-        f.unlink()
     data = pd.concat(data, axis=0).reset_index()
     output_artifact_path = get_output_artifact_path(country)
     logger.info(f"Writing results to {output_artifact_path}.")
