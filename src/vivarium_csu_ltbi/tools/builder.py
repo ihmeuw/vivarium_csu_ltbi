@@ -28,6 +28,29 @@ class DataRepo:
         return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
 
+    def get_and_package_dismod_ltbi_incidence(self, loc):
+        # dismod format
+        # ['index',
+        #  'value',
+        #  'draw',
+        #  'location',
+        #  'age_group_start',
+        #  'age_group_end',
+        #  'sex',
+        #  'year_start',
+        #  'year_end',
+        #  'parameter']
+
+        datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.lower()}.hdf'
+        if datafile.exists():
+            store = pd.HDFStore(datafile)
+            data = store.get('/cause/latent_tuberculosis_infection/incidence')
+            # Todo - long draw format needs to be transformed to wide
+            # and multi index added
+        else:
+            raise ValueError(f'Error: dismod data "{datafile}" is missing.')
+
+
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
         self.csmr_297 = get_measure(entity_from_id(297), 'cause_specific_mortality_rate', loc)
@@ -48,6 +71,7 @@ class DataRepo:
         self.i_948 = get_measure(entity_from_id(948), 'incidence_rate', loc)
         self.i_949 = get_measure(entity_from_id(949), 'incidence_rate', loc)
         self.i_950 = get_measure(entity_from_id(950), 'incidence_rate', loc)
+        self.incidence_ltbi = self.get_and_package_dismod_ltbi_incidence(loc)
 
         logger.info('Pulling prevalence data')
         self.prev_297 = get_measure(entity_from_id(297), 'prevalence', loc)
@@ -197,7 +221,7 @@ def compute_transition_rates(art, data):
     logger.info('Computing transition_rates...')
 
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_LTBI_SUSCEPTIBLE_HIV}.transition_rate',
-          data.get_filled_with(0.01))
+          data.incidence_ltbi, skip_interval_processing=True)
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.i_300)
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_PROTECTED_TB_SUSCEPTIBLE_HIV}.transition_rate',
@@ -213,7 +237,7 @@ def compute_transition_rates(art, data):
     write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.get_zeros())
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
-          data.get_filled_with(0.01))
+          data.incidence_ltbi, skip_interval_processing=True)
     write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_PROTECTED_TB_POSITIVE_HIV}.transition_rate',
           data.get_zeros())
     write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
@@ -234,10 +258,13 @@ def create_new_artifact(path: str, location: str) -> Artifact:
     return art
 
 
-def write(artifact, key, data):
-    tmp = data.copy(deep='all') if isinstance(data, pd.core.frame.DataFrame) else data
-    tmp = split_interval(tmp, interval_column='age', split_column_prefix='age')
-    tmp = split_interval(tmp, interval_column='year', split_column_prefix='year')
+def write(artifact, key, data, skip_interval_processing=False):
+    if skip_interval_processing:
+        tmp = data
+    else:
+        tmp = data.copy(deep='all') if isinstance(data, pd.core.frame.DataFrame) else data
+        tmp = split_interval(tmp, interval_column='age', split_column_prefix='age')
+        tmp = split_interval(tmp, interval_column='year', split_column_prefix='year')
     if isinstance(tmp, pd.core.frame.DataFrame):
         assert 'age_end' in tmp.index.names
     artifact.write(key, tmp)
