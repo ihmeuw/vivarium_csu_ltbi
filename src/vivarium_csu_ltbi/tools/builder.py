@@ -34,10 +34,10 @@ class DataRepo:
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
             data['draw'] = data['draw'].apply(lambda x: f'draw_{x}')
+            data.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'}, inplace = True)
             result = pd.pivot_table(data,
                            index=['location', 'age_group_start', 'age_group_end', 'sex', 'year_start', 'year_end'],
                            columns='draw', values='value')
-            result.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'}, inplace = True)
             result.columns.name = ''
             return result
         else:
