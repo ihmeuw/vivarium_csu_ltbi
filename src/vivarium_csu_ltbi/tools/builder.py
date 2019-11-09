@@ -36,7 +36,7 @@ class DataRepo:
             data['draw'] = data['draw'].apply(lambda x: f'draw_{x}')
             data.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'}, inplace = True)
             result = pd.pivot_table(data,
-                           index=['location', 'age_group_start', 'age_group_end', 'sex', 'year_start', 'year_end'],
+                           index=['location', 'age_start', 'age_end', 'sex', 'year_start', 'year_end'],
                            columns='draw', values='value')
             result.columns.name = ''
             return result
