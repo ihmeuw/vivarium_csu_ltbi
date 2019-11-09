@@ -29,24 +29,16 @@ class DataRepo:
 
 
     def get_and_package_dismod_ltbi_incidence(self, loc):
-        # dismod format
-        # ['index',
-        #  'value',
-        #  'draw',
-        #  'location',
-        #  'age_group_start',
-        #  'age_group_end',
-        #  'sex',
-        #  'year_start',
-        #  'year_end',
-        #  'parameter']
-
         datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.lower()}.hdf'
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
-            # Todo - long draw format needs to be transformed to wide
-            # and multi index added
+            data['draw'] = data['draw'].apply(lambda x: f'draw_{x}')
+            result = pd.pivot_table(data,
+                           index=['location', 'age_group_start', 'age_group_end', 'sex', 'year_start', 'year_end'],
+                           columns='draw', values='value')
+            result.columns.name = ''
+            return result
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
