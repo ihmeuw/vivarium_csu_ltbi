@@ -56,9 +56,15 @@ if __name__ == "__main__":
     func = sys.argv[1]
     country = sys.argv[2]
     if func == 'estimate_ltbi_incidence':
-        draw = int(os.environ['SGE_TASK_ID']) - 1
+        if 'SGE_TASK_ID' in os.environ and os.environ['SGE_TASK_ID'] != 'undefined':
+            draw = int(os.environ['SGE_TASK_ID']) - 1
+        elif 'TASK_ID' in os.environ:
+            draw = int(os.environ['TASK_ID']) - 1
+        else:
+            raise ValueError("No task number given")
         estimate_ltbi_incidence(country, draw)
     elif func == 'collect_ltbi_incidence':
         collect_ltbi_incidence(country)
     else:
         raise ValueError(f"Bad first argument: {func}. Must be 'estimate_ltbi_incidence' or 'collect_ltbi_incidence'.")
+
