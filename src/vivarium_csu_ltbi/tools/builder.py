@@ -263,10 +263,14 @@ def write(artifact, key, data, skip_interval_processing=False):
     artifact.write(key, tmp)
 
 
+def get_output_artifact_path(country):
+    return DEFAULT_PATH / f'{country.replace(" ",  "_").lower()}.hdf'
+
+
 def build_ltbi_artifact(loc, output_dir=None):
     data = DataRepo()
     data.pull_data(loc)
-    out_path = f'{output_dir}/{loc}.hdf' if output_dir else f'{DEFAULT_PATH}/{loc}.hdf'
+    out_path = f'{loc.replace(" ",  "_").lower()}.hdf' if output_dir else get_output_artifact_path(loc)
     art = create_new_artifact(out_path, loc)
     write_demographic_data(art, loc, data)
     write_metadata(art, loc)
