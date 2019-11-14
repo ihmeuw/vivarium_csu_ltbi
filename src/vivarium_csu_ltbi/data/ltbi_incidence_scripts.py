@@ -10,7 +10,7 @@ from vivarium_csu_ltbi.data.ltbi_incidence_paths import (get_input_artifact_path
                                                          get_intermediate_output_dir_path)
 
 
-KNOTS = list(range(0, 101, 5))
+KNOTS = list(range(0, 101, 10))
 
 
 def estimate_ltbi_incidence(country, draw):
