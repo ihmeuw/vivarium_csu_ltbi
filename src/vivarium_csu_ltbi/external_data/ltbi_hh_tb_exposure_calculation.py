@@ -14,7 +14,8 @@ actb_names = ['drug_susceptible_tuberculosis',
 			  'hiv_aids_multidrug_resistant_tuberculosis_without_extensive_drug_resistance',
 			  'hiv_aids_extensively_drug_resistant_tuberculosis']
 
-def load_hh_data(country_name):
+def load_hh_data(country_name: str):
+	"""format household microdata"""
     if country_name == 'South Africa':
         country_name = 'South_Africa'
     df = pd.read_stata(master_dir + country_name + '.dta')
@@ -47,13 +48,14 @@ def interpolation(prev_actb: pd.DataFrame, df: pd.DataFrame, year_start: int, dr
 						   continuous_parameters=[['age', 'age_group_start', 'age_group_end']],
 						   order=0,
 						   extrapolate=True)
-	
+
 	df['pr_actb'] = interp(df).value
-	
 	return df
 
 def calc_pr_actb_in_hh(df: pd.DataFrame):
-	"""compute the probability that there is at least one person with active TB for each household"""
+	"""compute the probability that 
+	there is at least one person with active TB for each household
+	"""
 	pr_no_tb = 1 - df.pr_actb
 	pr_no_tb_in_hh = np.prod(pr_no_tb)
 	return 1 - pr_no_tb_in_hh
