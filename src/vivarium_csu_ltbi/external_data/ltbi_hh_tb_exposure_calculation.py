@@ -16,14 +16,14 @@ actb_names = ['drug_susceptible_tuberculosis',
 
 def load_hh_data(country_name: str):
 	"""format household microdata"""
-    if country_name == 'South Africa':
-        country_name = 'South_Africa'
-    df = pd.read_stata(master_dir + country_name + '.dta')
-    df['hh_id'] = df['hh_id'].astype(int)
-    df['sex'] = df['sex'].str.capitalize()
-    df['age'] = df['age'].replace('95+', 95)
-    df = df[df.age != "don't know"]
-    return df
+	if country_name == 'South Africa':
+		country_name = 'South_Africa'
+	df = pd.read_stata(master_dir + country_name + '.dta')
+	df['hh_id'] = df['hh_id'].astype(int)
+	df['sex'] = df['sex'].str.capitalize()
+	df['age'] = df['age'].replace('95+', 95)
+	df = df[df.age != "don't know"]
+	return df
 
 def load_and_transform(country_name: str):
 	"""output all-form TB prevalence"""
@@ -83,9 +83,13 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	"""
 	outputs = pd.DataFrame()
 	df_hh = load_hh_data(country_name)
+	hh_ids = df.hh_id.unique()
 	prev_actb = load_and_transform(country_name)
 	for draw in range(1000):
-		data = interpolation(prev_actb, df_hh, year_start, draw)
+		# boostrap HH data by resampling hh_id with replacement
+		sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
+		df_hh_sample = df_hh[df_hh.hh_id.isin(sample_hhids)]
+		data = interpolation(prev_actb, df_hh_sample, year_start, draw)
 		res = age_sex_specific_actb_prop(data)
 		res['location'] = country_name
 		res['year_start'] = year_start
@@ -95,7 +99,6 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	
 	outputs = outputs.set_index(index_cols)
 	return outputs
-
 
 
 
