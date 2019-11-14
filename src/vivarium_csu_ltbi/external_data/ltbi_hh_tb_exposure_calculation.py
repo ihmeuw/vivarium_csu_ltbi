@@ -6,7 +6,7 @@ from vivarium_inputs.interface import get_measure
 from vivarium_inputs.data_artifact.utilities import split_interval
 
 master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/literature/household_structure/microdata/'
-index_cols = ['draw', 'location', 'sex', 'age_start', 'age_end', 'year_start', 'year_end']
+index_cols = ['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']
 actb_names = ['drug_susceptible_tuberculosis', 
 			  'multidrug_resistant_tuberculosis_without_extensive_drug_resistance',
 			  'extensively_drug_resistant_tuberculosis',
@@ -36,7 +36,7 @@ def load_and_transform(country_name: str):
 
 	prev_actb = split_interval(prev_actb, interval_column='age', split_column_prefix='age_group')
 	prev_actb = split_interval(prev_actb, interval_column='year', split_column_prefix='year')
-	prev_actb = prev_actb.stack().reset_index().rename(columns={'level_6': 'draw', 0: 'value'})
+	prev_actb = prev_actb.reset_index().melt(id_vars=index_cols[:-1], var_name=['draw'])
 	prev_actb['draw'] = prev_actb.draw.map(lambda x: int(x.split('_')[1]))
 	
 	return prev_actb
@@ -66,13 +66,13 @@ def age_sex_specific_actb_prop(df: pd.DataFrame):
 	"""
 	age_bins = [0, 1] + list(range(5, 96, 5)) + [125]
 	res = pd.DataFrame()
-	for i, age_start in enumerate(age_bins[:-1]):
-		age_end = age_bins[i+1]
+	for i, age_group_start in enumerate(age_bins[:-1]):
+		age_group_end = age_bins[i+1]
 		for sex in ['Male', 'Female']:
-			hh_with = df.query(f'age >= {age_start} and age < {age_end} and sex == "{sex}"').hh_id.unique()
+			hh_with = df.query(f'age >= {age_group_start} and age < {age_group_end} and sex == "{sex}"').hh_id.unique()
 			prop = df[df.hh_id.isin(hh_with)].groupby('hh_id').apply(calc_pr_actb_in_hh)
 			prop_mean = prop.mean()
-			age_sex_res = pd.DataFrame({'age_start': [age_start], 'age_end': [age_end], 
+			age_sex_res = pd.DataFrame({'age_group_start': [age_group_start], 'age_group_end': [age_group_end], 
 										'sex': [sex], 'pr_actb_in_hh': [prop_mean]})
 			res = res.append(age_sex_res, ignore_index=True)
 	return res
@@ -83,12 +83,16 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	"""
 	outputs = pd.DataFrame()
 	df_hh = load_hh_data(country_name)
-	hh_ids = df.hh_id.unique()
+	hh_ids = df_hh.hh_id.unique()
 	prev_actb = load_and_transform(country_name)
+
 	for draw in range(1000):
 		# boostrap HH data by resampling hh_id with replacement
 		sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
-		df_hh_sample = df_hh[df_hh.hh_id.isin(sample_hhids)]
+		df_hh_sample = pd.DataFrame()
+		for i in sample_hhids:
+			df_hh_sample = df_hh_sample.append(df_hh[df_hh.hh_id == i])
+		
 		data = interpolation(prev_actb, df_hh_sample, year_start, draw)
 		res = age_sex_specific_actb_prop(data)
 		res['location'] = country_name
@@ -99,6 +103,5 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	
 	outputs = outputs.set_index(index_cols)
 	return outputs
-
 
 
