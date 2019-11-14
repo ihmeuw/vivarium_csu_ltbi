@@ -1,10 +1,11 @@
 import pandas as pd
+import numpy as np
 from gbd_mapping import causes
 from vivarium.interpolation import Interpolation
 from vivarium_inputs.interface import get_measure
 from vivarium_inputs.data_artifact.utilities import split_interval
 
-master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/literature/household_structure/'
+master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/literature/household_structure/microdata/'
 index_cols = ['draw', 'location', 'sex', 'age_start', 'age_end', 'year_start', 'year_end']
 actb_names = ['drug_susceptible_tuberculosis', 
 			  'multidrug_resistant_tuberculosis_without_extensive_drug_resistance',
@@ -12,6 +13,16 @@ actb_names = ['drug_susceptible_tuberculosis',
 			  'hiv_aids_drug_susceptible_tuberculosis',
 			  'hiv_aids_multidrug_resistant_tuberculosis_without_extensive_drug_resistance',
 			  'hiv_aids_extensively_drug_resistant_tuberculosis']
+
+def load_hh_data(country_name):
+    if country_name == 'South Africa':
+        country_name = 'South_Africa'
+    df = pd.read_stata(master_dir + country_name + '.dta')
+    df['hh_id'] = df['hh_id'].astype(int)
+    df['sex'] = df['sex'].str.capitalize()
+    df['age'] = df['age'].replace('95+', 95)
+    df = df[df.age != "don't know"]
+    return df
 
 def load_and_transform(country_name: str):
 	"""output all-form TB prevalence"""
@@ -69,7 +80,7 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	sweep over draw
 	"""
 	outputs = pd.DataFrame()
-	df_hh = pd.read_csv(master_dir + country_name + '.csv') # TO DO: prepare long-format country-specific HH microdata from the most recent survey
+	df_hh = load_hh_data(country_name)
 	prev_actb = load_and_transform(country_name)
 	for draw in range(1000):
 		data = interpolation(prev_actb, df_hh, year_start, draw)
@@ -82,7 +93,6 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	
 	outputs = outputs.set_index(index_cols)
 	return outputs
-
 
 
 
