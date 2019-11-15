@@ -1,6 +1,10 @@
 # disease name
 TUBERCULOSIS_AND_HIV = 'tuberculosis_and_hiv'
 
+# risk names
+HOUSEHOLD_TUBERCULOSIS = 'household_tuberculosis'
+RISK_DISTRIBUTION_TYPE = 'dichotomous'
+
 
 #  state names
 ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'

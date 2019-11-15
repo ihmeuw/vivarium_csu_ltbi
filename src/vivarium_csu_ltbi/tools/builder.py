@@ -109,6 +109,10 @@ def write_metadata(artifact, location):
     write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
+def write_exposure_type_key(art):
+    art.write( f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+
+
 def write_demographic_data(artifact, location, data):
     logger.info('Writing demographic data...')
     load = get_load(location)
@@ -274,10 +278,14 @@ def build_ltbi_artifact(loc, output_dir=None):
     art = create_new_artifact(out_path, loc)
     write_demographic_data(art, loc, data)
     write_metadata(art, loc)
+
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
+
+    write_exposure_type_key(art)
+
     logger.info('!!! Done !!!')
 
 
