@@ -15,18 +15,18 @@ actb_names = ['drug_susceptible_tuberculosis',
 			  'hiv_aids_extensively_drug_resistant_tuberculosis']
 
 def load_hh_data(country_name: str):
-    "format household microdata"
-    if country_name == 'South Africa':
-        country_name = 'South_Africa'
-    df = pd.read_stata(master_dir + country_name + '.dta')
-    df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
-    df['sex'] = df['sex'].str.capitalize()
-    if country_name == 'Philippines':
-        df['age'] = df['age'].replace('96+', 95)
-    else:
-        df['age'] = df['age'].replace('95+', 95)
-    df = df[df.age != "don't know"]
-    return df
+	"format household microdata"
+	if country_name == 'South Africa':
+		country_name = 'South_Africa'
+	df = pd.read_stata(master_dir + country_name + '.dta')
+	df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
+	df['sex'] = df['sex'].str.capitalize()
+	if country_name == 'Philippines':
+		df['age'] = df['age'].replace('96+', 95)
+	else:
+		df['age'] = df['age'].replace('95+', 95)
+	df = df[df.age != "don't know"]
+	return df
 
 def load_and_transform(country_name: str):
 	"""output all-form TB prevalence"""
