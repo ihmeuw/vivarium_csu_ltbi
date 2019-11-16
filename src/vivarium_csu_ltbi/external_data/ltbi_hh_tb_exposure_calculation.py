@@ -15,15 +15,18 @@ actb_names = ['drug_susceptible_tuberculosis',
 			  'hiv_aids_extensively_drug_resistant_tuberculosis']
 
 def load_hh_data(country_name: str):
-	"""format household microdata"""
-	if country_name == 'South Africa':
-		country_name = 'South_Africa'
-	df = pd.read_stata(master_dir + country_name + '.dta')
-	df['hh_id'] = df['hh_id'].astype(int)
-	df['sex'] = df['sex'].str.capitalize()
-	df['age'] = df['age'].replace('95+', 95)
-	df = df[df.age != "don't know"]
-	return df
+    "format household microdata"
+    if country_name == 'South Africa':
+        country_name = 'South_Africa'
+    df = pd.read_stata(master_dir + country_name + '.dta')
+    df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
+    df['sex'] = df['sex'].str.capitalize()
+    if country_name == 'Philippines':
+        df['age'] = df['age'].replace('96+', 95)
+    else:
+        df['age'] = df['age'].replace('95+', 95)
+    df = df[df.age != "don't know"]
+    return df
 
 def load_and_transform(country_name: str):
 	"""output all-form TB prevalence"""
@@ -87,7 +90,7 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	prev_actb = load_and_transform(country_name)
 
 	for draw in range(1000):
-		# boostrap HH data by resampling hh_id with replacement
+		# bootstrap HH data by resampling hh_id with replacement
 		sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
 		df_hh_sample = pd.DataFrame()
 		for i in sample_hhids:
@@ -103,5 +106,4 @@ def country_specific_outputs(country_name: str, year_start=2017):
 	
 	outputs = outputs.set_index(index_cols)
 	return outputs
-
 
