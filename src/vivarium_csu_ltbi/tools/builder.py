@@ -2,7 +2,7 @@ from pathlib import Path
 from loguru import logger
 import pandas as pd
 
-from gbd_mapping import causes
+from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
@@ -27,7 +27,6 @@ class DataRepo:
     def get_filled_with(self, fill_value):
         return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
-
     def get_and_package_dismod_ltbi_incidence(self, loc):
         datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.replace(" ", "_").lower()}.hdf'
         if datafile.exists():
@@ -43,6 +42,9 @@ class DataRepo:
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
+    def get_hh_tuberculosis_exposure(self, loc):
+        # TODO - proxy dichotomous exposure data
+        return get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -87,6 +89,9 @@ class DataRepo:
         self.dw_949 = get_measure(entity_from_id(949), 'disability_weight', loc)
         self.dw_950 = get_measure(entity_from_id(950), 'disability_weight', loc)
 
+        logger.info('Pulling risk/exposure data')
+        self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
+
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
 
@@ -109,8 +114,10 @@ def write_metadata(artifact, location):
     write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
-def write_exposure_type_key(art):
-    art.write( f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+def write_exposure_data(art, data):
+    # distribution type key
+    art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+    art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
 
 
 def write_demographic_data(artifact, location, data):
@@ -284,7 +291,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
 
-    write_exposure_type_key(art)
+    write_exposure_data(art, data)
 
     logger.info('!!! Done !!!')
 
