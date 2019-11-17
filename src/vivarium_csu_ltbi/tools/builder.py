@@ -135,12 +135,14 @@ def write_metadata(artifact, location):
 
 
 def write_exposure_data(art, data):
+    logger.info('In write_exposure_data...')
     # distribution type key
     art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
     art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
 
 
 def write_risk_data(art, data):
+    logger.info('In write_risk_data...')
     art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
 
 
@@ -316,6 +318,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_transition_rates(art, data)
 
     write_exposure_data(art, data)
+    write_risk_data(art, data)
 
     logger.info('!!! Done !!!')
 
