@@ -1,3 +1,4 @@
+import numpy as np
 from pathlib import Path
 from loguru import logger
 import pandas as pd
@@ -46,6 +47,24 @@ class DataRepo:
         # TODO - proxy dichotomous exposure data
         return get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
 
+    def get_hh_tuberculosis_risk(self, loc):
+        df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
+        df_flat = df.reset_index()
+
+        # duplicate lines because we have rates for 2 states
+        df_dup = df_flat.loc[np.repeat(df_flat.index.values, 2)].reset_index(drop=True)
+        df_dup.affected_measure.replace('incidence_rate', 'transition_rate', inplace=True)
+
+        # set the 2 states
+        idx_odd = df_dup.index.values % 2 == 1
+        idx_even = df_dup.index.values % 2 == 0
+        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_positive_hiv"
+        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_susceptible_hiv"
+
+        # reset the index
+        df_dup.set_index(['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+        return df_dup
+
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
         self.csmr_297 = get_measure(entity_from_id(297), 'cause_specific_mortality_rate', loc)
@@ -91,6 +110,7 @@ class DataRepo:
 
         logger.info('Pulling risk/exposure data')
         self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
+        self.risk_hhtb = self.get_hh_tuberculosis_risk(loc)
 
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
@@ -118,6 +138,10 @@ def write_exposure_data(art, data):
     # distribution type key
     art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
     art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
+
+
+def write_risk_data(art, data):
+    art.write(f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
 
 
 def write_demographic_data(artifact, location, data):
