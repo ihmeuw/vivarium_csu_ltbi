@@ -58,8 +58,8 @@ class DataRepo:
         # set the 2 states
         idx_odd = df_dup.index.values % 2 == 1
         idx_even = df_dup.index.values % 2 == 0
-        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_positive_hiv"
-        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_susceptible_hiv"
+        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
 
         # reset the index
         df_dup = df_dup.set_index(['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
@@ -236,6 +236,15 @@ def compute_disability_weight(art, data):
     write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.disability_weight', total_disability_weight)
 
 
+def compute_paf(art, data):
+    # RR: relative risk
+    # p: exposure
+    # RR * (p - 1) / (RR * (p - 1) + 1)
+    p_minus_one = data.exposure_hhtb - 1
+    paf = data.risk_hhtb * p_minus_one / data.risk_hhtb * p_minus_one + 1
+    write(art, f'etiology.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf)
+
+
 def load_em_from_meid(meid, location):
     location_id = utility_data.get_location_id(location)
     data = gbd.get_modelable_entity_draws(meid, location_id)
@@ -319,6 +328,7 @@ def build_ltbi_artifact(loc, output_dir=None):
 
     write_exposure_data(art, data)
     write_risk_data(art, data)
+    compute_paf(art, data)
 
     logger.info('!!! Done !!!')
 
