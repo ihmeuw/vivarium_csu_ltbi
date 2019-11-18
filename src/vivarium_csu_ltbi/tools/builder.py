@@ -62,7 +62,7 @@ class DataRepo:
         df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_susceptible_hiv"
 
         # reset the index
-        df_dup.set_index(['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+        df_dup = df_dup.set_index(['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
         return df_dup
 
     def pull_data(self, loc):
