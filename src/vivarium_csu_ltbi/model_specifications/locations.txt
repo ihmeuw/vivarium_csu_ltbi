@@ -8,4 +8,8 @@
 # location reporting hierarchy wherever possible. If using sub-national
 # locations, they may be found in GBD location set 35, the model
 # results location hierarchy.
-
+India
+South Africa
+Philippines
+Ethiopia
+Brazil
