@@ -34,13 +34,13 @@ def load_data(country_path: str):
 	
 	return df
 
-def get_sex_from_template(template_string):
+def get_sex_from_template(template_string: str):
 	return template_string.split('_among_')[1].split('_in_')[0].capitalize()
 
-def get_age_group_from_template(template_string):
+def get_age_group_from_template(template_string: str):
 	return template_string.split('_age_group_')[1]
 
-def standardize_shape(data, measure):
+def standardize_shape(data: pd.DataFrame, measure: str):
 	"""select specific measure of data and unpivot it into long-format dataframe"""
 	measure_data = data[[c for c in data.columns if measure in c]]
 	measure_data = measure_data.reset_index().melt(id_vars=['input_draw'], var_name=['label'])
@@ -57,7 +57,7 @@ def standardize_shape(data, measure):
 	measure_data.drop(columns='label', inplace=True)
 	return measure_data
 
-def get_disaggregated_results(data, cause_names):
+def get_disaggregated_results(data: pd.DataFrame, cause_names: list):
 	"""get disaggregated deaths, ylls, ylds, and dalys for each state"""
 	deaths = []
 	ylls = []
@@ -89,7 +89,7 @@ def get_disaggregated_results(data, cause_names):
 	
 	return output.reset_index()
 
-def append_demographic_aggregates(data, by_cause=False):
+def append_demographic_aggregates(data: pd.DataFrame, by_cause=False):
 	"""aggregate results on demographic groups and append it to input data"""
 	extra_cols = ['cause'] if by_cause else []
 	
@@ -106,7 +106,7 @@ def append_demographic_aggregates(data, by_cause=False):
 	
 	return data.reset_index()
 
-def append_cause_aggregates(data):
+def append_cause_aggregates(data: pd.DataFrame):
 	"""aggregate results on cause and append it to input data"""
 	cause_aggregate = data.groupby(template_cols[1:]).value.sum().reset_index()
 	cause_aggregate['cause'] = 'all_causes'
@@ -115,7 +115,7 @@ def append_cause_aggregates(data):
 	
 	return data.set_index(template_cols).sort_index().reset_index()
 
-def get_person_time(data):
+def get_person_time(data: pd.DataFrame):
 	"""aggregate person_time on demographic groups"""
 	pt = standardize_shape(data, 'person_time')
 	pt_agg = append_demographic_aggregates(pt, by_cause=False)
