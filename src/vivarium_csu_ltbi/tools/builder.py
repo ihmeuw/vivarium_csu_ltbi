@@ -121,6 +121,10 @@ class DataRepo:
         self.dw_949 = get_measure(entity_from_id(949), 'disability_weight', loc)
         self.dw_950 = get_measure(entity_from_id(950), 'disability_weight', loc)
 
+        logger.info('Pulling risk/exposure data')
+        self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
+        self.risk_hhtb = self.get_hh_tuberculosis_risk(loc)
+
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
 
@@ -330,6 +334,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
+    write_exposure_risk_data(art, data)
     logger.info('!!! Done !!!')
 
 
