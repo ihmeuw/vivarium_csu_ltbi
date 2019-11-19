@@ -16,6 +16,12 @@ PROJ_NAME = 'vivarium_csu_ltbi'
 DEFAULT_PATH = gbd.ARTIFACT_FOLDER / PROJ_NAME
 
 
+def set_to_known_value(df, set_to):
+    for col in df.columns:
+        df[col].values[:] = set_to
+    return df
+
+
 class DataRepo:
 
     def __init__(self):
@@ -29,7 +35,7 @@ class DataRepo:
         return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
     def get_and_package_dismod_ltbi_incidence(self, loc):
-        datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.replace(" ", "_").lower()}.hdf'
+        datafile = DEFAULT_PATH / 'ltbi_incidence' / 'knot10' / f'{loc.replace(" ", "_").lower()}.hdf'
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
@@ -44,8 +50,9 @@ class DataRepo:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
     def get_hh_tuberculosis_exposure(self, loc):
-        # TODO - proxy dichotomous exposure data
-        return get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
+        KNOWN_VALUE = 0.5
+        df = get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
+        return set_to_known_value(df, KNOWN_VALUE)
 
     def get_hh_tuberculosis_risk(self, loc):
         df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
@@ -62,8 +69,19 @@ class DataRepo:
         df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
 
         # reset the index
-        df_dup = df_dup.set_index(['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
-        return df_dup
+        df_dup = df_dup.set_index(
+            ['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+
+        # manufacture data
+        n_rows = len(df_dup.index)
+        data = np.ones([n_rows, 1000])
+        even = list(range(0, n_rows, 2))
+        odd = list(range(1, n_rows, 2))
+        data[even] = data[even] * 2
+        data[odd] = data[odd] * 3
+
+        return pd.DataFrame(data, df_dup.index, [f'draw_{i}' for i in range(0, 1000)])
+
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -134,16 +152,23 @@ def write_metadata(artifact, location):
     write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
-def write_exposure_data(art, data):
-    logger.info('In write_exposure_data...')
-    # distribution type key
+def write_exposure_risk_data(art, data):
+    logger.info('In write_exposure_risk_data...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
 
-
-def write_risk_data(art, data):
-    logger.info('In write_risk_data...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
+
+    # build paf data
+    ridx = data.risk_hhtb.index.copy()
+    ridx = ridx.droplevel('parameter')
+    one_minus_exp = 1.0 - data.exposure_hhtb.values
+    num = ((data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp) - 1
+    den = (data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp
+    paf = num / den
+    df_paf = pd.DataFrame(paf, ridx, [f'draw_{i}' for i in range(0, 1000)])
+
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', df_paf)
 
 
 def write_demographic_data(artifact, location, data):
@@ -236,15 +261,6 @@ def compute_disability_weight(art, data):
     write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.disability_weight', total_disability_weight)
 
 
-def compute_paf(art, data):
-    # RR: relative risk
-    # p: exposure
-    # RR * (p - 1) / (RR * (p - 1) + 1)
-    p_minus_one = data.exposure_hhtb - 1
-    paf = data.risk_hhtb * p_minus_one / data.risk_hhtb * p_minus_one + 1
-    write(art, f'etiology.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf)
-
-
 def load_em_from_meid(meid, location):
     location_id = utility_data.get_location_id(location)
     data = gbd.get_modelable_entity_draws(meid, location_id)
@@ -326,9 +342,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
 
-    write_exposure_data(art, data)
-    write_risk_data(art, data)
-    compute_paf(art, data)
+    write_exposure_risk_data(art, data)
 
     logger.info('!!! Done !!!')
 
