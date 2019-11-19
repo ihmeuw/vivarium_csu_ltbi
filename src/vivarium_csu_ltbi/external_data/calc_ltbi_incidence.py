@@ -4,6 +4,7 @@ import dismod_mr
 import pymc as pm
 from gbd_mapping import causes
 from vivarium_inputs.interface import get_measure
+from vivarium_inputs.data_artifact.utilities import split_interval
 
 country_names = ['South Africa', 'India', 'Philippines', 'Ethiopia', 'Brazil']
 index_cols = ['draw', 'location', 'sex', 'age_group_start', 'age_group_end', 'year_start', 'year_end']
@@ -18,31 +19,34 @@ def load_data(country_name: str):
 	"""output LTBI prevalence, LTBI excess mortality, and All Causes cause-specific mortality"""
 	p_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', country_name)
 	
-	i_actb = p_ltbi.drop('value', axis=1)
-	i_actb['value'] = 0.0
-	i_actb = i_actb.set_index(index_cols)
+	i_actb = pd.DataFrame(0.0, index=p_ltbi.index, columns=['draw_' + str(i) for i in range(1000)])
 	# aggregate all child active TB causes incidence to obtain all-form active TB incidence
 	for actb in actb_names:
-		i_actb += get_measure(getattr(causes, actb), 'incidence', country_name).set_index(index_cols)
+		i_actb += get_measure(getattr(causes, actb), 'incidence', country_name)
 	
-	f_ltbi = i_actb / p_ltbi.set_index(index_cols)
-	f_ltbi = f_ltbi.reset_index()
+	f_ltbi = i_actb / p_ltbi
 	csmr_all = get_measure(causes.all_causes, 'cause_specific_mortality', country_name)
 	return p_ltbi, f_ltbi, csmr_all
 
-def format_for_dismod(df: pd.DataFrame, draw: int, sex: str, year: int, data_type: str):
+def format_for_dismod(data: pd.DataFrame, draw: int, sex: str, year: int, data_type: str):
 	"""prepare data into dismod format"""
-	df = df.query(f'draw == {draw} and sex == "{sex}" and year_start == {year}').copy()
-	df['data_type'] = data_type
-	df['area'] = 'all'
-	df['sex'] = 'total'
-	df['standard_error'] = 0.01
-	df['upper_ci'] = np.nan
-	df['lower_ci'] = np.nan
-	df['effective_sample_size'] = 1_000
+	df = data.copy()
+	df = split_interval(df, interval_column='age', split_column_prefix='age_group')
+	df = split_interval(df, interval_column='year', split_column_prefix='year')
+	df = df.stack().reset_index().rename(columns={'level_6': 'draw', 0: 'value'})
+	df['draw'] = df.draw.map(lambda x: int(x.split('_')[1]))
 	
-	df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'})
-	return df
+	df_sub = df.query(f'draw == {draw} and sex == "{sex}" and year_start == {year}').reset_index(drop=True)
+	df_sub['data_type'] = data_type
+	df_sub['area'] = 'all'
+	df_sub['sex'] = 'total'
+	df_sub['standard_error'] = 0.01
+	df_sub['upper_ci'] = np.nan
+	df_sub['lower_ci'] = np.nan
+	df_sub['effective_sample_size'] = 1_000
+	
+	df_sub = df_sub.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'})
+	return df_sub
 
 def make_disease_model(p: pd.DataFrame, f: pd.DataFrame, m_all: pd.DataFrame, knots: list):
 	dm = dismod_mr.data.ModelData()
