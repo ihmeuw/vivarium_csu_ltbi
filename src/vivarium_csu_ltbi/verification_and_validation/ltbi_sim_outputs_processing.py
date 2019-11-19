@@ -1,17 +1,14 @@
 import pandas as pd
-import numpy as np
-
 import yaml
 import warnings
 
 result_dir = '/share/costeffectiveness/vivarium_csu_ltbi/'
-country_names = ['brazil', 'ethiopia', 'india', 'philippines', 'south_africa']
 
-path_for_location = {'brazil': result_dir + 'brazil/2019_11_12_22_39_17',
-					 'ethiopia': result_dir + 'ethiopia/2019_11_12_19_23_10',
-					 'india': result_dir + 'india/2019_11_12_19_20_29',
-					 'philippines': result_dir + 'philippines/2019_11_12_22_40_56',
-					 'south_africa': result_dir + 'south_africa/2019_11_12_19_24_48'}
+path_for_location = {'Brazil': result_dir + 'brazil/2019_11_12_22_39_17',
+					 'Ethiopia': result_dir + 'ethiopia/2019_11_12_19_23_10',
+					 'India': result_dir + 'india/2019_11_12_19_20_29',
+					 'Philippines': result_dir + 'philippines/2019_11_12_22_40_56',
+					 'South Africa': result_dir + 'south_africa/2019_11_12_19_24_48'}
 
 cause_names = ['ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'protected_tb_susceptible_hiv',
 			   'ltbi_positive_hiv', 'activetb_positive_hiv', 'protected_tb_positive_hiv',
