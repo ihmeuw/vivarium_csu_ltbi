@@ -14,6 +14,7 @@ actb_names = ['drug_susceptible_tuberculosis',
 			  'hiv_aids_multidrug_resistant_tuberculosis_without_extensive_drug_resistance',
 			  'hiv_aids_extensively_drug_resistant_tuberculosis']
 
+
 def load_hh_data(country_name: str):
 	"format household microdata"
 	if country_name == 'South Africa':
@@ -27,6 +28,7 @@ def load_hh_data(country_name: str):
 		df['age'] = df['age'].replace('95+', 95)
 	df = df[df.age != "don't know"]
 	return df
+
 
 def load_and_transform(country_name: str):
 	"""output all-form TB prevalence"""
