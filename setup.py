@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     install_requirements = [
         'vivarium==0.8.24',
-        'vivarium_public_health==0.9.18',
+        'vivarium_public_health==0.9.19',
         'vivarium_cluster_tools==1.0.14',
         'vivarium_inputs[data]==3.0.1',
         
