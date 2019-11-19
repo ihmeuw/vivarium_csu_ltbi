@@ -3,14 +3,14 @@ import os
 import pandas as pd
 from loguru import logger
 
-from vivarium_public_health.dataset_manager.artifact import Artifact
+from vivarium import Artifact
 
 from vivarium_csu_ltbi.data.ltbi_incidence_model import format_for_dismod, fit_and_predict, format_for_art
 from vivarium_csu_ltbi.data.ltbi_incidence_paths import (get_input_artifact_path, get_output_artifact_path,
                                                          get_intermediate_output_dir_path)
 
 
-KNOTS = list(range(0, 101, 10))
+KNOTS = list(range(0, 101, 20))
 
 
 def estimate_ltbi_incidence(country, draw):
