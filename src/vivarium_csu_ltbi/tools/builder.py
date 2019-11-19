@@ -1,8 +1,10 @@
+
 from pathlib import Path
 from loguru import logger
 import pandas as pd
+import numpy as np
 
-from gbd_mapping import causes
+from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
@@ -43,6 +45,38 @@ class DataRepo:
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
+    def get_hh_tuberculosis_exposure(self, loc):
+        KNOWN_VALUE = 0.5
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
+        df.loc[:, :] = KNOWN_VALUE
+        return df
+
+    def get_hh_tuberculosis_risk(self, loc):
+        df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
+        df_flat = df.reset_index()
+
+        # duplicate lines because we have rates for 2 states
+        df_dup = df_flat.loc[np.repeat(df_flat.index.values, 2)].reset_index(drop=True)
+        df_dup.affected_measure.replace('incidence_rate', 'transition_rate', inplace=True)
+
+        # set the 2 states
+        idx_odd = df_dup.index.values % 2 == 1
+        idx_even = df_dup.index.values % 2 == 0
+        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+
+        # reset the index
+        df_dup = df_dup.set_index(
+            ['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+
+        n_rows = len(df_dup.index)
+        data = np.ones([n_rows, 1000])
+        even = list(range(0, n_rows, 2))
+        odd = list(range(1, n_rows, 2))
+        data[even] = data[even] * 2
+        data[odd] = data[odd] * 3
+
+        return pd.DataFrame(data, df_dup.index, [f'draw_{i}' for i in range(0, 1000)])
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -124,6 +158,24 @@ def write_demographic_data(artifact, location, data):
 
     key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
     write(artifact, key, (data.csmr_298 + data.csmr_297))
+
+
+def write_exposure_risk_data(art, data):
+    logger.info('In write_exposure_risk_data...')
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
+
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
+
+    # build paf data
+    ridx = data.risk_hhtb.index.copy()
+    one_minus_exp = 1.0 - data.exposure_hhtb.values
+    num = ((data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp) - 1
+    den = (data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp
+    paf = num / den
+    df_paf = pd.DataFrame(paf, ridx, [f'draw_{i}' for i in range(0, 1000)])
+
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', df_paf)
 
 
 def compute_prevalence(art, data):
