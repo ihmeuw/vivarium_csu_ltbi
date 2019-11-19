@@ -131,3 +131,5 @@ def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
 							('rate', 'mean'), ('rate', '2.5%'), ('rate', '97.5%'),
 							('person_time', 'mean'), ('person_time', '2.5%'), ('person_time', '97.5%')])
 	return table_shell
+
+	
