@@ -68,5 +68,6 @@ if __name__ == "__main__":
             get_ltbi_incidence_input_data=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_input_data
             get_ltbi_incidence_parallel=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_parallel
             restart_ltbi_incidence_parallel=vivarium_csu_ltbi.data.cli:restart_ltbi_incidence_parallel
+            get_household_tb_input_data=vivarium_csu_ltbi.data.cli:get_household_tb_input_data
         '''
     )
