@@ -4,7 +4,7 @@ import os
 import click
 from loguru import logger
 
-from vivarium_public_health.dataset_manager.artifact import Artifact
+from vivarium import Artifact
 from vivarium_cluster_tools.psimulate.utilities import get_drmaa
 
 from vivarium_csu_ltbi.data.ltbi_incidence_model import load_data
