@@ -100,47 +100,44 @@ def make_plots(cause: str, sim_results: pd.DataFrame, gbd_results: pd.DataFrame,
     sim_results = sim_results.set_index(['cause', 'sex', 'measure']).sort_index().reset_index()
     sim_data = sim_results.loc[sim_results.cause == cause]
     sim_data['rate'] = sim_data['value'] / sim_data['person_time'] * 100_000
-
+    
     sim_mean = sim_data.groupby(template_cols[:-1]).rate.mean().reset_index()
     sim_mean = sim_mean.loc[sim_mean.age_group.map(age_dict).sort_values().index]
     sim_mean = sim_mean.set_index(['cause', 'sex', 'measure']).sort_index().reset_index()
-
+    
     gbd_data = gbd_results.loc[(gbd_results.sex != 'Both') & (gbd_results.cause == cause)]
-
+    
     measure_s = sim_data.loc[sim_data.measure == measure]
     measure_m = sim_mean.loc[sim_mean.measure == measure]
     measure_g = gbd_data.loc[gbd_data.measure == measure]
-
+    
     fig, ax = plt.subplots(figsize=(20, 10))
     clrs = sns.color_palette('husl', 2)
 
-    g1 = sns.catplot(x='age_group', y='rate',
-                     hue='sex', palette=clrs,
-                     alpha=0.2, ax=ax,
-                     data=measure_s)
-    sns.scatterplot(x='age_group', y='rate',
-                    hue='sex', palette=clrs,
-                    s=300, marker='P',
-                    ax=ax, legend=False,
-                    data=measure_m)
-    sns.lineplot(x='age_group', y='val',
-                 hue='sex', palette=clrs,
-                 linewidth=2, ax=ax,
-                 sort=False,
-                 data=measure_g)
+    g1 = sns.catplot(x='age_group', y='rate', 
+                     hue='sex', palette=clrs, alpha=0.2, 
+                     ax=ax, data=measure_s)
+
+    sns.lineplot(x='age_group', y='val', 
+                 hue='sex', palette=clrs, linewidth=2,
+                 ax=ax, data=measure_g, sort=False)
 
     for i, sex in enumerate(['Female', 'Male']):
         sex_g = measure_g.loc[measure_g.sex == sex]
         ax.fill_between(sex_g.age_group, sex_g.upper, sex_g.lower, alpha=0.3, facecolor=clrs[i])
-
+        
+        sex_m = measure_m.loc[measure_m.sex == sex]
+        ax.scatter(sex_m.age_group, sex_m.rate, s=250, color=clrs[i], marker='P', label=f'Sim {sex} mean')
+        
     ax.set_title(f'{location}, {measure.capitalize()} due to {cause}', fontsize=20)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=60, fontsize=16)
+    ax.set_xticks([c-0.2 for c in range(23)])
     ax.set_xlabel('Age group', fontsize=18)
     ax.set_ylabel(f'{measure.capitalize()} per 100k PY', fontsize=18)
 
-    l = ax.legend(loc='best')
+    l = ax.legend(loc=(1.02, 0.05), fontsize=12)
     labels = ['GBD Female', 'GBD Male', 'Sim Female', 'Sim Male']
-    for text, label in zip(l.texts[1:], labels):
+    for text, label in zip(l.texts[1:5], labels):
         text.set_text(label)
 
     plt.close(g1.fig)
