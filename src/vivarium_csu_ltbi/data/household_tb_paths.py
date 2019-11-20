@@ -14,8 +14,8 @@ def get_input_data_path(country):
         'ethiopia': 'Ethiopia',
         'brazil': 'Brazil'
     }
-    data_path = Path("/home/j/Project/simulation_science/latent_tuberculosis_infection/literature/household_structure/"
-                     "microdata/")
+    data_path = Path("/home/j/Project/simulation_science/latent_tuberculosis_infection/"
+                     "literature/household_structure/microdata/")
     input_data_file = data_path / f"{file_names[formatted_country(country)]}.dta"
     return input_data_file
 

@@ -1,16 +1,18 @@
 import pandas as pd
 import numpy as np
+
 from gbd_mapping import causes
 from vivarium.interpolation import Interpolation
 from vivarium_inputs.interface import get_measure
 from vivarium_inputs.data_artifact.utilities import split_interval
 
-from vivarium_csu_ltbi.data.household_tb_paths import get_input_data_path
+from vivarium_csu_ltbi.data import household_tb_paths
 from vivarium_csu_ltbi.data.globals import ACTIVE_TB_NAMES, formatted_country
 
 
 def load_household_input_data(country: str):
-    input_data_path = get_input_data_path(country)
+    input_data_path = household_tb_paths.get_input_data_path(country)
+
     df = pd.read_stata(input_data_path)
     df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
     df['sex'] = df['sex'].str.capitalize()
@@ -20,12 +22,12 @@ def load_household_input_data(country: str):
         df['age'] = df['age'].replace('95+', 95)
     df = df[df.age != "don't know"]
     df['age'] = df['age'].astype(float)
+
     return df
 
 
 def load_actb_prevalence_input_data(country: str):
     """output all-form TB prevalence"""
-
     prev_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', country)
     prev_actb = pd.DataFrame(0.0, index=prev_ltbi.index, columns=['draw_' + str(i) for i in range(1000)])
 
@@ -55,8 +57,8 @@ def interpolation(prev_actb: pd.DataFrame, df: pd.DataFrame, year_start: int, dr
 
 
 def calc_pr_actb_in_hh(df: pd.DataFrame):
-    """compute the probability that
-    there is at least one person with active TB for each household
+    """compute the probability that there is at least one person with active TB
+    for each household
     """
     pr_no_tb = 1 - df.pr_actb
     pr_no_tb_in_hh = np.prod(pr_no_tb)
