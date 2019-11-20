@@ -2,6 +2,7 @@
 
 COUNTRIES = ['South Africa', 'India', 'Philippines', 'Ethiopia', 'Brazil']
 
+
 def formatted_country(country):
     return country.replace(" ", "_").lower()
 
