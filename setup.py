@@ -17,16 +17,17 @@ if __name__ == "__main__":
         long_description = f.read()
 
     install_requirements = [
-        'vivarium==0.8.24',
-        'vivarium_public_health==0.9.19',
-        'vivarium_cluster_tools==1.0.15',
-        'vivarium_inputs[data]==3.0.1',
+        'vivarium==0.9.1',
+        'vivarium_public_health==0.10.0',
+        'vivarium_cluster_tools==1.1.0',
+        'vivarium_inputs[data]==3.1.0',
         
         # These are pinned for internal dependencies on IHME libraries
         'numpy<=1.15.4',
         'tables<=3.4.0',
-        'pandas<0.25',        
-        
+        'pandas<0.25',
+
+        'loguru',
         'scipy',
         'matplotlib',
         'seaborn',
@@ -63,5 +64,9 @@ if __name__ == "__main__":
         entry_points='''
             [console_scripts]
             make_specs=vivarium_csu_ltbi.tools.cli:make_specs
+            build_ltbi_artifact=vivarium_csu_ltbi.tools.build_ltbi_artifact:build_artifact
+            get_ltbi_incidence_input_data=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_input_data
+            get_ltbi_incidence_parallel=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_parallel
+            restart_ltbi_incidence_parallel=vivarium_csu_ltbi.data.cli:restart_ltbi_incidence_parallel
         '''
     )
