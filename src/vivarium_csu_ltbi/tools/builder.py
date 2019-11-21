@@ -52,31 +52,28 @@ class DataRepo:
         return df
 
     def get_hh_tuberculosis_risk(self, loc):
-        df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
-        df_flat = df.reset_index()
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'relative_risk', loc)
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
 
-        # duplicate lines because we have rates for 2 states
-        df_dup = df_flat.loc[np.repeat(df_flat.index.values, 2)].reset_index(drop=True)
-        df_dup.affected_measure.replace('incidence_rate', 'transition_rate', inplace=True)
+        df = df.reset_index()
+        df = df.loc[df.affected_entity == 'diarrheal_diseases']
 
-        # set the 2 states
-        idx_odd = df_dup.index.values % 2 == 1
-        idx_even = df_dup.index.values % 2 == 0
-        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
-        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        df.affected_entity = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        df.affected_measure = 'transition_rate'
 
-        # reset the index
-        df_dup = df_dup.set_index(
-            ['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+        df.loc[df.parameter == 'cat2', [c for c in df.columns if 'draw' in c]] = 1.0
+        df.loc[df.parameter == 'cat1', [c for c in df.columns if 'draw' in c]] = 3.0
 
-        n_rows = len(df_dup.index)
-        data = np.ones([n_rows, 1000])
-        even = list(range(0, n_rows, 2))
-        odd = list(range(1, n_rows, 2))
-        data[even] = data[even] * 2
-        data[odd] = data[odd] * 3
+        hiv_positive = df.copy()
+        hiv_negative = df.copy()
 
-        return pd.DataFrame(data, df_dup.index, [f'draw_{i}' for i in range(0, 1000)])
+        hiv_negative.affected_entity = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+        hiv_negative.loc[hiv_negative.parameter == 'cat1', [c for c in hiv_negative.columns if 'draw' in c]] = 2.0
+
+        data = pd.concat([hiv_positive, hiv_negative], ignore_index=True)
+        data = data.set_index([c for c in data.columns if 'draw' not in c])
+        return data
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -172,14 +169,12 @@ def write_exposure_risk_data(art, data):
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
 
     # build paf data
-    ridx = data.risk_hhtb.index.copy()
-    one_minus_exp = 1.0 - data.exposure_hhtb.values
-    num = ((data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp) - 1
-    den = (data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp
+    one_minus_exp = 1.0 - data.exposure_hhtb
+    risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
+    num = (risk_by_exposure + one_minus_exp) - 1
+    den = risk_by_exposure + one_minus_exp
     paf = num / den
-    df_paf = pd.DataFrame(paf, ridx, [f'draw_{i}' for i in range(0, 1000)])
-
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', df_paf)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf)
 
 
 def compute_prevalence(art, data):
