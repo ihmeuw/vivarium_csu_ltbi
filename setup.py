@@ -27,6 +27,7 @@ if __name__ == "__main__":
         'tables<=3.4.0',
         'pandas<0.25',
 
+        'dismod_mr',
         'loguru',
         'scipy',
         'matplotlib',
