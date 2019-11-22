@@ -1,8 +1,9 @@
 from pathlib import Path
 from loguru import logger
 import pandas as pd
+import numpy as np
 
-from gbd_mapping import causes
+from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
@@ -43,6 +44,38 @@ class DataRepo:
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
+    def get_hh_tuberculosis_exposure(self, loc):
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
+        df.loc[df.index.get_level_values(level='parameter') == 'cat1'] = 0.1
+        df.loc[df.index.get_level_values(level='parameter') == 'cat2'] = 0.9
+
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
+        return df
+
+    def get_hh_tuberculosis_risk(self, loc):
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'relative_risk', loc)
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
+
+        df = df.reset_index()
+        df = df.loc[df.affected_entity == 'diarrheal_diseases']
+
+        df.affected_entity = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        df.affected_measure = 'transition_rate'
+
+        df.loc[df.parameter == 'cat2', [c for c in df.columns if 'draw' in c]] = 1.0
+        df.loc[df.parameter == 'cat1', [c for c in df.columns if 'draw' in c]] = 3.0
+
+        hiv_positive = df.copy()
+        hiv_negative = df.copy()
+
+        hiv_negative.affected_entity = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+        hiv_negative.loc[hiv_negative.parameter == 'cat1', [c for c in hiv_negative.columns if 'draw' in c]] = 2.0
+
+        data = pd.concat([hiv_positive, hiv_negative], ignore_index=True)
+        data = data.set_index([c for c in data.columns if 'draw' not in c])
+        return data
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -87,6 +120,10 @@ class DataRepo:
         self.dw_949 = get_measure(entity_from_id(949), 'disability_weight', loc)
         self.dw_950 = get_measure(entity_from_id(950), 'disability_weight', loc)
 
+        logger.info('Pulling risk/exposure data')
+        self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
+        self.risk_hhtb = self.get_hh_tuberculosis_risk(loc)
+
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
 
@@ -124,6 +161,24 @@ def write_demographic_data(artifact, location, data):
 
     key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
     write(artifact, key, (data.csmr_298 + data.csmr_297))
+
+
+def write_exposure_risk_data(art, data):
+    logger.info('In write_exposure_risk_data...')
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
+
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
+
+    # build paf data
+    one_minus_exp = 1.0 - data.exposure_hhtb
+    risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
+    num = (risk_by_exposure + one_minus_exp) - 1
+    den = risk_by_exposure + one_minus_exp
+    paf = num / den
+    paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
+    paf.index = paf.index.droplevel(4)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
@@ -278,6 +333,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
+    write_exposure_risk_data(art, data)
     logger.info('!!! Done !!!')
 
 
