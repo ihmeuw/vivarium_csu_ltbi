@@ -23,11 +23,13 @@ def estimate_household_tb(country: str, draw: int, year_start=2017):
     prev_actb = art.load("cause.activate_tuberculosis.prevalence")
 
     logger.info(f"Estimating household TB for draw: {draw}.")
-    sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
-    df_hh_sample = pd.DataFrame()
-    for i in sample_hhids:
-        df_hh_sample = df_hh_sample.append(df_hh[df_hh.hh_id == i])
 
+    logger.info("Re-sampling households.")
+    sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
+    df_hh = df_hh.set_index("hh_id")
+    df_hh_sample = df_hh.loc[sample_hhids].reset_index()
+
+    logger.info("Interpolating household TB exposure.")
     data = household_tb_model.interpolation(prev_actb, df_hh_sample, year_start, draw)
     res = household_tb_model.age_sex_specific_actb_prop(data)
     res['location'] = country
