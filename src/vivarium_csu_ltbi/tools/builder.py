@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from loguru import logger
 import pandas as pd
@@ -46,9 +45,12 @@ class DataRepo:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
     def get_hh_tuberculosis_exposure(self, loc):
-        KNOWN_VALUE = 0.5
         df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
-        df.loc[:, :] = KNOWN_VALUE
+        df.loc[df.index.get_level_values(level='parameter') == 'cat1'] = 0.1
+        df.loc[df.index.get_level_values(level='parameter') == 'cat2'] = 0.9
+
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
         return df
 
     def get_hh_tuberculosis_risk(self, loc):
@@ -164,17 +166,22 @@ def write_demographic_data(artifact, location, data):
 def write_exposure_risk_data(art, data):
     logger.info('In write_exposure_risk_data...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
 
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
 
     # build paf data
+    logger.info('In write_exposure_risk_data Before paf...')
     one_minus_exp = 1.0 - data.exposure_hhtb
     risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
     num = (risk_by_exposure + one_minus_exp) - 1
     den = risk_by_exposure + one_minus_exp
+    logger.info('In write_exposure_risk_data Before paf division...')
     paf = num / den
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf)
+    paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
+    paf.index = paf.index.droplevel(4)
+    logger.info('In write_exposure_risk_data Before writing paf...')
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
