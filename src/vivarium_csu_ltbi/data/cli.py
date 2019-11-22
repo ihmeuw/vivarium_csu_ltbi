@@ -159,7 +159,7 @@ def get_household_tb_parallel(country):
         jt = s.createJobTemplate()
         jt.remoteCommand = shutil.which('python')
         jt.args = [hh_tb_script.__file__, "estimate_household_tb", country]
-        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=1G -l fthread=1 -l h_rt=5:00:00 "
+        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=3G -l fthread=1 -l h_rt=2:00:00 "
                                   f"-N {formatted_country(country)}_ghh_tb_exp")
         jids = s.runBulkJobs(jt, 1, 1000, 1)
         parent_jid = jids[0].split('.')[0]
@@ -170,7 +170,7 @@ def get_household_tb_parallel(country):
         jt.workingDirectory = os.getcwd()
         jt.remoteCommand = shutil.which('python')
         jt.args = [hh_tb_script.__file__, "collect_household_tb", country]
-        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=4G -l fthread=1 -l h_rt=5:00:00 "
+        jt.nativeSpecification = ("-V -b y -P proj_cost_effect -q all.q -l fmem=6G -l fthread=1 -l h_rt=2:00:00 "
                                   f"-N {formatted_country(country)}_chh_tb_exp -hold_jid {parent_jid}")
         jid = s.runJob(jt)
         logger.info(f"Submitted hold job ({jid}) for aggregating household TB exposure in {country}.")
