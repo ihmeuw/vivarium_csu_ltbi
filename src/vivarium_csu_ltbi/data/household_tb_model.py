@@ -69,13 +69,14 @@ def age_sex_specific_actb_prop(df: pd.DataFrame):
     """calculate the probability of an active TB case in the household
     for certain age and sex group
     """
+    df = df.set_index('hh_id')
     age_bins = [0, 1] + list(range(5, 96, 5)) + [125]
     res = pd.DataFrame()
     for i, age_group_start in enumerate(age_bins[:-1]):
         age_group_end = age_bins[i + 1]
         for sex in ['Male', 'Female']:
-            hh_with = df.query(f'age >= {age_group_start} and age < {age_group_end} and sex == "{sex}"').hh_id.unique()
-            prop = df[df.hh_id.isin(hh_with)].groupby('hh_id').apply(calc_pr_actb_in_hh)
+            hh_with = df.query(f'age >= {age_group_start} and age < {age_group_end} and sex == "{sex}"').index.unique()
+            prop = df.loc[hh_with].groupby(level=0).apply(calc_pr_actb_in_hh)
             prop_mean = prop.mean()
             age_sex_res = pd.DataFrame({'age_group_start': [age_group_start], 'age_group_end': [age_group_end],
                                         'sex': [sex], 'pr_actb_in_hh': [prop_mean]})
