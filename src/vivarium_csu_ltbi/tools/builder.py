@@ -171,16 +171,13 @@ def write_exposure_risk_data(art, data):
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
 
     # build paf data
-    logger.info('In write_exposure_risk_data Before paf...')
     one_minus_exp = 1.0 - data.exposure_hhtb
     risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
     num = (risk_by_exposure + one_minus_exp) - 1
     den = risk_by_exposure + one_minus_exp
-    logger.info('In write_exposure_risk_data Before paf division...')
     paf = num / den
     paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
     paf.index = paf.index.droplevel(4)
-    logger.info('In write_exposure_risk_data Before writing paf...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
 
 
