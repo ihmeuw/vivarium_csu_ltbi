@@ -9,9 +9,7 @@ from vivarium_csu_ltbi.data import household_tb_model, household_tb_paths
 
 
 def estimate_household_tb(country: str, draw: int, year_start=2017):
-    """for certain country in year 2017,
-    sweep over draw
-    """
+    """for certain country in year 2017, sweep over draw."""
 
     input_artifact_path = household_tb_paths.get_input_artifact_path(country)
     intermediate_output_path = household_tb_paths.get_intermediate_output_dir_path(country)
@@ -76,3 +74,4 @@ if __name__ == '__main__':
         collect_household_tb(country)
     else:
         raise ValueError(f"Bad first argument: {func}. Must be 'estimate_ltbi_incidence' or 'collect_ltbi_incidence'.")
+

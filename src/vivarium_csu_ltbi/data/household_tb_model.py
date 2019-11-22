@@ -27,7 +27,8 @@ def load_household_input_data(country: str):
 
 
 def load_actb_prevalence_input_data(country: str):
-    """output all-form TB prevalence"""
+    """output all-form TB prevalence."""
+
     prev_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', country)
     prev_actb = pd.DataFrame(0.0, index=prev_ltbi.index, columns=['draw_' + str(i) for i in range(1000)])
 
@@ -45,7 +46,8 @@ def load_actb_prevalence_input_data(country: str):
 
 
 def interpolation(prev_actb: pd.DataFrame, df: pd.DataFrame, year_start: int, draw: int):
-    """assign the probability of active TB for each simulant"""
+    """assign the probability of active TB for each simulant."""
+
     interp = Interpolation(prev_actb.query(f'year_start == {year_start} and draw == {draw}'),
                            categorical_parameters=['sex'],
                            continuous_parameters=[['age', 'age_group_start', 'age_group_end']],
@@ -58,8 +60,8 @@ def interpolation(prev_actb: pd.DataFrame, df: pd.DataFrame, year_start: int, dr
 
 def calc_pr_actb_in_hh(df: pd.DataFrame):
     """compute the probability that there is at least one person with active TB
-    for each household
-    """
+    for each household."""
+
     pr_no_tb = 1 - df.pr_actb
     pr_no_tb_in_hh = np.prod(pr_no_tb)
     return 1 - pr_no_tb_in_hh
@@ -67,8 +69,8 @@ def calc_pr_actb_in_hh(df: pd.DataFrame):
 
 def age_sex_specific_actb_prop(df: pd.DataFrame):
     """calculate the probability of an active TB case in the household
-    for certain age and sex group
-    """
+    for certain age and sex group."""
+
     df = df.set_index('hh_id')
     age_bins = [0, 1] + list(range(5, 96, 5)) + [125]
     res = pd.DataFrame()
@@ -82,3 +84,4 @@ def age_sex_specific_actb_prop(df: pd.DataFrame):
                                         'sex': [sex], 'pr_actb_in_hh': [prop_mean]})
             res = res.append(age_sex_res, ignore_index=True)
     return res
+

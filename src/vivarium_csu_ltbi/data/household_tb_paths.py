@@ -35,3 +35,4 @@ def get_intermediate_output_dir_path(country):
     output_path = ARTIFACT_PATH / 'output' / f'{formatted_country(country)}'
     output_path.mkdir(parents=True, exist_ok=True)
     return output_path
+
