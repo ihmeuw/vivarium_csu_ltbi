@@ -9,7 +9,8 @@ from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data
 from vivarium_gbd_access import gbd
-from ..components.names import *
+
+from vivarium_csu_ltbi.components.names import *
 
 
 PROJ_NAME = 'vivarium_csu_ltbi'
@@ -34,7 +35,8 @@ class DataRepo:
     def get_filled_with(self, fill_value):
         return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
-    def get_and_package_dismod_ltbi_incidence(self, loc):
+    @staticmethod
+    def get_and_package_dismod_ltbi_incidence(loc):
         datafile = DEFAULT_PATH / 'ltbi_incidence' / 'knot10' / f'{loc.replace(" ", "_").lower()}.hdf'
         if datafile.exists():
             store = pd.HDFStore(datafile)
@@ -49,12 +51,14 @@ class DataRepo:
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
-    def get_hh_tuberculosis_exposure(self, loc):
+    @staticmethod
+    def get_hh_tuberculosis_exposure(loc):
         KNOWN_VALUE = 0.5
         df = get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
         return set_to_known_value(df, KNOWN_VALUE)
 
-    def get_hh_tuberculosis_risk(self, loc):
+    @staticmethod
+    def get_hh_tuberculosis_risk(loc):
         df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
         df_flat = df.reset_index()
 
@@ -81,7 +85,6 @@ class DataRepo:
         data[odd] = data[odd] * 3
 
         return pd.DataFrame(data, df_dup.index, [f'draw_{i}' for i in range(0, 1000)])
-
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -138,8 +141,8 @@ class DataRepo:
         self.df_zero = self.get_filled_with(0.0)
 
 
-def entity_from_id(id):
-    return [c for c in causes if c.gbd_id == id][0]
+def entity_from_id(entity_id):
+    return [c for c in causes if c.gbd_id == entity_id][0]
 
 
 def get_load(location):
@@ -345,11 +348,3 @@ def build_ltbi_artifact(loc, output_dir=None):
     write_exposure_risk_data(art, data)
 
     logger.info('!!! Done !!!')
-
-
-
-
-
-
-
-
