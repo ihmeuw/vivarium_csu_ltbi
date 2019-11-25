@@ -16,6 +16,8 @@ KNOTS = list(range(0, 101, 20))
 def estimate_ltbi_incidence(country, draw):
     """"""
     input_artifact_path = get_input_artifact_path(country)
+    intermediate_output_path = get_intermediate_output_dir_path(country)
+
     logger.info(f"Loading input data from {input_artifact_path}.")
     art = Artifact(str(input_artifact_path))
     p_ltbi = art.load('cause.latent_tuberculosis_infection.prevalence')
@@ -31,7 +33,7 @@ def estimate_ltbi_incidence(country, draw):
             m_all = format_for_dismod(csmr_all, draw, sex, year, 'm_all')
             i_ltbi = fit_and_predict(p, f, m_all, KNOTS)
             output.append(format_for_art(i_ltbi, draw, country, sex, year))
-    intermediate_output_path = get_intermediate_output_dir_path(country)
+
     logger.info(f"Writing results to {intermediate_output_path}.")
     df = pd.concat(output, axis=0)
     df.to_hdf(intermediate_output_path / f'{draw}.hdf', 'data')
@@ -40,12 +42,14 @@ def estimate_ltbi_incidence(country, draw):
 def collect_ltbi_incidence(country):
     """Aggregate the results of LTBI incidence modeling into a single HDF file."""
     intermediate_output_path = get_intermediate_output_dir_path(country)
+
     logger.info(f"Reading results from {intermediate_output_path}")
     data = []
     for f in intermediate_output_path.iterdir():
         data.append(pd.read_hdf(f))
     data = pd.concat(data, axis=0).reset_index()
     output_artifact_path = get_output_artifact_path(country)
+
     logger.info(f"Writing results to {output_artifact_path}.")
     art = Artifact(str(output_artifact_path))
     art.write("cause.latent_tuberculosis_infection.incidence", data)
@@ -67,4 +71,3 @@ if __name__ == "__main__":
         collect_ltbi_incidence(country)
     else:
         raise ValueError(f"Bad first argument: {func}. Must be 'estimate_ltbi_incidence' or 'collect_ltbi_incidence'.")
-
