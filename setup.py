@@ -27,7 +27,6 @@ if __name__ == "__main__":
         'tables<=3.4.0',
         'pandas<0.25',
 
-        'dismod_mr',
         'loguru',
         'scipy',
         'matplotlib',
@@ -40,6 +39,10 @@ if __name__ == "__main__":
         'jinja2',
         'click',
         'loguru',
+    ]
+
+    data_requires = [
+        'dismod_mr==1.1.1'
     ]
 
     setup(
@@ -59,6 +62,9 @@ if __name__ == "__main__":
         include_package_data=True,
 
         install_requires=install_requirements,
+        extras_require={
+            'data': data_requires,
+        },
 
         zip_safe=False,
 
