@@ -94,6 +94,7 @@ class DataRepo:
         ui_ub = 2.98719309
         std = (ui_ub - ui_lb) / (2 * 1.96)
 
+        np.random.seed(12221990)
         draws = np.random.normal(mean, std, 1000)
 
         demog = get_demographic_dimensions(loc)
