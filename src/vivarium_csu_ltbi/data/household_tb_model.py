@@ -14,15 +14,22 @@ def load_household_input_data(country: str):
     input_data_path = household_tb_paths.get_input_data_path(country)
 
     df = pd.read_stata(input_data_path)
-    df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
-    df['sex'] = df['sex'].str.capitalize()
-    if formatted_country(country) == 'philippines':
-        df['age'] = df['age'].replace('96+', 95)
-    else:
-        df['age'] = df['age'].replace('95+', 95)
-    df = df[df.age != "don't know"]
-    df['age'] = df['age'].astype(float)
 
+    if formatted_country(country) in ['ethiopia', 'india', 'philippines']:
+        df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
+        df['sex'] = df['sex'].str.capitalize()
+        if formatted_country(country) == 'philippines':
+            df['age'] = df['age'].replace('96+', 95)
+        else:
+            df['age'] = df['age'].replace('95+', 95)
+        df = df[df.age != "don't know"]
+    else:
+        df['age'] = df['age'].replace({'Less than 1 year': '0',
+                                       'less than 1 year': '0',
+                                       '1 year': '1',
+                                       '2 years': '2',
+                                       '100+': '100'})
+    df['age'] = df['age'].astype(float)
     return df
 
 

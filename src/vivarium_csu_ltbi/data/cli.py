@@ -128,9 +128,6 @@ def get_household_tb_input_data():
             input_artifact_path.unlink()
 
     for country in COUNTRIES:
-        # We don't have microdata for all countries yet
-        if country not in ['Ethiopia', 'India', 'Philippines']:
-            continue
         logger.info(f"Processing {country}.")
         input_artifact_path = household_tb_paths.get_input_artifact_path(country)
         art = Artifact(str(input_artifact_path))
