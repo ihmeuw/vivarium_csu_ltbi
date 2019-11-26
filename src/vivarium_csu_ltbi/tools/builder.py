@@ -57,25 +57,34 @@ class DataRepo:
         df = pd.read_hdf(f'/share/costeffectiveness/artifacts/vivarium_csu_ltbi/household_tb/{loc.replace(" ", "_").lower()}.hdf')
         df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
 
+        # fix age groups
+        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07673233, 1)]
+        replicated = [df.loc[df.age_start == 0].copy() for _ in
+                      range(len(young_ages))]  # create copies of 0-1 age group
+        df = df.loc[df.age_start != 0.0]  # remove that group from the data
+        for i, (age_start, age_end) in enumerate(young_ages):
+            replicated[i].loc[:, 'age_start'] = age_start
+            replicated[i].loc[:, 'age_end'] = age_end
+        df = pd.concat([df] + replicated, axis=0)
+
         cat1 = df.copy()
         cat1['parameter'] = 'cat1'
-
         cat2 = df.copy()
         cat2['parameter'] = 'cat2'
         cat1['value'] = 1 - cat2['value']
 
         complete = pd.concat([cat1, cat2], axis=0).reset_index(drop=True)
-        complete = complete.set_index(
-            ['location', 'parameter', 'sex', 'age_start', 'year_start', 'age_end', 'year_end'])
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start',
+                                       'year_start', 'age_end', 'year_end'])
         complete['draw'] = complete['draw'].apply(lambda x: f'draw_{x}')
 
         wide = pd.pivot_table(complete,
                               index=['location', 'parameter', 'sex', 'age_start', 'year_start', 'age_end', 'year_end'],
                               columns=['draw'], values=['value'])
         wide.columns = wide.columns.get_level_values('draw')
-        wide = utilities.sort_hierarchical_data(wide)
+        exposure = utilities.sort_hierarchical_data(wide)
 
-        return wide
+        return exposure
 
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
@@ -87,7 +96,7 @@ class DataRepo:
 
         draws = np.random.normal(mean, std, 1000)
 
-        demog = get_demographic_dimensions('India')
+        demog = get_demographic_dimensions(loc)
         demog = split_interval(demog, interval_column='age', split_column_prefix='age').reset_index()
         demog = demog.drop(columns=['year'])
         demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
@@ -107,8 +116,35 @@ class DataRepo:
         hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
         complete = pd.concat([hiv_negative, hiv_positive], axis=0)
-        
-        return complete
+        rr = utilities.sort_hierarchical_data(complete)
+
+        return rr
+
+    @staticmethod
+    def get_hh_tuberculosis_paf(exposure, rr):
+
+        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
+        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
+
+        ae_specific_pafs = []
+        # assume one measure per entity
+        # assume only years 2017-18 present
+        for affected_entity in rr.affected_entity.unique():
+            ae_rr = rr.loc[rr.affected_entity == affected_entity]
+            affected_measure = list(ae_rr.affected_measure.unique())
+            assert len(affected_measure) == 1
+            ae_paf = exposure * ae_rr
+            ae_paf['affected_entity'] = affected_entity
+            ae_paf['affected_measure'] = affected_measure * len(ae_paf)
+            ae_paf['year_start'] = 2017
+            ae_paf['year_end'] = 2018
+            ae_specific_pafs.append(ae_paf)
+
+        paf = pd.concat(ae_specific_pafs, axis=0)
+        paf = paf.set_index(['affected_entity', 'affected_measure', 'year_start', 'year_end'], append=True)
+        paf = utilities.sort_hierarchical_data(paf)
+
+        return paf
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -156,6 +192,7 @@ class DataRepo:
         logger.info('Pulling risk/exposure data')
         self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
         self.risk_hhtb = self.get_hh_tuberculosis_risk(loc)
+        self.paf_hhtb = self.get_hh_tuberculosis_paf(self.exposure_hhtb, self.risk_hhtb)
 
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
@@ -200,18 +237,9 @@ def write_exposure_risk_data(art, data):
     logger.info('In write_exposure_risk_data...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
-
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
-
-    # build paf data
-    one_minus_exp = 1.0 - data.exposure_hhtb
-    risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
-    num = (risk_by_exposure + one_minus_exp) - 1
-    den = risk_by_exposure + one_minus_exp
-    paf = num / den
-    paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
-    paf.index = paf.index.droplevel(4)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', data.paf_hhtb,
+          skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
