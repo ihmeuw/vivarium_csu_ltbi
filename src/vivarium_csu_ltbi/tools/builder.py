@@ -58,7 +58,7 @@ class DataRepo:
         df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
 
         # fix age groups
-        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07673233, 1)]
+        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07671233, 1)]
         replicated = [df.loc[df.age_start == 0].copy() for _ in
                       range(len(young_ages))]  # create copies of 0-1 age group
         df = df.loc[df.age_start != 0.0]  # remove that group from the data
