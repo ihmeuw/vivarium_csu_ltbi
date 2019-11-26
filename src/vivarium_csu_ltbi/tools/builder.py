@@ -1,12 +1,13 @@
 from pathlib import Path
 from loguru import logger
 import pandas as pd
+import numpy as np
 
 from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
-from vivarium_inputs import get_measure, utilities, globals, utility_data
+from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
 from vivarium_gbd_access import gbd
 
 from vivarium_csu_ltbi.components.names import *
@@ -52,38 +53,62 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_exposure(loc):
-        df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
-        df.loc[df.index.get_level_values(level='parameter') == 'cat1'] = 0.1
-        df.loc[df.index.get_level_values(level='parameter') == 'cat2'] = 0.9
 
-        df = split_interval(df, interval_column='age', split_column_prefix='age')
-        df = split_interval(df, interval_column='year', split_column_prefix='year')
-        return df
+        df = pd.read_hdf(f'/share/costeffectiveness/artifacts/vivarium_csu_ltbi/household_tb/{loc.replace(" ", "_").lower()}.hdf')
+        df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
+
+        cat1 = df.copy()
+        cat1['parameter'] = 'cat1'
+
+        cat2 = df.copy()
+        cat2['parameter'] = 'cat2'
+        cat1['value'] = 1 - cat2['value']
+
+        complete = pd.concat([cat1, cat2], axis=0).reset_index(drop=True)
+        complete = complete.set_index(
+            ['location', 'parameter', 'sex', 'age_start', 'year_start', 'age_end', 'year_end'])
+        complete['draw'] = complete['draw'].apply(lambda x: f'draw_{x}')
+
+        wide = pd.pivot_table(complete,
+                              index=['location', 'parameter', 'sex', 'age_start', 'year_start', 'age_end', 'year_end'],
+                              columns=['draw'], values=['value'])
+        wide.columns = wide.columns.get_level_values('draw')
+        wide = utilities.sort_hierarchical_data(wide)
+
+        return wide
 
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
-        df = get_measure(risk_factors.vitamin_a_deficiency, 'relative_risk', loc)
-        df = split_interval(df, interval_column='age', split_column_prefix='age')
-        df = split_interval(df, interval_column='year', split_column_prefix='year')
+        # From Yaqi via Abie. Preliminary, not age- or sex-specific.
+        mean = 2.108823418
+        ui_lb = 1.488734097
+        ui_ub = 2.98719309
+        std = (ui_ub - ui_lb) / (2 * 1.96)
 
-        df = df.reset_index()
-        df = df.loc[df.affected_entity == 'diarrheal_diseases']
+        draws = np.random.normal(mean, std, 1000)
 
-        df.affected_entity = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
-        df.affected_measure = 'transition_rate'
+        demog = get_demographic_dimensions('India')
+        demog = split_interval(demog, interval_column='age', split_column_prefix='age').reset_index()
+        demog = demog.drop(columns=['year'])
+        demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        demog['affected_measure'] = 'transition_rate'
 
-        df.loc[df.parameter == 'cat2', [c for c in df.columns if 'draw' in c]] = 1.0
-        df.loc[df.parameter == 'cat1', [c for c in df.columns if 'draw' in c]] = 3.0
+        cat1 = demog.copy()
+        cat1['parameter'] = 'cat1'
+        cat1 = pd.concat([cat1, pd.DataFrame(data={f'draw_{i}': [1.0] * len(cat1.index) for i in range(1000)})], axis=1)
 
-        hiv_positive = df.copy()
-        hiv_negative = df.copy()
+        cat2 = demog.copy()
+        cat2['parameter'] = 'cat2'
+        cat2 = pd.concat([cat2, pd.DataFrame(data={f'draw_{i}': [draws[i]] * len(cat2.index) for i in range(1000)})],
+                         axis=1)
 
-        hiv_negative.affected_entity = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
-        hiv_negative.loc[hiv_negative.parameter == 'cat1', [c for c in hiv_negative.columns if 'draw' in c]] = 2.0
+        hiv_positive = pd.concat([cat1, cat2], axis=0, ignore_index=True)
+        hiv_negative = hiv_positive.copy()
+        hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
-        data = pd.concat([hiv_positive, hiv_negative], ignore_index=True)
-        data = data.set_index([c for c in data.columns if 'draw' not in c])
-        return data
+        complete = pd.concat([hiv_negative, hiv_positive], axis=0)
+        
+        return complete
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
