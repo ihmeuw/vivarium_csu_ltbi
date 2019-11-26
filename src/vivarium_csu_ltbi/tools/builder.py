@@ -1,8 +1,6 @@
-import numpy as np
 from pathlib import Path
 from loguru import logger
 import pandas as pd
-import numpy as np
 
 from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
@@ -363,17 +361,6 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
-<<<<<<< HEAD
-=======
-    write_exposure_risk_data(art, data)
-    logger.info('!!! Done !!!')
-
-
-
-
-
-
->>>>>>> master
 
     write_exposure_risk_data(art, data)
 
