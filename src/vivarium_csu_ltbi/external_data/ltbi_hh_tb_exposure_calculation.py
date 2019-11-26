@@ -19,22 +19,20 @@ def load_hh_data(country_name: str):
     if country_name == 'South Africa':
         country_name = 'South_Africa'
     
-    df = pd.read_stata(master_dir + country_name + '.dta')
+    df = pd.read_stata(master_dir + country_name + '.dta').dropna()
     
-    if country_name in ['Ethiopia', 'India', 'Philippines']:
-        df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
-        df['sex'] = df['sex'].str.capitalize()
-        if country_name == 'Philippines':
-            df['age'] = df['age'].replace('96+', 96)
-        else:
-            df['age'] = df['age'].replace('95+', 95)
-        df = df[df.age != "don't know"]
-    else:
-        df['age'] = df['age'].replace({'Less than 1 year': '0',
-                                       'less than 1 year': '0',
+    if country_name == 'South_Africa':
+        df['age'] = df['age'].replace({'less than 1 year': '0',
                                        '1 year': '1',
                                        '2 years': '2',
-                                       '100+': '100'}).astype(int)
+                                       '100+': '100'}).astype(float)
+    else:
+        df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
+        df['sex'] = df['sex'].str.capitalize()
+        df['age'] = df['age'].replace({'95+': 95, '96+': 96})
+        df = df[~((df.age == "don't know") | (df.age == "dk"))]
+        df['age'] = df['age'].astype(float)
+    
     return df
 
 def load_and_transform(country_name: str):
