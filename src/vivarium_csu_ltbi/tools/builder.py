@@ -116,6 +116,8 @@ class DataRepo:
         hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
         complete = pd.concat([hiv_negative, hiv_positive], axis=0)
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+                                       'affected_entity', 'affected_measure'])
         rr = utilities.sort_hierarchical_data(complete)
 
         return rr
