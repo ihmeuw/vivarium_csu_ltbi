@@ -19,7 +19,7 @@ configuration:
     input_data:
         location: India
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/india.hdf
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/india_with_risk.hdf
     interpolation:
         order: 0
         extrapolate: True

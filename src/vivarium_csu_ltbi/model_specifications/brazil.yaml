@@ -3,10 +3,6 @@ components:
         population:
             - BasePopulation()
             - Mortality()
-        risks:
-            - Risk("risk_factor.household_tuberculosis")
-            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv.transition_rate")
-            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_positive_hiv_to_ltbi_positive_hiv.transition_rate")
 
         metrics:
             - DisabilityObserver()
@@ -17,9 +13,9 @@ components:
 
 configuration:
     input_data:
-        location: India
+        location: Brazil
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/india.hdf
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/brazil.hdf
     interpolation:
         order: 0
         extrapolate: True

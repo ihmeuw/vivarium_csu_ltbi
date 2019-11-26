@@ -1,0 +1,1 @@
+psimulate run -P proj_csu -o /share/costeffectiveness/results/vivarium_csu_ltbi -m 2 -r 48:00:00 $1 branches_vivarium_csu_ltbi.yaml 
