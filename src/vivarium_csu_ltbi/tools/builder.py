@@ -2,6 +2,7 @@ import numpy as np
 from pathlib import Path
 from loguru import logger
 import pandas as pd
+import numpy as np
 
 from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
@@ -53,38 +54,38 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_exposure(loc):
-        KNOWN_VALUE = 0.5
-        df = get_measure(risk_factors.occupational_exposure_to_asbestos, 'exposure', loc)
-        return set_to_known_value(df, KNOWN_VALUE)
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
+        df.loc[df.index.get_level_values(level='parameter') == 'cat1'] = 0.1
+        df.loc[df.index.get_level_values(level='parameter') == 'cat2'] = 0.9
+
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
+        return df
 
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
-        df = get_measure(risk_factors.diet_low_in_calcium, 'relative_risk', loc)
-        df_flat = df.reset_index()
+        df = get_measure(risk_factors.vitamin_a_deficiency, 'relative_risk', loc)
+        df = split_interval(df, interval_column='age', split_column_prefix='age')
+        df = split_interval(df, interval_column='year', split_column_prefix='year')
 
-        # duplicate lines because we have rates for 2 states
-        df_dup = df_flat.loc[np.repeat(df_flat.index.values, 2)].reset_index(drop=True)
-        df_dup.affected_measure.replace('incidence_rate', 'transition_rate', inplace=True)
+        df = df.reset_index()
+        df = df.loc[df.affected_entity == 'diarrheal_diseases']
 
-        # set the 2 states
-        idx_odd = df_dup.index.values % 2 == 1
-        idx_even = df_dup.index.values % 2 == 0
-        df_dup.loc[idx_odd, "affected_entity"] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
-        df_dup.loc[idx_even, "affected_entity"] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        df.affected_entity = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        df.affected_measure = 'transition_rate'
 
-        # reset the index
-        df_dup = df_dup.set_index(
-            ['location', 'sex', 'age', 'year', 'affected_entity', 'affected_measure', 'parameter'])
+        df.loc[df.parameter == 'cat2', [c for c in df.columns if 'draw' in c]] = 1.0
+        df.loc[df.parameter == 'cat1', [c for c in df.columns if 'draw' in c]] = 3.0
 
-        # manufacture data
-        n_rows = len(df_dup.index)
-        data = np.ones([n_rows, 1000])
-        even = list(range(0, n_rows, 2))
-        odd = list(range(1, n_rows, 2))
-        data[even] = data[even] * 2
-        data[odd] = data[odd] * 3
+        hiv_positive = df.copy()
+        hiv_negative = df.copy()
 
-        return pd.DataFrame(data, df_dup.index, [f'draw_{i}' for i in range(0, 1000)])
+        hiv_negative.affected_entity = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+        hiv_negative.loc[hiv_negative.parameter == 'cat1', [c for c in hiv_negative.columns if 'draw' in c]] = 2.0
+
+        data = pd.concat([hiv_positive, hiv_negative], ignore_index=True)
+        data = data.set_index([c for c in data.columns if 'draw' not in c])
+        return data
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -189,6 +190,24 @@ def write_demographic_data(artifact, location, data):
 
     key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
     write(artifact, key, (data.csmr_298 + data.csmr_297))
+
+
+def write_exposure_risk_data(art, data):
+    logger.info('In write_exposure_risk_data...')
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
+
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
+
+    # build paf data
+    one_minus_exp = 1.0 - data.exposure_hhtb
+    risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
+    num = (risk_by_exposure + one_minus_exp) - 1
+    den = risk_by_exposure + one_minus_exp
+    paf = num / den
+    paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
+    paf.index = paf.index.droplevel(4)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
@@ -344,6 +363,17 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
+<<<<<<< HEAD
+=======
+    write_exposure_risk_data(art, data)
+    logger.info('!!! Done !!!')
+
+
+
+
+
+
+>>>>>>> master
 
     write_exposure_risk_data(art, data)
 
