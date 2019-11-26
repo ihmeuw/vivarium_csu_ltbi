@@ -33,7 +33,7 @@ def build_cache():
         logger.info(f"Entity found for id={id}: {entity.name}")
         for loc in LOCATIONS:
             logger.info(f"Pulling for {loc}")
-            vivarium_inputs.get_measure(entity, 'cause_specific_mortality', loc)
+            vivarium_inputs.get_measure(entity, 'cause_specific_mortality_rate', loc)
 
     # Incidence
     # NOTE: ID 954 fails for all countries -- no non-zero data!
@@ -43,7 +43,7 @@ def build_cache():
         logger.info(f"Entity found for id={id}: {entity.name}")
         for loc in LOCATIONS:
             logger.info(f"Pulling for {loc}")
-            vivarium_inputs.get_measure(entity, 'incidence', loc)
+            vivarium_inputs.get_measure(entity, 'incidence_rate', loc)
 
     # Remission
     location_ids = gbd.get_location_ids()

@@ -5,6 +5,7 @@ TUBERCULOSIS_AND_HIV = 'tuberculosis_and_hiv'
 HOUSEHOLD_TUBERCULOSIS = 'household_tuberculosis'
 RISK_DISTRIBUTION_TYPE = 'dichotomous'
 
+
 #  state names
 ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'
 ACTIVETB_SUSCEPTIBLE_HIV = 'activetb_susceptible_hiv'

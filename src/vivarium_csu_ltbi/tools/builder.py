@@ -7,13 +7,20 @@ from gbd_mapping import causes, risk_factors
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
-from vivarium_inputs import get_measure, utilities, globals, utility_data
+from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
 from vivarium_gbd_access import gbd
-from ..components.names import *
+
+from vivarium_csu_ltbi.components.names import *
 
 
 PROJ_NAME = 'vivarium_csu_ltbi'
 DEFAULT_PATH = gbd.ARTIFACT_FOLDER / PROJ_NAME
+
+
+def set_to_known_value(df, set_to):
+    for col in df.columns:
+        df[col].values[:] = set_to
+    return df
 
 
 class DataRepo:
@@ -28,8 +35,8 @@ class DataRepo:
     def get_filled_with(self, fill_value):
         return pd.DataFrame().reindex_like(self._df_template.copy(deep='all')).fillna(fill_value)
 
-
-    def get_and_package_dismod_ltbi_incidence(self, loc):
+    @staticmethod
+    def get_and_package_dismod_ltbi_incidence(loc):
         datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.replace(" ", "_").lower()}.hdf'
         if datafile.exists():
             store = pd.HDFStore(datafile)
@@ -44,38 +51,103 @@ class DataRepo:
         else:
             raise ValueError(f'Error: dismod data "{datafile}" is missing.')
 
-    def get_hh_tuberculosis_exposure(self, loc):
-        df = get_measure(risk_factors.vitamin_a_deficiency, 'exposure', loc)
-        df.loc[df.index.get_level_values(level='parameter') == 'cat1'] = 0.1
-        df.loc[df.index.get_level_values(level='parameter') == 'cat2'] = 0.9
+    @staticmethod
+    def get_hh_tuberculosis_exposure(loc):
 
-        df = split_interval(df, interval_column='age', split_column_prefix='age')
-        df = split_interval(df, interval_column='year', split_column_prefix='year')
-        return df
+        df = pd.read_hdf(f'/share/costeffectiveness/artifacts/vivarium_csu_ltbi/household_tb/{loc.replace(" ", "_").lower()}.hdf')
+        df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
 
-    def get_hh_tuberculosis_risk(self, loc):
-        df = get_measure(risk_factors.vitamin_a_deficiency, 'relative_risk', loc)
-        df = split_interval(df, interval_column='age', split_column_prefix='age')
-        df = split_interval(df, interval_column='year', split_column_prefix='year')
+        # fix age groups
+        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07673233, 1)]
+        replicated = [df.loc[df.age_start == 0].copy() for _ in
+                      range(len(young_ages))]  # create copies of 0-1 age group
+        df = df.loc[df.age_start != 0.0]  # remove that group from the data
+        for i, (age_start, age_end) in enumerate(young_ages):
+            replicated[i].loc[:, 'age_start'] = age_start
+            replicated[i].loc[:, 'age_end'] = age_end
+        df = pd.concat([df] + replicated, axis=0)
 
-        df = df.reset_index()
-        df = df.loc[df.affected_entity == 'diarrheal_diseases']
+        cat1 = df.copy()
+        cat1['parameter'] = 'cat1'
+        cat2 = df.copy()
+        cat2['parameter'] = 'cat2'
+        cat1['value'] = 1 - cat2['value']
 
-        df.affected_entity = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
-        df.affected_measure = 'transition_rate'
+        complete = pd.concat([cat1, cat2], axis=0).reset_index(drop=True)
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start',
+                                       'year_start', 'age_end', 'year_end'])
+        complete['draw'] = complete['draw'].apply(lambda x: f'draw_{x}')
 
-        df.loc[df.parameter == 'cat2', [c for c in df.columns if 'draw' in c]] = 1.0
-        df.loc[df.parameter == 'cat1', [c for c in df.columns if 'draw' in c]] = 3.0
+        wide = pd.pivot_table(complete,
+                              index=['location', 'parameter', 'sex', 'age_start', 'year_start', 'age_end', 'year_end'],
+                              columns=['draw'], values=['value'])
+        wide.columns = wide.columns.get_level_values('draw')
+        exposure = utilities.sort_hierarchical_data(wide)
 
-        hiv_positive = df.copy()
-        hiv_negative = df.copy()
+        return exposure
 
-        hiv_negative.affected_entity = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
-        hiv_negative.loc[hiv_negative.parameter == 'cat1', [c for c in hiv_negative.columns if 'draw' in c]] = 2.0
+    @staticmethod
+    def get_hh_tuberculosis_risk(loc):
+        # From Yaqi via Abie. Preliminary, not age- or sex-specific.
+        mean = 2.108823418
+        ui_lb = 1.488734097
+        ui_ub = 2.98719309
+        std = (ui_ub - ui_lb) / (2 * 1.96)
 
-        data = pd.concat([hiv_positive, hiv_negative], ignore_index=True)
-        data = data.set_index([c for c in data.columns if 'draw' not in c])
-        return data
+        np.random.seed(12221990)
+        draws = np.random.normal(mean, std, 1000)
+
+        demog = get_demographic_dimensions(loc)
+        demog = split_interval(demog, interval_column='age', split_column_prefix='age').reset_index()
+        demog = demog.drop(columns=['year'])
+        demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
+        demog['affected_measure'] = 'transition_rate'
+
+        cat1 = demog.copy()
+        cat1['parameter'] = 'cat1'
+        cat1 = pd.concat([cat1, pd.DataFrame(data={f'draw_{i}': [1.0] * len(cat1.index) for i in range(1000)})], axis=1)
+
+        cat2 = demog.copy()
+        cat2['parameter'] = 'cat2'
+        cat2 = pd.concat([cat2, pd.DataFrame(data={f'draw_{i}': [draws[i]] * len(cat2.index) for i in range(1000)})],
+                         axis=1)
+
+        hiv_positive = pd.concat([cat1, cat2], axis=0, ignore_index=True)
+        hiv_negative = hiv_positive.copy()
+        hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
+
+        complete = pd.concat([hiv_negative, hiv_positive], axis=0)
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+                                       'affected_entity', 'affected_measure'])
+        rr = utilities.sort_hierarchical_data(complete)
+
+        return rr
+
+    @staticmethod
+    def get_hh_tuberculosis_paf(exposure, rr):
+
+        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
+        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
+
+        ae_specific_pafs = []
+        # assume one measure per entity
+        # assume only years 2017-18 present
+        for affected_entity in rr.affected_entity.unique():
+            ae_rr = rr.loc[rr.affected_entity == affected_entity]
+            affected_measure = list(ae_rr.affected_measure.unique())
+            assert len(affected_measure) == 1
+            ae_paf = exposure * ae_rr
+            ae_paf['affected_entity'] = affected_entity
+            ae_paf['affected_measure'] = affected_measure * len(ae_paf)
+            ae_paf['year_start'] = 2017
+            ae_paf['year_end'] = 2018
+            ae_specific_pafs.append(ae_paf)
+
+        paf = pd.concat(ae_specific_pafs, axis=0)
+        paf = paf.set_index(['affected_entity', 'affected_measure', 'year_start', 'year_end'], append=True)
+        paf = utilities.sort_hierarchical_data(paf)
+
+        return paf
 
     def pull_data(self, loc):
         logger.info('Pulling cause_specific_mortality data')
@@ -123,6 +195,7 @@ class DataRepo:
         logger.info('Pulling risk/exposure data')
         self.exposure_hhtb = self.get_hh_tuberculosis_exposure(loc)
         self.risk_hhtb = self.get_hh_tuberculosis_risk(loc)
+        self.paf_hhtb = self.get_hh_tuberculosis_paf(self.exposure_hhtb, self.risk_hhtb)
 
         # TODO: likely a stand-in that will change
         self.dismod_9422_remission = load_em_from_meid(9422, loc)
@@ -132,8 +205,8 @@ class DataRepo:
         self.df_zero = self.get_filled_with(0.0)
 
 
-def entity_from_id(id):
-    return [c for c in causes if c.gbd_id == id][0]
+def entity_from_id(entity_id):
+    return [c for c in causes if c.gbd_id == entity_id][0]
 
 
 def get_load(location):
@@ -167,18 +240,9 @@ def write_exposure_risk_data(art, data):
     logger.info('In write_exposure_risk_data...')
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
-
     write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
-
-    # build paf data
-    one_minus_exp = 1.0 - data.exposure_hhtb
-    risk_by_exposure = data.risk_hhtb * data.exposure_hhtb
-    num = (risk_by_exposure + one_minus_exp) - 1
-    den = risk_by_exposure + one_minus_exp
-    paf = num / den
-    paf = paf.loc[paf.index.get_level_values('parameter') == 'cat1']
-    paf.index = paf.index.droplevel(4)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', paf, skip_interval_processing=True)
+    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', data.paf_hhtb,
+          skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
@@ -329,17 +393,12 @@ def build_ltbi_artifact(loc, output_dir=None):
     art = create_new_artifact(out_path, loc)
     write_demographic_data(art, loc, data)
     write_metadata(art, loc)
+
     compute_prevalence(art, data)
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
+
     write_exposure_risk_data(art, data)
+
     logger.info('!!! Done !!!')
-
-
-
-
-
-
-
-
