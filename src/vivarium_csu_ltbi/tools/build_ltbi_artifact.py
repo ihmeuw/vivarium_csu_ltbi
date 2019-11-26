@@ -1,8 +1,9 @@
 import click
 from loguru import logger
+
 from vivarium.framework.utilities import handle_exceptions
 
-from . import builder
+from vivarium_csu_ltbi.tools import builder
 
 PROJECT_NAME = 'vivarium_csu_ltbi'
 
@@ -10,7 +11,7 @@ PROJECT_NAME = 'vivarium_csu_ltbi'
 @click.command()
 @click.option('-l', '--location',
               required=True,
-              help=('The location for which to build an artifact'))
+              help='The location for which to build an artifact')
 @click.option('-o', '--output-dir',
               default=f'/share/costeffectiveness/artifacts/{PROJECT_NAME}/',
               show_default=True,
