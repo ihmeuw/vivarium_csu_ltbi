@@ -98,8 +98,8 @@ class DataRepo:
         draws = np.random.normal(mean, std, 1000)
 
         demog = get_demographic_dimensions(loc)
-        demog = split_interval(demog, interval_column='age', split_column_prefix='age').reset_index()
-        demog = demog.drop(columns=['year'])
+        demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+        demog = split_interval(demog, interval_column='year', split_column_prefix='year').reset_index()
         demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
         demog['affected_measure'] = 'transition_rate'
 
@@ -117,7 +117,7 @@ class DataRepo:
         hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
         complete = pd.concat([hiv_negative, hiv_positive], axis=0)
-        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end', 'year_start', 'year_end',
                                        'affected_entity', 'affected_measure'])
         rr = utilities.sort_hierarchical_data(complete)
 
@@ -126,12 +126,13 @@ class DataRepo:
     @staticmethod
     def get_hh_tuberculosis_paf(exposure, rr):
 
-        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
-        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
+        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end',
+                                                     'year_start', 'year_end'])
+        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end', 'year_start',
+                                         'year_end'])
 
         ae_specific_pafs = []
         # assume one measure per entity
-        # assume only years 2017-18 present
         for affected_entity in rr.affected_entity.unique():
             ae_rr = rr.loc[rr.affected_entity == affected_entity]
             affected_measure = list(ae_rr.affected_measure.unique())
@@ -139,12 +140,11 @@ class DataRepo:
             ae_paf = exposure * ae_rr
             ae_paf['affected_entity'] = affected_entity
             ae_paf['affected_measure'] = affected_measure * len(ae_paf)
-            ae_paf['year_start'] = 2017
-            ae_paf['year_end'] = 2018
             ae_specific_pafs.append(ae_paf)
 
         paf = pd.concat(ae_specific_pafs, axis=0)
-        paf = paf.set_index(['affected_entity', 'affected_measure', 'year_start', 'year_end'], append=True)
+        paf = paf.set_index(['affected_entity', 'affected_measure'], append=True)
+        paf = paf.loc[pd.notnull(paf).all(axis=1)]  # RR has full years, exposure does not
         paf = utilities.sort_hierarchical_data(paf)
 
         return paf
