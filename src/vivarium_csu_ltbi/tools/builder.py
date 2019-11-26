@@ -37,7 +37,7 @@ class DataRepo:
 
     @staticmethod
     def get_and_package_dismod_ltbi_incidence(loc):
-        datafile = DEFAULT_PATH / 'ltbi_incidence' / 'knot10' / f'{loc.replace(" ", "_").lower()}.hdf'
+        datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.replace(" ", "_").lower()}.hdf'
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
