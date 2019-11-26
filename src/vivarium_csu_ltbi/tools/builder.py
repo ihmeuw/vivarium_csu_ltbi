@@ -154,25 +154,6 @@ def write_metadata(artifact, location):
     write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
-def write_exposure_risk_data(art, data):
-    logger.info('In write_exposure_risk_data...')
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb)
-
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb)
-
-    # build paf data
-    ridx = data.risk_hhtb.index.copy()
-    ridx = ridx.droplevel('parameter')
-    one_minus_exp = 1.0 - data.exposure_hhtb.values
-    num = ((data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp) - 1
-    den = (data.risk_hhtb.values * data.exposure_hhtb.values) + one_minus_exp
-    paf = num / den
-    df_paf = pd.DataFrame(paf, ridx, [f'draw_{i}' for i in range(0, 1000)])
-
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', df_paf)
-
-
 def write_demographic_data(artifact, location, data):
     logger.info('Writing demographic data...')
     load = get_load(location)
