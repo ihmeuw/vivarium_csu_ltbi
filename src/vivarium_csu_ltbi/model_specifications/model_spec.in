@@ -33,9 +33,9 @@ configuration:
             month: 1
             day: 1
         end:
-            year: 2019
-            month: 2
-            day: 1
+            year: 2024
+            month: 12
+            day: 31
         step_size: 7 # Days
     population:
         population_size: 50_000
