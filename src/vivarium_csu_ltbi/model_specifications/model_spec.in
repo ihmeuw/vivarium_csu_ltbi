@@ -9,13 +9,11 @@ components:
             - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv.transition_rate")
             - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_positive_hiv_to_ltbi_positive_hiv.transition_rate")
 
-        metrics:
-            - DisabilityObserver()
-            - MortalityObserver()
-            - DiseaseObserver("tuberculosis_and_hiv")
-
     vivarium_csu_ltbi.components:
         - TuberculosisAndHIV()
+        - HouseholdTuberculosisMortalityObserver()
+        - HouseholdTuberculosisDisabilityObserver()
+        - HouseholdTuberculosisDiseaseObserver("tuberculosis_and_hiv")
 
 configuration:
     input_data:
