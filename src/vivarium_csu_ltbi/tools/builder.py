@@ -58,7 +58,7 @@ class DataRepo:
         df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
 
         # fix age groups
-        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07673233, 1)]
+        young_ages = [(0, 0.01917808), (0.01917808, 0.07671233), (0.07671233, 1)]
         replicated = [df.loc[df.age_start == 0].copy() for _ in
                       range(len(young_ages))]  # create copies of 0-1 age group
         df = df.loc[df.age_start != 0.0]  # remove that group from the data
@@ -98,8 +98,8 @@ class DataRepo:
         draws = np.random.normal(mean, std, 1000)
 
         demog = get_demographic_dimensions(loc)
-        demog = split_interval(demog, interval_column='age', split_column_prefix='age').reset_index()
-        demog = demog.drop(columns=['year'])
+        demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+        demog = split_interval(demog, interval_column='year', split_column_prefix='year').reset_index()
         demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
         demog['affected_measure'] = 'transition_rate'
 
@@ -117,34 +117,38 @@ class DataRepo:
         hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
         complete = pd.concat([hiv_negative, hiv_positive], axis=0)
-        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+        complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end', 'year_start', 'year_end',
                                        'affected_entity', 'affected_measure'])
         rr = utilities.sort_hierarchical_data(complete)
 
         return rr
 
     @staticmethod
-    def get_hh_tuberculosis_paf(exposure, rr):
+    def get_hh_tuberculosis_paf(exposure, relative_risk):
+        e = exposure.reset_index().set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+                                              'year_start', 'year_end'])
+        r = relative_risk.reset_index().set_index(['location', 'parameter', 'sex', 'age_start',
+                                                   'age_end', 'year_start', 'year_end'])
 
-        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
-        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end'])
-
-        ae_specific_pafs = []
-        # assume one measure per entity
-        # assume only years 2017-18 present
-        for affected_entity in rr.affected_entity.unique():
-            ae_rr = rr.loc[rr.affected_entity == affected_entity]
+        weighted_rrs = []
+        for affected_entity in r.affected_entity.unique():
+            ae_rr = r.loc[r.affected_entity == affected_entity]
             affected_measure = list(ae_rr.affected_measure.unique())
             assert len(affected_measure) == 1
-            ae_paf = exposure * ae_rr
-            ae_paf['affected_entity'] = affected_entity
-            ae_paf['affected_measure'] = affected_measure * len(ae_paf)
-            ae_paf['year_start'] = 2017
-            ae_paf['year_end'] = 2018
-            ae_specific_pafs.append(ae_paf)
+            weighted_rr = e * ae_rr
+            weighted_rr['affected_entity'] = affected_entity
+            weighted_rr['affected_measure'] = affected_measure * len(weighted_rr)
+            weighted_rrs.append(weighted_rr)
 
-        paf = pd.concat(ae_specific_pafs, axis=0)
-        paf = paf.set_index(['affected_entity', 'affected_measure', 'year_start', 'year_end'], append=True)
+        weighted_rrs = pd.concat(weighted_rrs, axis=0)
+        weighted_rrs = weighted_rrs.set_index(['affected_entity', 'affected_measure'], append=True)
+        weighted_rrs = weighted_rrs.loc[pd.notnull(weighted_rrs).all(axis=1)]  # RR has full years, exposure does not
+        weighted_rrs = weighted_rrs.droplevel('parameter')
+
+        names = weighted_rrs.index.names
+        avg_rr = weighted_rrs.reset_index().groupby(names).sum()  # sums over categories
+
+        paf = (avg_rr - 1) / avg_rr
         paf = utilities.sort_hierarchical_data(paf)
 
         return paf
