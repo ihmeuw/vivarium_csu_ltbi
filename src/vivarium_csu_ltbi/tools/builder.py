@@ -124,27 +124,31 @@ class DataRepo:
         return rr
 
     @staticmethod
-    def get_hh_tuberculosis_paf(exposure, rr):
+    def get_hh_tuberculosis_paf(exposure, relative_risk):
+        e = exposure.reset_index().set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
+                                              'year_start', 'year_end'])
+        r = relative_risk.reset_index().set_index(['location', 'parameter', 'sex', 'age_start',
+                                                   'age_end', 'year_start', 'year_end'])
 
-        exposure = exposure.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end',
-                                                     'year_start', 'year_end'])
-        rr = rr.reset_index().set_index(['location', 'sex', 'parameter', 'age_start', 'age_end', 'year_start',
-                                         'year_end'])
-
-        ae_specific_pafs = []
-        # assume one measure per entity
-        for affected_entity in rr.affected_entity.unique():
-            ae_rr = rr.loc[rr.affected_entity == affected_entity]
+        weighted_rrs = []
+        for affected_entity in r.affected_entity.unique():
+            ae_rr = r.loc[r.affected_entity == affected_entity]
             affected_measure = list(ae_rr.affected_measure.unique())
             assert len(affected_measure) == 1
-            ae_paf = exposure * ae_rr
-            ae_paf['affected_entity'] = affected_entity
-            ae_paf['affected_measure'] = affected_measure * len(ae_paf)
-            ae_specific_pafs.append(ae_paf)
+            weighted_rr = e * ae_rr
+            weighted_rr['affected_entity'] = affected_entity
+            weighted_rr['affected_measure'] = affected_measure * len(weighted_rr)
+            weighted_rrs.append(weighted_rr)
 
-        paf = pd.concat(ae_specific_pafs, axis=0)
-        paf = paf.set_index(['affected_entity', 'affected_measure'], append=True)
-        paf = paf.loc[pd.notnull(paf).all(axis=1)]  # RR has full years, exposure does not
+        weighted_rrs = pd.concat(weighted_rrs, axis=0)
+        weighted_rrs = weighted_rrs.set_index(['affected_entity', 'affected_measure'], append=True)
+        weighted_rrs = weighted_rrs.loc[pd.notnull(weighted_rrs).all(axis=1)]  # RR has full years, exposure does not
+        weighted_rrs = weighted_rrs.droplevel('parameter')
+
+        names = weighted_rrs.index.names
+        avg_rr = weighted_rrs.reset_index().groupby(names).sum()  # sums over categories
+
+        paf = (avg_rr - 1) / avg_rr
         paf = utilities.sort_hierarchical_data(paf)
 
         return paf
