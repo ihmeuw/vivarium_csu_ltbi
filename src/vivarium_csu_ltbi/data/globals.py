@@ -1,6 +1,6 @@
 
 
-COUNTRIES = ['South Africa', 'India', 'Philippines', 'Ethiopia', 'Brazil']
+COUNTRIES = ['South Africa', 'India', 'Philippines', 'Ethiopia', 'Peru']
 
 
 def formatted_country(country):
