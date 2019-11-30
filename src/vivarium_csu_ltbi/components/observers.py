@@ -106,14 +106,14 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
                                                                  self.clock().year, self.step_size(),
                                                                  self.age_bins, self.disability_weight_pipelines,
                                                                  self.causes)
-        exposed_ylds_this_step = {f'{k}_exposed_to_httb': v for k, v in exposed_ylds_this_step.items()}
+        exposed_ylds_this_step = {f'{k}_exposed_to_hhtb': v for k, v in exposed_ylds_this_step.items()}
         self.years_lived_with_disability.update(exposed_ylds_this_step)
 
         unexposed_ylds_this_step = get_years_lived_with_disability(unexposed, self.config.to_dict(),
                                                                    self.clock().year, self.step_size(),
                                                                    self.age_bins, self.disability_weight_pipelines,
                                                                    self.causes)
-        unexposed_ylds_this_step = {f'{k}_unexposed_to_httb': v for k, v in unexposed_ylds_this_step.items()}
+        unexposed_ylds_this_step = {f'{k}_unexposed_to_hhtb': v for k, v in unexposed_ylds_this_step.items()}
         self.years_lived_with_disability.update(unexposed_ylds_this_step)
 
         pop.loc[:, 'years_lived_with_disability'] += self.disability_weight(pop.index)
