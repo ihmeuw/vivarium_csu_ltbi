@@ -20,8 +20,7 @@ def load_data(country_path: str):
     """load data and drop uncompleted draws if exists"""
     with open(country_path + '/keyspace.yaml', 'r') as f:
         keyspace = yaml.load(f.read())
-        
-    
+
     count = len(keyspace['random_seed'])
     df = pd.read_hdf(country_path + '/output.hdf')
     random_seed_count = df.groupby('input_draw').random_seed.count()
@@ -32,13 +31,13 @@ def load_data(country_path: str):
     
     return df
 
-def get_sex_from_template(template_string):
+def get_sex_from_template(template_string: str):
     return template_string.split('_among_')[1].split('_in_')[0].capitalize()
 
-def get_age_group_from_template(template_string):
+def get_age_group_from_template(template_string: str):
     return '_'.join(template_string.split('_age_group_')[1].split('_')[:-3])
 
-def get_risk_group_from_template(template_string):
+def get_risk_group_from_template(template_string: str):
     return '_'.join(template_string.split('_')[-3:])
 
 def standardize_shape(data: pd.DataFrame, measure: str):
