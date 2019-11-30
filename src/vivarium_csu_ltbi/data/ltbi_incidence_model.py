@@ -18,11 +18,11 @@ def load_data(country_name: str):
 
     # aggregate all child active TB causes incidence to obtain all-form active TB incidence
     for actb in ACTIVE_TB_NAMES:
-        i_actb += get_measure(getattr(causes, actb), 'incidence', country_name)
+        i_actb += get_measure(getattr(causes, actb), 'incidence_rate', country_name)
 
     f_ltbi = i_actb / p_ltbi
 
-    csmr_all = get_measure(causes.all_causes, 'cause_specific_mortality', country_name)
+    csmr_all = get_measure(causes.all_causes, 'cause_specific_mortality_rate', country_name)
 
     p_ltbi = split_interval(p_ltbi, interval_column='age', split_column_prefix='age_group')
     p_ltbi = split_interval(p_ltbi, interval_column='year', split_column_prefix='year')
