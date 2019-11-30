@@ -125,14 +125,14 @@ def get_person_time(data: pd.DataFrame):
     return pt_agg
 
 def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
-    """convert count space results to rate space and calculate mean, lower bound, and upper bound"""
+    """convert count space results to rate space, then
+    calculate mean, lower bound, and upper bound
+    """
     results_w_pt = pd.merge(results, person_time, on=['sex', 'age_group', 'risk_group', 'input_draw'])
     results_w_pt.rename(columns={'value': 'count'}, inplace=True)
     results_w_pt['rate'] = results_w_pt['count'] / results_w_pt['person_time'] * 100_000
     
     g = results_w_pt.groupby(template_cols[:-1])[['count', 'rate', 'person_time']].describe(percentiles=[.025, .975])
-    table_shell = g.filter([('count', 'mean'), ('count', '2.5%'), ('count', '97.5%'),
-                            ('rate', 'mean'), ('rate', '2.5%'), ('rate', '97.5%'),
-                            ('person_time', 'mean'), ('person_time', '2.5%'), ('person_time', '97.5%')])
-    return table_shell
+    t = g.loc[:, pd.IndexSlice[:, ['mean', '2.5%', '97.5%']]]
+    return t
 
