@@ -2,19 +2,19 @@ import pandas as pd
 import yaml
 import warnings
 
-result_dir = '/share/costeffectiveness/vivarium_csu_ltbi/'
+result_dir = '/share/costeffectiveness/results/vivarium_csu_ltbi/subminimal-with-risk/'
 
-path_for_location = {'Brazil': result_dir + 'brazil/2019_11_12_22_39_17',
-                     'Ethiopia': result_dir + 'ethiopia/2019_11_12_19_23_10',
-                     'India': result_dir + 'india/2019_11_12_19_20_29',
-                     'Philippines': result_dir + 'philippines/2019_11_12_22_40_56',
-                     'South Africa': result_dir + 'south_africa/2019_11_12_19_24_48'}
+# update it as needed
+path_for_location = {'Ethiopia': result_dir + 'ethiopia/2019_11_26_21_54_04',
+                     'India': result_dir + 'india/2019_11_26_21_53_09',
+                     'Philippines': result_dir + 'philippines/2019_11_26_21_54_09',
+                     'South Africa': result_dir + 'south_africa/2019_11_26_21_54_14'}
 
 cause_names = ['ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'protected_tb_susceptible_hiv',
                'ltbi_positive_hiv', 'activetb_positive_hiv', 'protected_tb_positive_hiv',
                'susceptible_tb_positive_hiv', 'other_causes']
 
-template_cols = ['cause', 'sex', 'age_group', 'measure', 'input_draw']
+template_cols = ['cause', 'sex', 'age_group', 'risk_group', 'measure', 'input_draw']
 
 def load_data(country_path: str):
     """load data and drop uncompleted draws if exists"""
@@ -32,11 +32,14 @@ def load_data(country_path: str):
     
     return df
 
-def get_sex_from_template(template_string: str):
+def get_sex_from_template(template_string):
     return template_string.split('_among_')[1].split('_in_')[0].capitalize()
 
-def get_age_group_from_template(template_string: str):
-    return template_string.split('_age_group_')[1]
+def get_age_group_from_template(template_string):
+    return '_'.join(template_string.split('_age_group_')[1].split('_')[:-3])
+
+def get_risk_group_from_template(template_string):
+    return '_'.join(template_string.split('_')[-3:])
 
 def standardize_shape(data: pd.DataFrame, measure: str):
     """select specific measure of data and unpivot it into long-format dataframe"""
@@ -51,6 +54,7 @@ def standardize_shape(data: pd.DataFrame, measure: str):
         measure_data['measure'] = measure  
     measure_data['sex'] = measure_data.label.map(get_sex_from_template)
     measure_data['age_group'] = measure_data.label.map(get_age_group_from_template)
+    measure_data['risk_group'] = measure_data.label.map(get_risk_group_from_template)
     
     measure_data.drop(columns='label', inplace=True)
     return measure_data
@@ -91,12 +95,12 @@ def append_demographic_aggregates(data: pd.DataFrame, by_cause=False):
     """aggregate results on demographic groups and append it to input data"""
     extra_cols = ['cause'] if by_cause else []
     
-    age_aggregate = data.groupby(extra_cols + ['sex', 'measure', 'input_draw']).value.sum().reset_index()
+    age_aggregate = data.groupby(extra_cols + ['sex', 'risk_group', 'measure', 'input_draw']).value.sum().reset_index()
     age_aggregate['age_group'] = 'all_ages'
 
     data = pd.concat([data, age_aggregate])
 
-    sex_aggregate = data.groupby(extra_cols + ['age_group', 'measure', 'input_draw']).value.sum().reset_index()
+    sex_aggregate = data.groupby(extra_cols + ['age_group', 'risk_group', 'measure', 'input_draw']).value.sum().reset_index()
     sex_aggregate['sex'] = 'Both'
 
     data = pd.concat([data, sex_aggregate])
@@ -123,7 +127,7 @@ def get_person_time(data: pd.DataFrame):
 
 def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
     """convert count space results to rate space and calculate mean, lower bound, and upper bound"""
-    results_w_pt = pd.merge(results, person_time, on=['sex', 'age_group', 'input_draw'])
+    results_w_pt = pd.merge(results, person_time, on=['sex', 'age_group', 'risk_group', 'input_draw'])
     results_w_pt.rename(columns={'value': 'count'}, inplace=True)
     results_w_pt['rate'] = results_w_pt['count'] / results_w_pt['person_time'] * 100_000
     
