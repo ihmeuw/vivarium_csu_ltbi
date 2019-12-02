@@ -4,12 +4,16 @@ components:
             - BasePopulation()
             - Mortality()
 
-        metrics:
-            - DisabilityObserver()
-            - MortalityObserver()
+        risks:
+            - Risk("risk_factor.household_tuberculosis")
+            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv.transition_rate")
+            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_positive_hiv_to_ltbi_positive_hiv.transition_rate")
 
     vivarium_csu_ltbi.components:
         - TuberculosisAndHIV()
+        - HouseholdTuberculosisMortalityObserver()
+        - HouseholdTuberculosisDisabilityObserver()
+        - HouseholdTuberculosisDiseaseObserver("tuberculosis_and_hiv")
 
 configuration:
     input_data:
@@ -48,3 +52,11 @@ configuration:
             by_age: True
             by_sex: True
             by_year: False
+        tuberculosis_and_hiv_observer:
+            by_age: True
+            by_age: True
+            by_year: False
+            prevalence_sample_date:
+                month: 7
+                day: 1
+
