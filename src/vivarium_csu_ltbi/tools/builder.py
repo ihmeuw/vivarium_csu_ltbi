@@ -250,13 +250,23 @@ def write_exposure_risk_data(art, data):
           skip_interval_processing=True)
 
 
-def write_baseline_coverage_levels(art):
+def write_baseline_coverage_levels(art, loc):
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f'Reading baseline coverage data from {data_path} and writing')
 
     data = pd.read_csv(data_path / 'baseline_coverage.csv')
+    data = data.rename(columns={'year': 'year_start'})
+    data['year_end'] = data['year_start'] + 1
+    data = data.set_index(['location'])
 
-    write(art, 'baseline_coverage.proportion', data, skip_interval_processing=True)
+    demog = get_demographic_dimensions(loc).reset_index()
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = demog.drop(['year'])
+    demog = demog.set_index(['location'])
+
+    duplicated = data.join(demog)
+
+    write(art, 'baseline_coverage.proportion', duplicated.reset_index(), skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
@@ -415,6 +425,6 @@ def build_ltbi_artifact(loc, output_dir=None):
 
     write_exposure_risk_data(art, data)
 
-    write_baseline_coverage_levels(art)
+    write_baseline_coverage_levels(art, loc)
 
     logger.info('!!! Done !!!')
