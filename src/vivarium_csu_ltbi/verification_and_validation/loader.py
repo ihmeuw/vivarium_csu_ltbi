@@ -6,7 +6,7 @@ import pandas as pd
 import yaml
 
 
-RESULT_DIRECTORY = Path('/share/costeffectiveness/vivarium_csu_ltbi/')
+RESULT_DIRECTORY = Path('/share/costeffectiveness/results/vivarium_csu_ltbi/')
 CAUSE_NAMES = ['ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'protected_tb_susceptible_hiv',
                'ltbi_positive_hiv', 'activetb_positive_hiv', 'protected_tb_positive_hiv',
                'susceptible_tb_positive_hiv', 'other_causes']
