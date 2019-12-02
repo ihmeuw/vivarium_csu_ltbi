@@ -58,19 +58,30 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
 
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index)
-        for state in self.states:
-            state_person_time_this_step = self.get_state_person_time(pop, self.config.to_dict(), self.disease, state,
-                                                                     self.clock().year, event.step_size, self.age_bins)
-            # Manually fixing an odd state name
-            state_person_time_this_step = self.fix_susceptible_state(state, state_person_time_this_step)
-            self.person_time.update(state_person_time_this_step)
+        pop_exposure_category = self.household_tb_exposure(event.index)
+
+        for category in ['cat1', 'cat2']:
+            exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
+            pop_in_category = pop.loc[pop_exposure_category == category]
+            for state in self.states:
+                state_person_time_this_step = self.get_state_person_time(pop_in_category, self.config.to_dict(),
+                                                                         self.disease, state, self.clock().year,
+                                                                         event.step_size, self.age_bins)
+                state_person_time_this_step = self.fix_susceptible_state_name(state, state_person_time_this_step)
+                state_person_time_this_step = {f'{k}_{exposure_state}': v for k, v in state_person_time_this_step.items()}
+                self.person_time.update(state_person_time_this_step)
 
         if self.should_sample(event.time):
-            for state in self.states:
-                state_point_prevalence = self.get_state_prevalent_cases(pop, self.config.to_dict(), self.disease, state,
-                                                                        event.time, self.age_bins)
-                state_point_prevalence = self.fix_susceptible_state(state, state_point_prevalence)
-                self.prevalence.update(state_point_prevalence)
+            for category in ['cat1', 'cat2']:
+                exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
+                pop_in_category = pop.loc[pop_exposure_category == category]
+                for state in self.states:
+                    state_point_prevalence = self.get_state_prevalent_cases(pop_in_category, self.config.to_dict(),
+                                                                            self.disease, state, event.time,
+                                                                            self.age_bins)
+                    state_point_prevalence = self.fix_susceptible_state_name(state, state_point_prevalence)
+                    state_point_prevalence = {f'{k}_{exposure_state}': v for k, v in state_point_prevalence.items()}
+                    self.prevalence.update(state_point_prevalence)
 
         # This enables tracking of transitions between states
         prior_state_pop = self.population_view.get(event.index)
@@ -78,16 +89,15 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         self.population_view.update(prior_state_pop)
 
     @staticmethod
-    def fix_susceptible_state(state: str, data: dict):
-        """Manually fixing an odd state name"""
+    def fix_susceptible_state_name(state: str, data: dict):
+        """Manually fixing an odd state name that is unavoidable from the disease model."""
         if state == 'susceptible_to_susceptible_tb_susceptible_hiv':
-            data = {f"{k.replace('susceptible_to_', '')}": v for k, v in
-                                           data.items()}
+            data = {f"{k.replace('susceptible_to_', '')}": v for k, v in data.items()}
         return data
 
     def on_collect_metrics(self, event):
         pop = self.population_view.get(event.index)
-        exposure_category = self.household_tb_exposure(event.index)
+        pop_exposure_category = self.household_tb_exposure(event.index)
 
         for category in ['cat1', 'cat2']:
             exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
@@ -103,7 +113,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
                     state_counts = get_disease_event_counts(pop_in_state_and_from_state, self.config.to_dict(),
                                                             state, event.time, self.age_bins)
                     state_counts = {f"{k}_from_{previous_state}_{exposure_state}": v for k, v in state_counts.items()}
-                    state_counts = self.fix_susceptible_state(state, state_counts)
+                    state_counts = self.fix_susceptible_state_name(state, state_counts)
                     self.counts.update(state_counts)
 
 
