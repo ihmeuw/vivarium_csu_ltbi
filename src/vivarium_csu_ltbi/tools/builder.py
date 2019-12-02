@@ -3,13 +3,14 @@ from loguru import logger
 import pandas as pd
 import numpy as np
 
-from gbd_mapping import causes, risk_factors
+from gbd_mapping import causes
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
 from vivarium_gbd_access import gbd
 
+import vivarium_csu_ltbi
 from vivarium_csu_ltbi.components.names import *
 
 
@@ -249,6 +250,15 @@ def write_exposure_risk_data(art, data):
           skip_interval_processing=True)
 
 
+def write_baseline_coverage_levels(art):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f'Reading baseline coverage data from {data_path} and writing')
+
+    data = pd.read_csv(data_path / 'baseline_coverage.csv')
+
+    write(art, 'baseline_coverage.proportion', data, skip_interval_processing=True)
+
+
 def compute_prevalence(art, data):
     logger.info('Computing prevalence...')
 
@@ -404,5 +414,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_transition_rates(art, data)
 
     write_exposure_risk_data(art, data)
+
+    write_baseline_coverage_levels(art)
 
     logger.info('!!! Done !!!')
