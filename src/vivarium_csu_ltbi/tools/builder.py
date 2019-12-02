@@ -259,14 +259,15 @@ def write_baseline_coverage_levels(art, loc):
     data['year_end'] = data['year_start'] + 1
     data = data.set_index(['location'])
 
-    demog = get_demographic_dimensions(loc).reset_index()
+    demog = get_demographic_dimensions(loc)
     demog = split_interval(demog, interval_column='age', split_column_prefix='age')
-    demog = demog.drop(['year'])
+    demog = demog.reset_index().drop(['year'], axis=1)
     demog = demog.set_index(['location'])
 
-    duplicated = data.join(demog)
+    duplicated = pd.merge(demog, data, left_index=True, right_index=True)
+    duplicated = duplicated.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end'], append=True)
 
-    write(art, 'baseline_coverage.proportion', duplicated.reset_index(), skip_interval_processing=True)
+    write(art, 'baseline_coverage.proportion', duplicated, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
