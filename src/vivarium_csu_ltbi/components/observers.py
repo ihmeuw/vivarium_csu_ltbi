@@ -16,7 +16,6 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
 
         disease_component = builder.components.get_component("disease_model.tuberculosis_and_hiv")
         self.states = [state.name.split('.')[1] for state in disease_component.states]
-        self.builder = builder  # TODO: Remove
 
         self.previous_state_column = f'previous_{self.disease}'
         builder.population.initializes_simulants(self.initialize_previous_state,
