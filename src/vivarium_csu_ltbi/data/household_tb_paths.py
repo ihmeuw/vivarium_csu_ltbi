@@ -12,7 +12,7 @@ def get_input_data_path(country):
         'india': 'India',
         'philippines': 'Philippines',
         'ethiopia': 'Ethiopia',
-        'brazil': 'Brazil'
+        'peru': 'Peru'
     }
     data_path = Path("/home/j/Project/simulation_science/latent_tuberculosis_infection/"
                      "literature/household_structure/microdata/")
