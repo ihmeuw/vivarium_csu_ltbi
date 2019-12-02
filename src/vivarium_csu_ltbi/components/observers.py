@@ -92,9 +92,12 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         for category in ['cat1', 'cat2']:
             exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
             for state in self.states:
-                pop_in_state = pop.loc[(exposure_category == category) & (pop[self.disease] == state)]
-                previous_states = pop_in_state.previous_tuberculosis_and_hiv.unique()
-                for previous_state in previous_states:
+                pop_in_state = pop.loc[(pop_exposure_category == category) & (pop[self.disease] == state)]
+                # we must iterate over every state even if we know only a subset are present because we must have
+                # the same columns between simulations
+                for previous_state in self.states:
+                    if previous_state == state:
+                        continue
                     pop_in_state_and_from_state = pop_in_state.loc[pop_in_state[self.previous_state_column] ==
                                                                    previous_state]
                     state_counts = get_disease_event_counts(pop_in_state_and_from_state, self.config.to_dict(),
