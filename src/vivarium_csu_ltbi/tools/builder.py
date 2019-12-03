@@ -251,6 +251,7 @@ def write_exposure_risk_data(art, data):
 
 
 def write_baseline_coverage_levels(art, loc):
+    # TODO: Add in both drugs
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f'Reading baseline coverage data from {data_path} and writing')
 
@@ -265,9 +266,20 @@ def write_baseline_coverage_levels(art, loc):
     demog = demog.set_index(['location'])
 
     duplicated = pd.merge(demog, data, left_index=True, right_index=True)
-    duplicated = duplicated.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'group'], append=True)
 
-    data = pd.DataFrame(data={f'draw_{i}': duplicated['value'] for i in range(1000)}, index=duplicated.index)
+    six_h = duplicated.copy()
+    six_h['drug'] = '6h'
+    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'group', 'drug'], append=True)
+
+    three_h = duplicated.copy()
+    three_h['drug'] = '3h'
+    three_h['value'] = 0.0
+    three_h = three_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'group', 'drug'], append=True)
+
+    six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
+    three_h = pd.DataFrame(data={f'draw_{i}': three_h['value'] for i in range(1000)}, index=three_h.index)
+
+    data = pd.concat([three_h, six_h], axis=0)
 
     write(art, 'baseline_coverage.proportion', data, skip_interval_processing=True)
 
