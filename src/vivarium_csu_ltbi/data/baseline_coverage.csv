@@ -1,4 +1,4 @@
-location,year,subgroup,value
+location,year,treatment_subgroup,value
 South Africa,2019,with_hiv,67.14
 South Africa,2020,with_hiv,69.29
 South Africa,2021,with_hiv,71.43
