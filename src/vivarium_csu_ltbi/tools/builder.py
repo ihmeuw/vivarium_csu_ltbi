@@ -272,17 +272,16 @@ def write_baseline_coverage_levels(art, loc):
     six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
                             append=True)
 
-    three_h = duplicated.copy()
-    three_h['treatment_type'] = '3h'
-    three_h['value'] = 0.0
-    three_h = three_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
-                                append=True)
+    three_hp = duplicated.copy()
+    three_hp['value'] = 0.0
+    three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                                  append=True)
 
     six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
-    three_h = pd.DataFrame(data={f'draw_{i}': three_h['value'] for i in range(1000)}, index=three_h.index)
+    three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
 
     write(art, '6h.coverage.proportion', six_h, skip_interval_processing=True)
-    write(art, '3h.coverage.proportion', three_h, skip_interval_processing=True)
+    write(art, '3hp.coverage.proportion', three_hp, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
