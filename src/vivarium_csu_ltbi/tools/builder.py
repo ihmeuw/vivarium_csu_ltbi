@@ -258,6 +258,7 @@ def write_baseline_coverage_levels(art, loc):
     data = data.rename(columns={'year': 'year_start'})
     data['year_end'] = data['year_start'] + 1
     data = data.set_index(['location'])
+    data['value'] /= 100.
 
     demog = get_demographic_dimensions(loc)
     demog = split_interval(demog, interval_column='age', split_column_prefix='age')
