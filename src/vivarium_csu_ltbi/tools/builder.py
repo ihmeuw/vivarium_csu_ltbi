@@ -251,7 +251,6 @@ def write_exposure_risk_data(art, data):
 
 
 def write_baseline_coverage_levels(art, loc):
-    # TODO: Add in both drugs
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f'Reading baseline coverage data from {data_path} and writing')
 
@@ -263,6 +262,7 @@ def write_baseline_coverage_levels(art, loc):
     demog = get_demographic_dimensions(loc)
     demog = split_interval(demog, interval_column='age', split_column_prefix='age')
     demog = demog.reset_index().drop(['year'], axis=1)
+    demog = demog.drop_duplicates()
     demog = demog.set_index(['location'])
 
     duplicated = pd.merge(demog, data, left_index=True, right_index=True)
