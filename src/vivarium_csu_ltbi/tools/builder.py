@@ -269,13 +269,13 @@ def write_baseline_coverage_levels(art, loc):
     duplicated = pd.merge(demog, data, left_index=True, right_index=True)
 
     six_h = duplicated.copy()
-    six_h['drug'] = '6h'
-    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'group', 'drug'], append=True)
+    six_h['treatment_type'] = '6h'
+    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'subgroup', 'drug'], append=True)
 
     three_h = duplicated.copy()
-    three_h['drug'] = '3h'
+    three_h['treatment_type'] = '3h'
     three_h['value'] = 0.0
-    three_h = three_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'group', 'drug'], append=True)
+    three_h = three_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'subgroup', 'drug'], append=True)
 
     six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
     three_h = pd.DataFrame(data={f'draw_{i}': three_h['value'] for i in range(1000)}, index=three_h.index)

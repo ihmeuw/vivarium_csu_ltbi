@@ -1,4 +1,4 @@
-location,year,group,value
+location,year,subgroup,value
 South Africa,2019,with_hiv,67.14
 South Africa,2020,with_hiv,69.29
 South Africa,2021,with_hiv,71.43
@@ -6,13 +6,13 @@ South Africa,2022,with_hiv,73.57
 South Africa,2023,with_hiv,75.71
 South Africa,2024,with_hiv,77.86
 South Africa,2025,with_hiv,80.00
-South Africa,2019,under_five,61.57
-South Africa,2020,under_five,64.14
-South Africa,2021,under_five,66.71
-South Africa,2022,under_five,69.29
-South Africa,2023,under_five,71.86
-South Africa,2024,under_five,74.43
-South Africa,2025,under_five,77.00
+South Africa,2019,under_five_hhtb,61.57
+South Africa,2020,under_five_hhtb,64.14
+South Africa,2021,under_five_hhtb,66.71
+South Africa,2022,under_five_hhtb,69.29
+South Africa,2023,under_five_hhtb,71.86
+South Africa,2024,under_five_hhtb,74.43
+South Africa,2025,under_five_hhtb,77.00
 India,2019,with_hiv,27.00
 India,2020,with_hiv,31.25
 India,2021,with_hiv,35.50
@@ -20,13 +20,13 @@ India,2022,with_hiv,39.75
 India,2023,with_hiv,44.00
 India,2024,with_hiv,48.25
 India,2025,with_hiv,52.50
-India,2019,under_five,27.00
-India,2020,under_five,31.25
-India,2021,under_five,35.50
-India,2022,under_five,39.75
-India,2023,under_five,44.00
-India,2024,under_five,48.25
-India,2025,under_five,52.50
+India,2019,under_five_hhtb,27.00
+India,2020,under_five_hhtb,31.25
+India,2021,under_five_hhtb,35.50
+India,2022,under_five_hhtb,39.75
+India,2023,under_five_hhtb,44.00
+India,2024,under_five_hhtb,48.25
+India,2025,under_five_hhtb,52.50
 Philippines,2019,with_hiv,53.40
 Philippines,2020,with_hiv,56.00
 Philippines,2021,with_hiv,58.60
@@ -34,13 +34,13 @@ Philippines,2022,with_hiv,61.20
 Philippines,2023,with_hiv,63.80
 Philippines,2024,with_hiv,66.40
 Philippines,2025,with_hiv,69.00
-Philippines,2019,under_five,30.20
-Philippines,2020,under_five,34.25
-Philippines,2021,under_five,38.30
-Philippines,2022,under_five,42.35
-Philippines,2023,under_five,46.40
-Philippines,2024,under_five,50.45
-Philippines,2025,under_five,54.50
+Philippines,2019,under_five_hhtb,30.20
+Philippines,2020,under_five_hhtb,34.25
+Philippines,2021,under_five_hhtb,38.30
+Philippines,2022,under_five_hhtb,42.35
+Philippines,2023,under_five_hhtb,46.40
+Philippines,2024,under_five_hhtb,50.45
+Philippines,2025,under_five_hhtb,54.50
 Ethiopia,2019,with_hiv,48.33
 Ethiopia,2020,with_hiv,51.44
 Ethiopia,2021,with_hiv,54.56
@@ -48,13 +48,13 @@ Ethiopia,2022,with_hiv,57.67
 Ethiopia,2023,with_hiv,60.78
 Ethiopia,2024,with_hiv,63.89
 Ethiopia,2025,with_hiv,67.00
-Ethiopia,2019,under_five,27.21
-Ethiopia,2020,under_five,32.43
-Ethiopia,2021,under_five,37.64
-Ethiopia,2022,under_five,42.86
-Ethiopia,2023,under_five,48.07
-Ethiopia,2024,under_five,53.29
-Ethiopia,2025,under_five,58.50
+Ethiopia,2019,under_five_hhtb,27.21
+Ethiopia,2020,under_five_hhtb,32.43
+Ethiopia,2021,under_five_hhtb,37.64
+Ethiopia,2022,under_five_hhtb,42.86
+Ethiopia,2023,under_five_hhtb,48.07
+Ethiopia,2024,under_five_hhtb,53.29
+Ethiopia,2025,under_five_hhtb,58.50
 Peru,2019,with_hiv,47.00
 Peru,2020,with_hiv,47.00
 Peru,2021,with_hiv,47.00
@@ -62,10 +62,10 @@ Peru,2022,with_hiv,47.00
 Peru,2023,with_hiv,47.00
 Peru,2024,with_hiv,47.00
 Peru,2025,with_hiv,47.00
-Peru,2019,under_five,9.00
-Peru,2020,under_five,9.00
-Peru,2021,under_five,9.00
-Peru,2022,under_five,9.00
-Peru,2023,under_five,9.00
-Peru,2024,under_five,9.00
-Peru,2025,under_five,9.00
+Peru,2019,under_five_hhtb,9.00
+Peru,2020,under_five_hhtb,9.00
+Peru,2021,under_five_hhtb,9.00
+Peru,2022,under_five_hhtb,9.00
+Peru,2023,under_five_hhtb,9.00
+Peru,2024,under_five_hhtb,9.00
+Peru,2025,under_five_hhtb,9.00
