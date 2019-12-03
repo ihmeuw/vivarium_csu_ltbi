@@ -280,8 +280,8 @@ def write_baseline_coverage_levels(art, loc):
     six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
     three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
 
-    write(art, '6h.coverage.proportion', six_h, skip_interval_processing=True)
-    write(art, '3hp.coverage.proportion', three_hp, skip_interval_processing=True)
+    write(art, 'six_h.coverage.proportion', six_h, skip_interval_processing=True)
+    write(art, 'three_hp.coverage.proportion', three_hp, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
