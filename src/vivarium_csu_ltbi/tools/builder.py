@@ -291,7 +291,10 @@ def sample_from_normal(mean, std, index_name):
 
 
 def write_mock_adherence_data(art, loc):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info("Generating mock adherence data.")
+
+    adherence_parameters = pd.read_csv(data_path / 'adherence.csv')
 
     demog = get_demographic_dimensions(loc)
     demog = split_interval(demog, interval_column='age', split_column_prefix='age')
@@ -300,8 +303,8 @@ def write_mock_adherence_data(art, loc):
     demog['treatment_type'] = '3HP'
     three_hp_index = demog.set_index('treatment_type', append=True)
 
-    three_hp_mean = 0.5
-    three_hp_std = 0.25
+    three_hp_mean = adherence_parameters.loc[adherence_parameters['treatment_type'] == '3HP', 'mean']
+    three_hp_std = adherence_parameters.loc[adherence_parameters['treatment_type'] == '3HP', 'std']
     three_hp_draws = sample_from_normal(three_hp_mean, three_hp_std, '3HP')
 
     three_hp_data = three_hp_index.join(three_hp_draws)
@@ -309,8 +312,8 @@ def write_mock_adherence_data(art, loc):
     demog['treatment_type'] = '6H'
     six_h_index = demog.set_index('treatment_type', append=True)
 
-    six_h_mean = 0.75
-    six_h_std = 0.10
+    six_h_mean = adherence_parameters.loc[adherence_parameters['treatment_type'] == '6H', 'mean']
+    six_h_std = adherence_parameters.loc[adherence_parameters['treatment_type'] == '6H', 'std']
     six_h_draws = sample_from_normal(six_h_mean, six_h_std, '6H')
 
     six_h_data = six_h_index.join(six_h_draws)
@@ -320,7 +323,10 @@ def write_mock_adherence_data(art, loc):
 
 
 def write_mock_efficacy_data(art, loc):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info("Generating mock efficacy data.")
+
+    efficacy_parameters = pd.read_csv(data_path / 'efficacy.csv')
 
     demog = get_demographic_dimensions(loc)
     demog = split_interval(demog, interval_column='age', split_column_prefix='age')
@@ -329,8 +335,8 @@ def write_mock_efficacy_data(art, loc):
     demog['treatment_type'] = '3HP'
     three_hp_index = demog.set_index('treatment_type', append=True)
 
-    three_hp_mean = 0.5
-    three_hp_std = 0.25
+    three_hp_mean = efficacy_parameters.loc[efficacy_parameters['treatment_type'] == '3HP', 'mean']
+    three_hp_std = efficacy_parameters.loc[efficacy_parameters['treatment_type'] == '3HP', 'std']
     three_hp_draws = sample_from_normal(three_hp_mean, three_hp_std, '3HP')
 
     three_hp_data = three_hp_index.join(three_hp_draws)
@@ -338,8 +344,8 @@ def write_mock_efficacy_data(art, loc):
     demog['treatment_type'] = '6H'
     six_h_index = demog.set_index('treatment_type', append=True)
 
-    six_h_mean = 0.75
-    six_h_std = 0.10
+    six_h_mean = efficacy_parameters.loc[efficacy_parameters['treatment_type'] == '6H', 'mean']
+    six_h_std = efficacy_parameters.loc[efficacy_parameters['treatment_type'] == '6H', 'std']
     six_h_draws = sample_from_normal(six_h_mean, six_h_std, '6H')
 
     six_h_data = six_h_index.join(six_h_draws)
