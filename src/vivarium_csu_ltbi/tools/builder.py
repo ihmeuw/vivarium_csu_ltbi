@@ -269,21 +269,19 @@ def write_baseline_coverage_levels(art, loc):
     duplicated = pd.merge(demog, data, left_index=True, right_index=True)
 
     six_h = duplicated.copy()
-    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end'], append=True)
-    for treatment_subgroup in ['with_hiv', 'under_five_hhtb']:
-        six_h_subgroup = six_h.loc[six_h.treatment_subgroup == treatment_subgroup]
-        six_h_subgroup = pd.DataFrame(data={f'draw_{i}': six_h_subgroup['value'] for i in range(1000)},
-                                      index=six_h_subgroup.index)
-        write(art, f'six_h.{treatment_subgroup}.proportion', six_h_subgroup, skip_interval_processing=True)
+    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                            append=True)
 
     three_hp = duplicated.copy()
     three_hp['value'] = 0.0
-    three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end'], append=True)
-    for treatment_subgroup in ['with_hiv', 'under_five_hhtb']:
-        three_hp_subgroup = six_h.loc[three_hp.treatment_subgroup == treatment_subgroup]
-        three_hp_subgroup = pd.DataFrame(data={f'draw_{i}': three_hp_subgroup['value'] for i in range(1000)},
-                                      index=three_hp_subgroup.index)
-        write(art, f'three_hp.{treatment_subgroup}.proportion', three_hp_subgroup, skip_interval_processing=True)
+    three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                                  append=True)
+
+    six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
+    three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
+
+    write(art, 'six_h.coverage.proportion', six_h, skip_interval_processing=True)
+    write(art, 'three_hp.coverage.proportion', three_hp, skip_interval_processing=True)
 
 
 def compute_prevalence(art, data):
