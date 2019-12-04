@@ -3,13 +3,14 @@ from loguru import logger
 import pandas as pd
 import numpy as np
 
-from gbd_mapping import causes, risk_factors
+from gbd_mapping import causes
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
 from vivarium_gbd_access import gbd
 
+import vivarium_csu_ltbi
 from vivarium_csu_ltbi.components.names import *
 
 
@@ -249,6 +250,40 @@ def write_exposure_risk_data(art, data):
           skip_interval_processing=True)
 
 
+def write_baseline_coverage_levels(art, loc):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f'Reading baseline coverage data from {data_path} and writing')
+
+    data = pd.read_csv(data_path / 'baseline_coverage.csv')
+    data = data.rename(columns={'year': 'year_start'})
+    data['year_end'] = data['year_start'] + 1
+    data = data.set_index(['location'])
+    data['value'] /= 100.
+
+    demog = get_demographic_dimensions(loc)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = demog.reset_index().drop(['year'], axis=1)
+    demog = demog.drop_duplicates()
+    demog = demog.set_index(['location'])
+
+    duplicated = pd.merge(demog, data, left_index=True, right_index=True)
+
+    six_h = duplicated.copy()
+    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                            append=True)
+
+    three_hp = duplicated.copy()
+    three_hp['value'] = 0.0
+    three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                                  append=True)
+
+    six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
+    three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
+
+    write(art, 'six_h.coverage.proportion', six_h, skip_interval_processing=True)
+    write(art, 'three_hp.coverage.proportion', three_hp, skip_interval_processing=True)
+
+
 def sample_from_normal(mean, std, index_name):
     draw = np.random.normal(mean, std, size=1000)
     return pd.DataFrame(data={f'draw_{i}': draw[i] for i in range(1000)},
@@ -468,6 +503,8 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_transition_rates(art, data)
 
     write_exposure_risk_data(art, data)
+
+    write_baseline_coverage_levels(art, loc)
 
     write_mock_adherence_data(art, loc)
     write_mock_efficacy_data(art, loc)
