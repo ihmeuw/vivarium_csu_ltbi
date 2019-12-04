@@ -456,19 +456,20 @@ def get_output_artifact_path(country):
 
 def build_ltbi_artifact(loc, output_dir=None):
     data = DataRepo()
-    # data.pull_data(loc)
+    data.pull_data(loc)
     out_path = f'{loc.replace(" ",  "_").lower()}.hdf' if output_dir else get_output_artifact_path(loc)
     art = create_new_artifact(out_path, loc)
-    # write_demographic_data(art, loc, data)
-    # write_metadata(art, loc)
-    #
-    # compute_prevalence(art, data)
-    # compute_excess_mortality(art, data)
-    # compute_disability_weight(art, data)
-    # compute_transition_rates(art, data)
-    #
-    # write_exposure_risk_data(art, data)
+    write_demographic_data(art, loc, data)
+    write_metadata(art, loc)
 
+    compute_prevalence(art, data)
+    compute_excess_mortality(art, data)
+    compute_disability_weight(art, data)
+    compute_transition_rates(art, data)
+
+    write_exposure_risk_data(art, data)
+
+    write_mock_adherence_data(art, loc)
     write_mock_efficacy_data(art, loc)
 
     logger.info('!!! Done !!!')
