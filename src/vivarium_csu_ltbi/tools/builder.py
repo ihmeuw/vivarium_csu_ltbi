@@ -249,6 +249,70 @@ def write_exposure_risk_data(art, data):
           skip_interval_processing=True)
 
 
+def sample_from_normal(mean, std, index_name):
+    draw = np.random.normal(mean, std, size=1000)
+    return pd.DataFrame(data={f'draw_{i}': draw[i] for i in range(1000)},
+                        index=pd.Index([index_name], name='treatment_type'))
+
+
+def write_mock_adherence_data(art, loc):
+    logger.info("Generating mock adherence data.")
+
+    demog = get_demographic_dimensions(loc)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = split_interval(demog, interval_column='year', split_column_prefix='year')
+
+    demog['treatment_type'] = '3HP'
+    three_hp_index = demog.set_index('treatment_type', append=True)
+
+    three_hp_mean = 0.5
+    three_hp_std = 0.25
+    three_hp_draws = sample_from_normal(three_hp_mean, three_hp_std, '3HP')
+
+    three_hp_data = three_hp_index.join(three_hp_draws)
+
+    demog['treatment_type'] = '6H'
+    six_h_index = demog.set_index('treatment_type', append=True)
+
+    six_h_mean = 0.75
+    six_h_std = 0.10
+    six_h_draws = sample_from_normal(six_h_mean, six_h_std, '6H')
+
+    six_h_data = six_h_index.join(six_h_draws)
+
+    write(art, 'three_hp.adherence', three_hp_data, skip_interval_processing=True)
+    write(art, 'six_h.adherence', six_h_data, skip_interval_processing=True)
+
+
+def write_mock_efficacy_data(art, loc):
+    logger.info("Generating mock efficacy data.")
+
+    demog = get_demographic_dimensions(loc)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = split_interval(demog, interval_column='year', split_column_prefix='year')
+
+    demog['treatment_type'] = '3HP'
+    three_hp_index = demog.set_index('treatment_type', append=True)
+
+    three_hp_mean = 0.5
+    three_hp_std = 0.25
+    three_hp_draws = sample_from_normal(three_hp_mean, three_hp_std, '3HP')
+
+    three_hp_data = three_hp_index.join(three_hp_draws)
+
+    demog['treatment_type'] = '6H'
+    six_h_index = demog.set_index('treatment_type', append=True)
+
+    six_h_mean = 0.75
+    six_h_std = 0.10
+    six_h_draws = sample_from_normal(six_h_mean, six_h_std, '6H')
+
+    six_h_data = six_h_index.join(six_h_draws)
+
+    write(art, 'three_hp.efficacy', three_hp_data, skip_interval_processing=True)
+    write(art, 'six_h.efficacy', six_h_data, skip_interval_processing=True)
+
+
 def compute_prevalence(art, data):
     logger.info('Computing prevalence...')
 
@@ -392,17 +456,19 @@ def get_output_artifact_path(country):
 
 def build_ltbi_artifact(loc, output_dir=None):
     data = DataRepo()
-    data.pull_data(loc)
+    # data.pull_data(loc)
     out_path = f'{loc.replace(" ",  "_").lower()}.hdf' if output_dir else get_output_artifact_path(loc)
     art = create_new_artifact(out_path, loc)
-    write_demographic_data(art, loc, data)
-    write_metadata(art, loc)
+    # write_demographic_data(art, loc, data)
+    # write_metadata(art, loc)
+    #
+    # compute_prevalence(art, data)
+    # compute_excess_mortality(art, data)
+    # compute_disability_weight(art, data)
+    # compute_transition_rates(art, data)
+    #
+    # write_exposure_risk_data(art, data)
 
-    compute_prevalence(art, data)
-    compute_excess_mortality(art, data)
-    compute_disability_weight(art, data)
-    compute_transition_rates(art, data)
-
-    write_exposure_risk_data(art, data)
+    write_mock_efficacy_data(art, loc)
 
     logger.info('!!! Done !!!')
