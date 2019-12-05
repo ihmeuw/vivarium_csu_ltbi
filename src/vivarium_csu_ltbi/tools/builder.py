@@ -362,7 +362,7 @@ def write_relative_risk_data(art, location):
         full_cat_data.append(data)
 
     full_cat_data = pd.concat(full_cat_data, axis=0)
-    full_cat_data['affected_entity'] = 'hiv_and_tuberculosis'
+    full_cat_data['affected_entity'] = 'tuberculosis_and_hiv'
 
     affects_hiv_pos = full_cat_data.copy()
     affects_hiv_pos['affected_measure'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
