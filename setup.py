@@ -17,7 +17,7 @@ if __name__ == "__main__":
         long_description = f.read()
 
     install_requirements = [
-        'vivarium==0.9.1',
+        'vivarium==0.9.2',
         'vivarium_public_health==0.10.2',
         'vivarium_cluster_tools==1.1.0',
         'vivarium_inputs[data]==3.1.0',
@@ -27,18 +27,16 @@ if __name__ == "__main__":
         'tables<=3.4.0',
         'pandas<0.25',
 
-        'loguru',
-        'scipy',
-        'matplotlib',
-        'seaborn',
+        'click',
+        'jinja2',
         'jupyter',
-        'jupyterlab',
+        'loguru',
+        'matplotlib',
         'pytest',
         'pytest-mock',
         'pyyaml',
-        'jinja2',
-        'click',
-        'loguru',
+        'scipy',
+        'seaborn',
     ]
 
     data_requires = [
