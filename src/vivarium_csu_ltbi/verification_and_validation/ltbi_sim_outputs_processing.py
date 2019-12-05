@@ -126,6 +126,27 @@ def append_cause_aggregates(data: pd.DataFrame):
     
     return data.set_index(template_cols).sort_index().reset_index()
 
+def filter_by_causes(data: pd.DataFrame):
+    """calculate hiv_other by aggregating three states:
+    susceptible_tb_positive_hiv, ltbi_positive_hiv, and
+    protected_tb_positive_hiv; then select wanted causes.
+    """
+    wanted_causes = ['all_causes', 'activetb_susceptible_hiv', 'activetb_positive_hiv',
+                     'hiv_aids_resulting_in_other_diseases', 'other_causes']
+    
+    susceptible_tb_positive_hiv = data.loc[data.cause == 'susceptible_tb_positive_hiv'].set_index(template_cols[1:])
+    ltbi_positive_hiv = data.loc[data.cause == 'ltbi_positive_hiv'].set_index(template_cols[1:])
+    protected_tb_positive_hiv = data.loc[data.cause == 'protected_tb_positive_hiv'].set_index(template_cols[1:])
+
+    hiv_other = susceptible_tb_positive_hiv + ltbi_positive_hiv + protected_tb_positive_hiv
+    hiv_other['cause'] = 'hiv_aids_resulting_in_other_diseases'
+    
+    data = pd.concat([data, hiv_other.reset_index()])
+    data = data.loc[data.cause.isin(wanted_causes)]
+    data = data.set_index(template_cols).sort_index()
+    
+    return data.reset_index()
+
 def get_person_time(data: pd.DataFrame):
     """pull person time measure and append demographic aggregates"""
     pt = standardize_shape(data, 'person_time')
@@ -143,7 +164,9 @@ def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
     
     g = results_w_pt.groupby(template_cols[:-1])[['count', 'rate', 'person_time']].describe(percentiles=[.025, .975])
     t = g.loc[:, pd.IndexSlice[:, ['mean', '2.5%', '97.5%']]]
-    return t
+    t.columns = [f'{metric}_{val}' for metric, val in zip(t.columns.get_level_values(0), t.columns.get_level_values(1))]
+    
+    return t.reset_index()
 
 def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str, measure_type: str, hiv_status: str):
     """pull hiv-specific activetb counts or ltbi person time"""
