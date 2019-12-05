@@ -2,4 +2,4 @@ from .disease import TuberculosisAndHIV
 from .observers import (HouseholdTuberculosisDisabilityObserver,
                         HouseholdTuberculosisDiseaseObserver,
                         HouseholdTuberculosisMortalityObserver)
-from .treatment import BaselineCoverage
+from .treatment import LTBITreatmentCoverage
