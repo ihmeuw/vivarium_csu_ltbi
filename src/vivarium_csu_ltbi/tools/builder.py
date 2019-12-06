@@ -8,14 +8,9 @@ from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
-from vivarium_gbd_access import gbd
 
-import vivarium_csu_ltbi
-from vivarium_csu_ltbi.components.names import *
-
-
-PROJ_NAME = 'vivarium_csu_ltbi'
-DEFAULT_PATH = gbd.ARTIFACT_FOLDER / PROJ_NAME
+from vivarium_csu_ltbi import globals as ltbi_globals
+from vivarium_csu_ltbi import paths as ltbi_paths
 
 
 def set_to_known_value(df, set_to):
@@ -38,15 +33,15 @@ class DataRepo:
 
     @staticmethod
     def get_and_package_dismod_ltbi_incidence(loc):
-        datafile = DEFAULT_PATH / 'ltbi_incidence' / f'{loc.replace(" ", "_").lower()}.hdf'
+        datafile = ltbi_paths.get_ltbi_inc_input_artifact_path(loc)
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
             data['draw'] = data['draw'].apply(lambda x: f'draw_{x}')
-            data.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'}, inplace = True)
+            data.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end'}, inplace=True)
             result = pd.pivot_table(data,
-                           index=['location', 'age_start', 'age_end', 'sex', 'year_start', 'year_end'],
-                           columns='draw', values='value')
+                                    index=['location', 'age_start', 'age_end', 'sex', 'year_start', 'year_end'],
+                                    columns='draw', values='value')
             result.columns.name = ''
             return result
         else:
@@ -54,8 +49,8 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_exposure(loc):
-
-        df = pd.read_hdf(f'/share/costeffectiveness/artifacts/vivarium_csu_ltbi/household_tb/{loc.replace(" ", "_").lower()}.hdf')
+        datafile = ltbi_paths.get_hh_tb_output_artifact_path(loc)
+        df = pd.read_hdf(datafile)
         df = df.rename(columns={'age_group_start': 'age_start', 'age_group_end': 'age_end', 'pr_actb_in_hh': 'value'})
 
         # fix age groups
@@ -220,7 +215,7 @@ def get_load(location):
 
 def write_metadata(artifact, location):
     load = get_load(location)
-    key = f'cause.{TUBERCULOSIS_AND_HIV}.restrictions'
+    key = f'cause.{ltbi_globals.TUBERCULOSIS_AND_HIV}.restrictions'
     write(artifact, key, load(f'cause.hiv_aids.restrictions'))
 
 
@@ -237,20 +232,23 @@ def write_demographic_data(artifact, location, data):
     key = 'cause.all_causes.cause_specific_mortality_rate'
     write(artifact, key, load(key))
 
-    key = f'cause.{TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
+    key = f'cause.{ltbi_globals.TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
     write(artifact, key, (data.csmr_298 + data.csmr_297))
 
 
 def write_exposure_risk_data(art, data):
     logger.info('In write_exposure_risk_data...')
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.distribution', RISK_DISTRIBUTION_TYPE)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.exposure', data.exposure_hhtb, skip_interval_processing=True)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.relative_risk', data.risk_hhtb, skip_interval_processing=True)
-    write(art, f'risk_factor.{HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', data.paf_hhtb,
+    write(art, f'risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.distribution', ltbi_globals.RISK_DISTRIBUTION_TYPE)
+    write(art, f'risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure',
+          data.exposure_hhtb, skip_interval_processing=True)
+    write(art, f'risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.relative_risk',
+          data.risk_hhtb, skip_interval_processing=True)
+    write(art, f'risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.population_attributable_fraction', data.paf_hhtb,
           skip_interval_processing=True)
 
 
 def write_baseline_coverage_levels(art, loc):
+    import vivarium_csu_ltbi
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f'Reading baseline coverage data from {data_path} and writing')
 
@@ -291,6 +289,7 @@ def sample_from_normal(mean, std, index_name):
 
 
 def write_adherence_data(art, location):
+    import vivarium_csu_ltbi
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f"Reading adherence from {data_path}")
     data = pd.read_csv(data_path / "treatment_adherence_draws.csv", usecols=['adherence_3hp_real_world',
@@ -320,6 +319,7 @@ def write_adherence_data(art, location):
 
 
 def write_relative_risk_data(art, location):
+    import vivarium_csu_ltbi
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f"Reading relative risk data from {data_path}")
     data = pd.read_csv(data_path / "treatment_adherence_draws.csv", usecols=['RR_no_tx',
@@ -380,41 +380,41 @@ def compute_prevalence(art, data):
     logger.info('Computing prevalence...')
 
     state_sus_tb_sus_hiv = 1 - ((data.prev_297 + data.prev_298) - (data.prev_954 * data.prev_300))
-    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.prevalence', state_sus_tb_sus_hiv)
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.prevalence', state_sus_tb_sus_hiv)
 
     state_df_ltbi_s_hiv = data.prev_954 * (1 - data.prev_300)
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV}.prevalence', state_df_ltbi_s_hiv)
+    write(art, f'sequela.{ltbi_globals.LTBI_SUSCEPTIBLE_HIV}.prevalence', state_df_ltbi_s_hiv)
 
     state_act_tb_sus_hiv = data.prev_934 + data.prev_946 + data.prev_947
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.prevalence', state_act_tb_sus_hiv)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV}.prevalence', state_act_tb_sus_hiv)
 
     state_sus_tb_hiv_plus = (1 - data.prev_954) * data.prev_300
-    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.prevalence', state_sus_tb_hiv_plus)
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV}.prevalence', state_sus_tb_hiv_plus)
 
     state_ltbi_hiv_plus = data.prev_954 * data.prev_300
-    write(art, f'sequela.{LTBI_POSITIVE_HIV}.prevalence', state_ltbi_hiv_plus)
-    
+    write(art, f'sequela.{ltbi_globals.LTBI_POSITIVE_HIV}.prevalence', state_ltbi_hiv_plus)
+
     state_act_tb_hiv_plus = data.prev_948 + data.prev_949 + data.prev_950
-    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.prevalence', state_act_tb_hiv_plus)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_POSITIVE_HIV}.prevalence', state_act_tb_hiv_plus)
 
 
 def compute_excess_mortality(art, data):
     logger.info('Computing excess_mortality...')
 
-    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
 
     state_act_tb_sus_hiv = ((data.csmr_934 + data.csmr_946 + data.csmr_947)
                            / (data.prev_934 + data.prev_946 + data.prev_947))
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.excess_mortality_rate', state_act_tb_sus_hiv)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV}.excess_mortality_rate', state_act_tb_sus_hiv)
 
     emr_300 = data.csmr_300 / data.prev_300
-    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
-    write(art, f'sequela.{LTBI_POSITIVE_HIV}.excess_mortality_rate', emr_300)
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
+    write(art, f'sequela.{ltbi_globals.LTBI_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
+    write(art, f'sequela.{ltbi_globals.LTBI_POSITIVE_HIV}.excess_mortality_rate', emr_300)
 
     state_act_tb_plus_hiv = ((data.csmr_948 + data.csmr_949 + data.csmr_950)
                             / (data.prev_948 + data.prev_949 + data.prev_950))
-    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.excess_mortality_rate', state_act_tb_plus_hiv)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_POSITIVE_HIV}.excess_mortality_rate', state_act_tb_plus_hiv)
 
 
 def get_total_disability_weight(prevs, weights):
@@ -426,23 +426,24 @@ def get_total_disability_weight(prevs, weights):
 def compute_disability_weight(art, data):
     logger.info('Computing disability_weight...')
 
-    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.disability_weight', data.get_zeros())
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV}.disability_weight', data.get_zeros())
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.disability_weight', data.get_zeros())
+    write(art, f'sequela.{ltbi_globals.LTBI_SUSCEPTIBLE_HIV}.disability_weight', data.get_zeros())
 
     total_disability_weight = get_total_disability_weight(
         [data.prev_934, data.prev_946, data.prev_947], [data.dw_934, data.dw_946, data.dw_947])
 
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.disability_weight', total_disability_weight)
-    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
-    write(art, f'sequela.{LTBI_POSITIVE_HIV}.disability_weight', data.dw_300)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV}.disability_weight', total_disability_weight)
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
+    write(art, f'sequela.{ltbi_globals.LTBI_POSITIVE_HIV}.disability_weight', data.dw_300)
 
     total_disability_weight = get_total_disability_weight(
         [data.prev_948, data.prev_949, data.prev_950], [data.dw_948, data.dw_949, data.dw_950])
 
-    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV}.disability_weight', total_disability_weight)
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_POSITIVE_HIV}.disability_weight', total_disability_weight)
 
 
 def load_em_from_meid(meid, location):
+    from vivarium_gbd_access import gbd
     location_id = utility_data.get_location_id(location)
     data = gbd.get_modelable_entity_draws(meid, location_id)
     data = data[data.measure_id == globals.MEASURES['Remission rate']]
@@ -456,23 +457,23 @@ def load_em_from_meid(meid, location):
 def compute_transition_rates(art, data):
     logger.info('Computing transition_rates...')
 
-    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_LTBI_SUSCEPTIBLE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_LTBI_SUSCEPTIBLE_HIV}.transition_rate',
           data.incidence_ltbi, skip_interval_processing=True)
-    write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_ACTIVETB_SUSCEPTIBLE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.LTBI_SUSCEPTIBLE_HIV_TO_ACTIVETB_SUSCEPTIBLE_HIV}.transition_rate',
           (data.i_934 + data.i_946 + data.i_947) / (data.prev_954 * (1 - data.prev_300)))
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.incidence_ltbi, skip_interval_processing=True)
-    write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.LTBI_POSITIVE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
           (data.i_948 + data.i_949 + data.i_950) / (data.prev_954 * data.prev_300))
-    write(art, f'sequela.{ACTIVETB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.dismod_9422_remission)
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
+    write(art, f'sequela.{ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
           data.dismod_9422_remission)
 
 
@@ -496,14 +497,10 @@ def write(artifact, key, data, skip_interval_processing=False):
     artifact.write(key, tmp)
 
 
-def get_output_artifact_path(country):
-    return DEFAULT_PATH / f'{country.replace(" ",  "_").lower()}.hdf'
-
-
 def build_ltbi_artifact(loc, output_dir=None):
     data = DataRepo()
     data.pull_data(loc)
-    out_path = f'{loc.replace(" ",  "_").lower()}.hdf' if output_dir else get_output_artifact_path(loc)
+    out_path = f'{loc.replace(" ",  "_").lower()}.hdf' if output_dir else ltbi_paths.get_final_artifact_path(loc)
     art = create_new_artifact(out_path, loc)
     write_demographic_data(art, loc, data)
     write_metadata(art, loc)

@@ -1,5 +1,6 @@
 from vivarium_public_health.disease import DiseaseState, DiseaseModel, SusceptibleState, RateTransition
-from .names import *
+
+import vivarium_csu_ltbi.globals as ltbi_globals
 
 
 def wrap_data_getter(id):
@@ -48,15 +49,15 @@ class BetterRateTransition(RateTransition):
 
 def TuberculosisAndHIV():
     # the non-disease state
-    susceptible = BetterSusceptibleState(SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV)
+    susceptible = BetterSusceptibleState(ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV)
     susceptible.allow_self_transitions()
 
     # states
-    ltbi_susceptible_hiv = get_disease_state(LTBI_SUSCEPTIBLE_HIV)
-    activetb_susceptible_hiv = get_disease_state(ACTIVETB_SUSCEPTIBLE_HIV)
-    susceptible_tb_positive_hiv = get_disease_state(SUSCEPTIBLE_TB_POSITIVE_HIV)
-    ltbi_positive_hiv = get_disease_state(LTBI_POSITIVE_HIV)
-    activetb_positive_hiv = get_disease_state(ACTIVETB_POSITIVE_HIV)
+    ltbi_susceptible_hiv = get_disease_state(ltbi_globals.LTBI_SUSCEPTIBLE_HIV)
+    activetb_susceptible_hiv = get_disease_state(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV)
+    susceptible_tb_positive_hiv = get_disease_state(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV)
+    ltbi_positive_hiv = get_disease_state(ltbi_globals.LTBI_POSITIVE_HIV)
+    activetb_positive_hiv = get_disease_state(ltbi_globals.ACTIVETB_POSITIVE_HIV)
 
     # transitions
     susceptible.add_transition(ltbi_susceptible_hiv)
@@ -74,9 +75,7 @@ def TuberculosisAndHIV():
 
     activetb_positive_hiv.add_transition(susceptible_tb_positive_hiv)
 
-
-
-    return DiseaseModel(TUBERCULOSIS_AND_HIV,
+    return DiseaseModel(ltbi_globals.TUBERCULOSIS_AND_HIV,
                         states=[susceptible,
                                 ltbi_susceptible_hiv,
                                 activetb_susceptible_hiv,
