@@ -30,7 +30,7 @@ class LTBITreatmentCoverage:
         self.three_hp_with_hiv, self.three_hp_under_five_hhtb = self.setup_coverage_tables(builder,
                                                                                            three_hp_coverage_data)
 
-        self.coverage = builder.value.register_value_producer('ltbi_treatment.exposure',
+        self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage',
                                                               source=self.get_coverage,
                                                               requires_columns=['age', ltbi_globals.TUBERCULOSIS_AND_HIV],
                                                               requires_values=['household_tuberculosis.exposure'],
@@ -38,7 +38,7 @@ class LTBITreatmentCoverage:
 
         self._ltbi_treatment_status = pd.Series()
         self.ltbi_treatment_status = builder.value.register_value_producer(
-            'treatment_status.category',
+            'ltbi_treatment.exposure',
             source=lambda index: self._ltbi_treatment_status[index],
             requires_streams=[f'{self.name}.adherence_propensity']
         )

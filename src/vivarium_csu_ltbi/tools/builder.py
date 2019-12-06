@@ -376,10 +376,8 @@ def write_treatment_relative_risk_data(art, location):
     full_rr_data = full_rr_data.set_index(['affected_entity', 'affected_measure'], append=True)
 
     write(art, 'risk_factor.ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
-    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.relative_risk', full_rr_data, skip_interval_processing=True)
-    
     write(art, 'risk_factor.ltbi_treatment.distribution', 'ordered_polytomous', skip_interval_processing=True)
-    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.distribution', 'ordered_polytomous', skip_interval_processing=True)
+
     
 
 def write_population_attributable_fraction_data(art, location):
@@ -468,7 +466,6 @@ def write_population_attributable_fraction_data(art, location):
     paf = paf.set_index(['affected_entity', 'affected_measure'], append=True)
 
     write(art, 'risk_factor.ltbi_treatment.population_attributable_fraction', paf)
-    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.population_attributable_fraction', paf_hiv_neg)
 
 
 def compute_prevalence(art, data):
