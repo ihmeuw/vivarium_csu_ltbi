@@ -5,6 +5,8 @@ from vivarium_public_health.metrics.utilities import (get_output_template, get_d
                                                       get_group_counts, to_years, get_years_lived_with_disability,
                                                       get_person_time, get_deaths, get_years_of_life_lost)
 
+from vivarium_csu_ltbi import globals as ltbi_globals
+
 
 class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
 
@@ -14,7 +16,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
     def setup(self, builder):
         super().setup(builder)
 
-        disease_component = builder.components.get_component("disease_model.tuberculosis_and_hiv")
+        disease_component = builder.components.get_component(f"disease_model.{ltbi_globals.TUBERCULOSIS_AND_HIV}")
         self.states = [state.name.split('.')[1] for state in disease_component.states]
 
         self.previous_state_column = f'previous_{self.disease}'
@@ -32,7 +34,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
             columns_required += ['sex']
         self.population_view = builder.population.get_view(columns_required)
 
-        self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
+        self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
 
     def initialize_previous_state(self, pop_data):
         population = self.population_view.subview(['alive']).get(pop_data.index)
@@ -60,8 +62,8 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         pop = self.population_view.get(event.index)
         pop_exposure_category = self.household_tb_exposure(event.index)
 
-        for category in ['cat1', 'cat2']:
-            exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
+        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
             pop_in_category = pop.loc[pop_exposure_category == category]
             for state in self.states:
                 state_person_time_this_step = self.get_state_person_time(pop_in_category, self.config.to_dict(),
@@ -72,8 +74,8 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
                 self.person_time.update(state_person_time_this_step)
 
         if self.should_sample(event.time):
-            for category in ['cat1', 'cat2']:
-                exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
+            for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
+                exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
                 pop_in_category = pop.loc[pop_exposure_category == category]
                 for state in self.states:
                     state_point_prevalence = self.get_state_prevalent_cases(pop_in_category, self.config.to_dict(),
@@ -91,7 +93,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
     @staticmethod
     def fix_susceptible_state_name(state: str, data: dict):
         """Manually fixing an odd state name that is unavoidable from the disease model."""
-        if state == 'susceptible_to_susceptible_tb_susceptible_hiv':
+        if state == f'susceptible_to_{ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}':
             data = {f"{k.replace('susceptible_to_', '')}": v for k, v in data.items()}
         return data
 
@@ -99,8 +101,8 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         pop = self.population_view.get(event.index)
         pop_exposure_category = self.household_tb_exposure(event.index)
 
-        for category in ['cat1', 'cat2']:
-            exposure_state = 'exposed_to_hhtb' if category == 'cat1' else 'unexposed_to_hhtb'
+        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
             for state in self.states:
                 pop_in_state = pop.loc[(pop_exposure_category == category) & (pop[self.disease] == state)]
                 # we must iterate over every state even if we know only a subset are present because we must have
@@ -124,7 +126,7 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
 
     def setup(self, builder):
         super().setup(builder)
-        self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
+        self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
 
     def metrics(self, index, metrics):
         pop = self.population_view.get(index)
@@ -132,36 +134,21 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
 
         exposure_category = self.household_tb_exposure(index)
 
-        exposed = pop.loc[exposure_category == 'cat1']
-        unexposed = pop.loc[exposure_category == 'cat2']
+        measure_getters = (
+            (get_person_time, ()),
+            (get_deaths, (self.causes,)),
+            (get_years_of_life_lost, (self.life_expectancy, self.causes)),
+        )
 
-        exposed_person_time = get_person_time(exposed, self.config.to_dict(), self.start_time, self.clock(),
-                                              self.age_bins)
-        exposed_person_time = {f'{k}_exposed_to_hhtb': v for k, v in exposed_person_time.items()}
-        exposed_deaths = get_deaths(exposed, self.config.to_dict(), self.start_time, self.clock(), self.age_bins,
-                                    self.causes)
-        exposed_deaths = {f'{k}_exposed_to_hhtb': v for k, v in exposed_deaths.items()}
-        exposed_ylls = get_years_of_life_lost(exposed, self.config.to_dict(), self.start_time, self.clock(),
-                                              self.age_bins, self.life_expectancy, self.causes)
-        exposed_ylls = {f'{k}_exposed_to_hhtb': v for k, v in exposed_ylls.items()}
+        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
+            category_pop = pop.loc[exposure_category == category]
+            base_args = (category_pop, self.config.to_dict(), self.start_time, self.clock(), self.age_bins)
 
-        metrics.update(exposed_person_time)
-        metrics.update(exposed_deaths)
-        metrics.update(exposed_ylls)
-
-        unexposed_person_time = get_person_time(unexposed, self.config.to_dict(), self.start_time, self.clock(),
-                                                self.age_bins)
-        unexposed_person_time = {f'{k}_unexposed_to_hhtb': v for k, v in unexposed_person_time.items()}
-        unexposed_deaths = get_deaths(unexposed, self.config.to_dict(), self.start_time, self.clock(), self.age_bins,
-                                    self.causes)
-        unexposed_deaths = {f'{k}_unexposed_to_hhtb': v for k, v in unexposed_deaths.items()}
-        unexposed_ylls = get_years_of_life_lost(unexposed, self.config.to_dict(), self.start_time, self.clock(),
-                                              self.age_bins, self.life_expectancy, self.causes)
-        unexposed_ylls = {f'{k}_unexposed_to_hhtb': v for k, v in unexposed_ylls.items()}
-
-        metrics.update(unexposed_person_time)
-        metrics.update(unexposed_deaths)
-        metrics.update(unexposed_ylls)
+            for measure_getter, extra_args in measure_getters:
+                measure_data = measure_getter(*base_args, *extra_args)
+                measure_data = {f'{k}_{exposure_state}': v for k, v in measure_data.items()}
+                metrics.update(measure_data)
 
         the_living = pop[(pop.alive == 'alive') & pop.tracked]
         the_dead = pop[pop.alive == 'dead']
@@ -179,28 +166,25 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
 
     def setup(self, builder):
         super().setup(builder)
-        self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
+        self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
 
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index, query='tracked == True and alive == "alive"')
-        exposure_category = self.household_tb_exposure(event.index)
 
-        exposed = pop.loc[exposure_category == 'cat1']
-        unexposed = pop.loc[exposure_category == 'cat2']
-
-        exposed_ylds_this_step = get_years_lived_with_disability(exposed, self.config.to_dict(),
-                                                                 self.clock().year, self.step_size(),
-                                                                 self.age_bins, self.disability_weight_pipelines,
-                                                                 self.causes)
-        exposed_ylds_this_step = {f'{k}_exposed_to_hhtb': v for k, v in exposed_ylds_this_step.items()}
-        self.years_lived_with_disability.update(exposed_ylds_this_step)
-
-        unexposed_ylds_this_step = get_years_lived_with_disability(unexposed, self.config.to_dict(),
-                                                                   self.clock().year, self.step_size(),
-                                                                   self.age_bins, self.disability_weight_pipelines,
-                                                                   self.causes)
-        unexposed_ylds_this_step = {f'{k}_unexposed_to_hhtb': v for k, v in unexposed_ylds_this_step.items()}
-        self.years_lived_with_disability.update(unexposed_ylds_this_step)
+        self.update_metrics(pop)
 
         pop.loc[:, 'years_lived_with_disability'] += self.disability_weight(pop.index)
         self.population_view.update(pop)
+
+    def update_metrics(self, pop):
+        exposure_category = self.household_tb_exposure(pop.index)
+
+        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
+            category_pop = pop.loc[exposure_category == category]
+            ylds_this_step = get_years_lived_with_disability(category_pop, self.config.to_dict(),
+                                                             self.clock().year, self.step_size(),
+                                                             self.age_bins, self.disability_weight_pipelines,
+                                                             self.causes)
+            ylds_this_step = {f'{k}_{exposure_state}': v for k, v in ylds_this_step.items()}
+            self.years_lived_with_disability.update(ylds_this_step)

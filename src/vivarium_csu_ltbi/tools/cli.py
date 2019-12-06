@@ -25,7 +25,7 @@ from jinja2 import Template
 from loguru import logger
 
 
-PROJECT_NAME = 'vivarium_csu_ltbi'
+MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 Location = namedtuple('Location', ['proper', 'sanitized'])
 
 
@@ -112,7 +112,6 @@ def parse_locations(locations_file: Optional[str], single_location: Optional[str
     return locations
 
 
-MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 @click.command()
 @click.option('-l', '--locations-file',
               type=click.Path(dir_okay=False),

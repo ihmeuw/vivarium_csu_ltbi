@@ -5,14 +5,16 @@ import numpy as np
 from loguru import logger
 
 from vivarium import Artifact
-from vivarium_csu_ltbi.data import household_tb_model, household_tb_paths
+
+from vivarium_csu_ltbi import paths as ltbi_paths
+from vivarium_csu_ltbi.data import household_tb_model
 
 
-def estimate_household_tb(country: str, draw: int, year_start=2017):
-    """for certain country in year 2017, sweep over draw."""
+def estimate_household_tb(location: str, draw: int, year_start=2017):
+    """for certain location in year 2017, sweep over draw."""
 
-    input_artifact_path = household_tb_paths.get_input_artifact_path(country)
-    intermediate_output_path = household_tb_paths.get_intermediate_output_dir_path(country)
+    input_artifact_path = ltbi_paths.get_hh_tb_input_artifact_path(location)
+    intermediate_output_path = ltbi_paths.get_hh_tb_intermediate_output_dir_path(location)
 
     logger.info(f"Loading input data from {input_artifact_path}.")
     art = Artifact(input_artifact_path)
@@ -30,7 +32,7 @@ def estimate_household_tb(country: str, draw: int, year_start=2017):
     logger.info("Interpolating household TB exposure.")
     data = household_tb_model.interpolation(prev_actb, df_hh_sample, year_start, draw)
     res = household_tb_model.age_sex_specific_actb_prop(data)
-    res['location'] = country
+    res['location'] = location
     res['year_start'] = year_start
     res['year_end'] = year_start + 1
     res['draw'] = draw
@@ -43,15 +45,15 @@ def estimate_household_tb(country: str, draw: int, year_start=2017):
     res.to_hdf(intermediate_output_path / f'{draw}.hdf', 'data')
 
 
-def collect_household_tb(country: str):
-    intermediate_output_path = household_tb_paths.get_intermediate_output_dir_path(country)
+def collect_household_tb(location: str):
+    intermediate_output_path = ltbi_paths.get_hh_tb_intermediate_output_dir_path(location)
 
     logger.info(f"Reading results from {intermediate_output_path}")
     data = []
     for f in intermediate_output_path.iterdir():
         data.append(pd.read_hdf(f))
     data = pd.concat(data, axis=0).reset_index()
-    output_artifact_path = household_tb_paths.get_output_artifact_path(country)
+    output_artifact_path = ltbi_paths.get_hh_tb_output_artifact_path(location)
 
     logger.info(f"Writing results to {output_artifact_path}.")
     art = Artifact(str(output_artifact_path))
@@ -61,7 +63,7 @@ def collect_household_tb(country: str):
 if __name__ == '__main__':
     import sys
     func = sys.argv[1]
-    country = sys.argv[2]
+    location = sys.argv[2]
     if func == 'estimate_household_tb':
         if 'SGE_TASK_ID' in os.environ and os.environ['SGE_TASK_ID'] != 'undefined':
             draw = int(os.environ['SGE_TASK_ID']) - 1
@@ -69,9 +71,9 @@ if __name__ == '__main__':
             draw = int(os.environ['TASK_ID']) - 1
         else:
             raise ValueError("No task number given")
-        estimate_household_tb(country, draw)
+        estimate_household_tb(location, draw)
     elif func == 'collect_household_tb':
-        collect_household_tb(country)
+        collect_household_tb(location)
     else:
         raise ValueError(f"Bad first argument: {func}. Must be 'estimate_ltbi_incidence' or 'collect_ltbi_incidence'.")
 
