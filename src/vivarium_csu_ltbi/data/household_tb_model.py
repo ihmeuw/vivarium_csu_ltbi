@@ -6,16 +6,17 @@ from vivarium.interpolation import Interpolation
 from vivarium_inputs.interface import get_measure
 from vivarium_inputs.data_artifact.utilities import split_interval
 
-from vivarium_csu_ltbi.data import household_tb_paths
-from vivarium_csu_ltbi.data.globals import ACTIVE_TB_NAMES, formatted_country
+from vivarium_csu_ltbi import globals as ltbi_globals
+from vivarium_csu_ltbi import paths as ltbi_paths
 
 
-def load_household_input_data(country: str):
-    input_data_path = household_tb_paths.get_input_data_path(country)
+def load_household_input_data(location: str):
+    input_data_path = ltbi_paths.get_hh_tb_input_data_path(location)
 
     df = pd.read_stata(input_data_path).dropna()
 
-    if formatted_country(country) == 'south_africa':
+    formatted_location = ltbi_globals.formatted_location(location)
+    if formatted_location == 'south_africa':
         df['age'] = df['age'].replace({'Less than 1 year': '0',
                                        'less than 1 year': '0',
                                        '1 year': '1',
@@ -31,15 +32,14 @@ def load_household_input_data(country: str):
     return df
 
 
-def load_actb_prevalence_input_data(country: str):
+def load_actb_prevalence_input_data(location: str):
     """output all-form TB prevalence."""
-
-    prev_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', country)
+    prev_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', location)
     prev_actb = pd.DataFrame(0.0, index=prev_ltbi.index, columns=['draw_' + str(i) for i in range(1000)])
 
     # aggregate all child active TB causes prevalence to obtain all-form TB prevalence
-    for actb in ACTIVE_TB_NAMES:
-        prev_actb += get_measure(getattr(causes, actb), 'prevalence', country)
+    for actb in ltbi_globals.GBD_ACTIVE_TB_NAMES:
+        prev_actb += get_measure(getattr(causes, actb), 'prevalence', location)
 
     index_cols = ['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']
     prev_actb = split_interval(prev_actb, interval_column='age', split_column_prefix='age_group')

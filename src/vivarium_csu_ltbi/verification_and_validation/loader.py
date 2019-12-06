@@ -5,16 +5,14 @@ from loguru import logger
 import pandas as pd
 import yaml
 
+from vivarium_csu_ltbi import globals as ltbi_globals
+from vivarium_csu_ltbi import paths as ltbi_paths
 
-RESULT_DIRECTORY = Path('/share/costeffectiveness/results/vivarium_csu_ltbi/')
-CAUSE_NAMES = ['ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'protected_tb_susceptible_hiv',
-               'ltbi_positive_hiv', 'activetb_positive_hiv', 'protected_tb_positive_hiv',
-               'susceptible_tb_positive_hiv', 'other_causes']
 TEMPLATE_COLUMNS = ['cause', 'sex', 'age_group', 'measure', 'input_draw']
 
 
 def get_results(location: str, timestamp: str = None) -> pd.DataFrame:
-    """Retrieves the results for a country.
+    """Retrieves the results for a location.
 
     Parameters
     ----------
@@ -26,7 +24,7 @@ def get_results(location: str, timestamp: str = None) -> pd.DataFrame:
 
     Returns
     -------
-    The results for the country if they exist.
+    The results for the location if they exist.
 
     Raises
     ------
@@ -39,46 +37,8 @@ def get_results(location: str, timestamp: str = None) -> pd.DataFrame:
     rows in your outputs!
 
     """
-    output_dir = get_output_directory(location, timestamp)
+    output_dir = ltbi_paths.get_output_directory(location, timestamp)
     return load_results_from_output_dir(output_dir)
-
-
-def get_output_directory(location: str, timestamp: Union[str, None]):
-    """Converts a location name and a timestamp into a results directory path.
-
-    Parameters
-    ----------
-    location
-        The location name. Should be a proper name as specified in the
-        GBD reporting location hierarchy.
-    timestamp
-        Reference to the particular run. If not provided, this function
-        produce the path to the latest results.
-
-    Returns
-    -------
-    A path to the requested vivarium results.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the results directory indicated by the arguments does not exist.
-
-    """
-    if not RESULT_DIRECTORY.exists():
-        raise FileNotFoundError(f'Cannot find the results directory {str(RESULT_DIRECTORY)}. '
-                                f'Are you on the cluster?  Make sure you have access to the share drive.')
-    sanitized_location = location.lower().replace(' ', '_').replace("'", "")
-    location_directory = RESULT_DIRECTORY / sanitized_location
-    location_results = sorted(location_directory.iterdir(), key=lambda path: path.name)
-    if timestamp is not None:
-        if timestamp not in location_results:
-            raise FileNotFoundError(f'No results found at {str(location_directory / timestamp)}. Make sure the '
-                                    f'timestamp you specified exists in the location results directory.')
-        output_dir = location_directory / timestamp
-    else:
-        output_dir = location_directory / location_results[-1]
-    return output_dir
 
 
 def load_results_from_output_dir(output_dir: Union[str, Path], drop_missing=True) -> pd.DataFrame:

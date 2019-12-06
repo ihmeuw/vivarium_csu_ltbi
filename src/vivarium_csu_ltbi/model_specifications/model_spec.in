@@ -55,7 +55,7 @@ configuration:
             by_year: False
         tuberculosis_and_hiv_observer:
             by_age: True
-            by_age: True
+            by_sex: True
             by_year: False
             prevalence_sample_date:
                 month: 7

@@ -1,28 +1,27 @@
 import pandas as pd
 import numpy as np
-import dismod_mr
-import pymc as pm
+
 from gbd_mapping import causes
 
 from vivarium_inputs.interface import get_measure
 from vivarium_inputs.data_artifact.utilities import split_interval
 
-from vivarium_csu_ltbi.data.globals import ACTIVE_TB_NAMES
+from vivarium_csu_ltbi import globals as ltbi_globals
 
 
-def load_data(country_name: str):
+def load_data(location: str):
     """output LTBI prevalence, LTBI excess mortality, and All Causes cause-specific mortality"""
-    p_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', country_name)
+    p_ltbi = get_measure(causes.latent_tuberculosis_infection, 'prevalence', location)
 
     i_actb = pd.DataFrame(0.0, index=p_ltbi.index, columns=['draw_' + str(i) for i in range(1000)])
 
     # aggregate all child active TB causes incidence to obtain all-form active TB incidence
-    for actb in ACTIVE_TB_NAMES:
-        i_actb += get_measure(getattr(causes, actb), 'incidence_rate', country_name)
+    for actb in ltbi_globals.GBD_ACTIVE_TB_NAMES:
+        i_actb += get_measure(getattr(causes, actb), 'incidence_rate', location)
 
     f_ltbi = i_actb / p_ltbi
 
-    csmr_all = get_measure(causes.all_causes, 'cause_specific_mortality_rate', country_name)
+    csmr_all = get_measure(causes.all_causes, 'cause_specific_mortality_rate', location)
 
     p_ltbi = split_interval(p_ltbi, interval_column='age', split_column_prefix='age_group')
     p_ltbi = split_interval(p_ltbi, interval_column='year', split_column_prefix='year')
@@ -53,6 +52,7 @@ def format_for_dismod(df: pd.DataFrame, draw: int, sex: str, year: int, data_typ
 
 
 def make_disease_model(p: pd.DataFrame, f: pd.DataFrame, m_all: pd.DataFrame, knots: list):
+    import dismod_mr
     dm = dismod_mr.data.ModelData()
     # prepare dismod input data
     dm.input_data = pd.concat([p, f, m_all], ignore_index=True)
@@ -70,8 +70,9 @@ def make_disease_model(p: pd.DataFrame, f: pd.DataFrame, m_all: pd.DataFrame, kn
 
 
 def fit_and_predict(p: pd.DataFrame, f: pd.DataFrame, m_all: pd.DataFrame, knots: list):
-    """predict LTBI incidence for certain country, sex, and year
+    """predict LTBI incidence for certain location, sex, and year
     based on single draw input data"""
+    import pymc as pm
     dm = make_disease_model(p, f, m_all, knots)
     dm.setup_model(rate_model='normal', include_covariates=False)
     # set all dismod variables to maximum a posteriori values
@@ -82,11 +83,11 @@ def fit_and_predict(p: pd.DataFrame, f: pd.DataFrame, m_all: pd.DataFrame, knots
     return i_ltbi
 
 
-def format_for_art(i_ltbi: np.ndarray, draw: int, country_name: str, sex: str, year: int):
+def format_for_art(i_ltbi: np.ndarray, draw: int, location: str, sex: str, year: int):
     """prepare LTBI incidence back calculated from dismod into sim data artifact format"""
     df = pd.DataFrame({'value': i_ltbi[:-1]})
     df['draw'] = draw
-    df['location'] = country_name
+    df['location'] = location
     df['age_group_start'] = np.arange(0, 100)
     df['age_group_end'] = np.arange(1, 101)
     df['sex'] = sex

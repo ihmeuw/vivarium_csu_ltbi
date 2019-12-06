@@ -1,5 +1,6 @@
 from vivarium_public_health.disease import DiseaseState, DiseaseModel, SusceptibleState, RateTransition
-from .names import *
+
+import vivarium_csu_ltbi.globals as ltbi_globals
 
 
 def wrap_data_getter(id):
@@ -16,6 +17,12 @@ def get_disease_state(id):
     return ds
 
 
+class BetterDiseaseModel(DiseaseModel):
+
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+
+
 class BetterDiseaseState(DiseaseState):
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
         if get_data_functions == None:
@@ -25,8 +32,17 @@ class BetterDiseaseState(DiseaseState):
         self.transition_set.append(t)
         return t
 
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+        return metrics
+
 
 class BetterSusceptibleState(SusceptibleState):
+
+    def __init__(self, cause, *args, **kwargs):
+        # skip the initializer that adds the redundant prefix
+        super(SusceptibleState, self).__init__(cause, *args, name_prefix='', **kwargs)
+
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
         if get_data_functions == None:
             get_data_functions = {'transition_rate': lambda cause, builder: builder.data.load(
@@ -34,6 +50,10 @@ class BetterSusceptibleState(SusceptibleState):
         t = BetterRateTransition(self, output, get_data_functions, **kwargs)
         self.transition_set.append(t)
         return t
+
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+        return metrics
 
 
 class BetterRateTransition(RateTransition):
@@ -48,15 +68,15 @@ class BetterRateTransition(RateTransition):
 
 def TuberculosisAndHIV():
     # the non-disease state
-    susceptible = BetterSusceptibleState(SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV)
+    susceptible = BetterSusceptibleState(ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV)
     susceptible.allow_self_transitions()
 
     # states
-    ltbi_susceptible_hiv = get_disease_state(LTBI_SUSCEPTIBLE_HIV)
-    activetb_susceptible_hiv = get_disease_state(ACTIVETB_SUSCEPTIBLE_HIV)
-    susceptible_tb_positive_hiv = get_disease_state(SUSCEPTIBLE_TB_POSITIVE_HIV)
-    ltbi_positive_hiv = get_disease_state(LTBI_POSITIVE_HIV)
-    activetb_positive_hiv = get_disease_state(ACTIVETB_POSITIVE_HIV)
+    ltbi_susceptible_hiv = get_disease_state(ltbi_globals.LTBI_SUSCEPTIBLE_HIV)
+    activetb_susceptible_hiv = get_disease_state(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV)
+    susceptible_tb_positive_hiv = get_disease_state(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV)
+    ltbi_positive_hiv = get_disease_state(ltbi_globals.LTBI_POSITIVE_HIV)
+    activetb_positive_hiv = get_disease_state(ltbi_globals.ACTIVETB_POSITIVE_HIV)
 
     # transitions
     susceptible.add_transition(ltbi_susceptible_hiv)
@@ -74,13 +94,12 @@ def TuberculosisAndHIV():
 
     activetb_positive_hiv.add_transition(susceptible_tb_positive_hiv)
 
-
-
-    return DiseaseModel(TUBERCULOSIS_AND_HIV,
-                        states=[susceptible,
-                                ltbi_susceptible_hiv,
-                                activetb_susceptible_hiv,
-                                susceptible_tb_positive_hiv,
-                                ltbi_positive_hiv,
-                                activetb_positive_hiv
-                                ])
+    return BetterDiseaseModel(ltbi_globals.TUBERCULOSIS_AND_HIV,
+                              states=[susceptible,
+                                      ltbi_susceptible_hiv,
+                                      activetb_susceptible_hiv,
+                                      susceptible_tb_positive_hiv,
+                                      ltbi_positive_hiv,
+                                      activetb_positive_hiv
+                                      ]
+                              )
