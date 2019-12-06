@@ -68,7 +68,7 @@ class DataRepo:
         cat1['parameter'] = 'cat1'
         cat2 = df.copy()
         cat2['parameter'] = 'cat2'
-        cat1['value'] = 1 - cat2['value']
+        cat2['value'] = 1 - cat1['value']
 
         complete = pd.concat([cat1, cat2], axis=0).reset_index(drop=True)
         complete = complete.set_index(['location', 'parameter', 'sex', 'age_start',
@@ -453,8 +453,6 @@ def write_population_attributable_fraction_data(art, location):
     paf_hiv_pos = (mean_rr_hiv_pos - 1.) / mean_rr_hiv_pos
     paf_hiv_neg = (mean_rr_hiv_neg - 1.) / mean_rr_hiv_neg
 
-    import pdb
-    pdb.set_trace()
     write(art, 'ltbi_treatment.hiv_positive.population_attributable_fraction', paf_hiv_pos)
     write(art, 'ltbi_treatment.hiv_negative.population_attributable_fraction', paf_hiv_neg)
 
