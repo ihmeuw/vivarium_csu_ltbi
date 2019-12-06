@@ -178,6 +178,8 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
     def setup(self, builder):
         super().setup(builder)
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
+        self.disability_weight_pipelines = {k: v for k, v in self.disability_weight_pipelines
+                                            if k in ltbi_globals.CAUSE_OF_DISABILITY_STATES}
 
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index, query='tracked == True and alive == "alive"')
