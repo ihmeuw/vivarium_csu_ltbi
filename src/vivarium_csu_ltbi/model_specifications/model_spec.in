@@ -11,6 +11,7 @@ components:
 
     vivarium_csu_ltbi.components:
         - TuberculosisAndHIV()
+        - LTBITreatmentCoverage()
         - HouseholdTuberculosisMortalityObserver()
         - HouseholdTuberculosisDisabilityObserver()
         - HouseholdTuberculosisDiseaseObserver("tuberculosis_and_hiv")
