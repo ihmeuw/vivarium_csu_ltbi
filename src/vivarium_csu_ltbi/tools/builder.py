@@ -278,8 +278,8 @@ def write_baseline_coverage_levels(art, loc):
     six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
     three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
 
-    write(art, 'six_h.coverage.proportion', six_h, skip_interval_processing=True)
-    write(art, 'three_hp.coverage.proportion', three_hp, skip_interval_processing=True)
+    write(art, 'ltbi_treatment.six_h.coverage', six_h, skip_interval_processing=True)
+    write(art, 'ltbi_treatment.three_hp.coverage', three_hp, skip_interval_processing=True)
 
 
 def sample_from_normal(mean, std, index_name):
@@ -314,8 +314,9 @@ def write_adherence_data(art, location):
     six_h_index = demog.set_index('treatment_type', append=True)
     six_h_data = six_h_index.join(six_h_adherence)
 
-    write(art, 'three_hp.adherence', three_hp_data, skip_interval_processing=True)
-    write(art, 'six_h.adherence', six_h_data, skip_interval_processing=True)
+    adherence_data = pd.concat([three_hp_data, six_h_data], axis=0)
+
+    write(art, 'ltbi_treatment.adherence', adherence_data, skip_interval_processing=True)
 
 
 def write_relative_risk_data(art, location):
