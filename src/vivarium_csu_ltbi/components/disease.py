@@ -17,6 +17,12 @@ def get_disease_state(id):
     return ds
 
 
+class BetterDiseaseModel(DiseaseModel):
+
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+
+
 class BetterDiseaseState(DiseaseState):
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
         if get_data_functions == None:
@@ -25,6 +31,10 @@ class BetterDiseaseState(DiseaseState):
         t = BetterRateTransition(self, output, get_data_functions, **kwargs)
         self.transition_set.append(t)
         return t
+
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+        return metrics
 
 
 class BetterSusceptibleState(SusceptibleState):
@@ -35,6 +45,10 @@ class BetterSusceptibleState(SusceptibleState):
         t = BetterRateTransition(self, output, get_data_functions, **kwargs)
         self.transition_set.append(t)
         return t
+
+    def metrics(self, index, metrics):
+        """Suppress unnecessary columns."""
+        return metrics
 
 
 class BetterRateTransition(RateTransition):
