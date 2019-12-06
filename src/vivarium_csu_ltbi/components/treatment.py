@@ -32,7 +32,7 @@ class LTBITreatmentCoverage:
 
         self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage',
                                                               source=self.get_coverage,
-                                                              requires_columns=['age', self.disease_state_column],
+                                                              requires_columns=['age', ltbi_globals.TUBERCULOSIS_AND_HIV],
                                                               requires_values=['household_tuberculosis.exposure'],
                                                               preferred_post_processor=self.enforce_not_eligible)
 
@@ -48,8 +48,7 @@ class LTBITreatmentCoverage:
                                                  requires_columns=[],
                                                  creates_columns=self.columns_created)
 
-        self.disease_state_column = "tuberculosis_and_hiv"
-        self.population_view = builder.population.get_view([self.disease_state_column, 'age', 'sex', 'alive'] +
+        self.population_view = builder.population.get_view([ltbi_globals.TUBERCULOSIS_AND_HIV, 'age', 'sex', 'alive'] +
                                                            self.columns_created,
                                                            query="alive == 'alive'")
 
@@ -120,7 +119,7 @@ class LTBITreatmentCoverage:
         return coverage
 
     def enforce_not_eligible(self, data, timestep):
-        pop = self.population_view.subview(['age', self.disease_state_column]).get(data.index)
+        pop = self.population_view.subview(['age', ltbi_globals.TUBERCULOSIS_AND_HIV]).get(data.index)
 
         with_hiv = self.get_hiv_positive_subgroup(pop)
         under_five_hhtb = self.get_under_five_hhtb_subgroup(pop)
@@ -135,9 +134,9 @@ class LTBITreatmentCoverage:
         """Returns a bit mask of simulants in the treatment subgroup that is
         HIV+ and does not have active TB. The population is already filtered
         to untreated."""
-        with_hiv = ((pop[self.disease_state_column] == ltbi_globals.ACTIVETB_POSITIVE_HIV)
-                    | (pop[self.disease_state_column] == ltbi_globals.LTBI_POSITIVE_HIV)
-                    | (pop[self.disease_state_column] == ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV))
+        with_hiv = ((pop[ltbi_globals.TUBERCULOSIS_AND_HIV] == ltbi_globals.ACTIVETB_POSITIVE_HIV)
+                    | (pop[ltbi_globals.TUBERCULOSIS_AND_HIV] == ltbi_globals.LTBI_POSITIVE_HIV)
+                    | (pop[ltbi_globals.TUBERCULOSIS_AND_HIV] == ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV))
 
         return with_hiv
 
@@ -147,8 +146,8 @@ class LTBITreatmentCoverage:
         population is already filtered to untreated."""
         age_five_and_under = pop['age'] <= 5.0
         exposed_hhtb = self.household_tb_exposure(pop.index) == 'cat1'
-        no_active_tb = ((pop[self.disease_state_column] != ltbi_globals.ACTIVETB_POSITIVE_HIV)
-                        & (pop[self.disease_state_column] != ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV))
+        no_active_tb = ((pop[ltbi_globals.TUBERCULOSIS_AND_HIV] != ltbi_globals.ACTIVETB_POSITIVE_HIV)
+                        & (pop[ltbi_globals.TUBERCULOSIS_AND_HIV] != ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV))
         return age_five_and_under & exposed_hhtb & no_active_tb
 
     @staticmethod
