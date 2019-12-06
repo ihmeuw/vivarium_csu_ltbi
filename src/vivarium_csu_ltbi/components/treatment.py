@@ -15,6 +15,8 @@ class LTBITreatmentCoverage:
         return 'ltbi_treatment_coverage'
 
     def setup(self, builder):
+        self.time = builder.time.clock()
+
         self.treatment_stream = builder.randomness.get_stream(f'{self.name}.treatment_selection')
         self.adherence_stream = builder.randomness.get_stream(f'{self.name}.adherence_propensity')
 
@@ -72,7 +74,7 @@ class LTBITreatmentCoverage:
         treatment_type = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
         pop.loc[newly_treated, 'treatment_type'] = treatment_type
-        pop.loc[newly_treated, 'treatment_date'] = event.time
+        pop.loc[newly_treated, 'treatment_date'] = self.time()
         self.population_view.update(pop)
 
         are_adherent = pop.loc[newly_treated, 'adherence_propensity'] <= self.adherence(pop.loc[newly_treated].index)
