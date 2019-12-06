@@ -7,15 +7,14 @@ RISK_DISTRIBUTION_TYPE = 'dichotomous'
 
 
 #  state names
-ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'
 ACTIVETB_SUSCEPTIBLE_HIV = 'activetb_susceptible_hiv'
+ACTIVETB_POSITIVE_HIV = 'activetb_positive_hiv'
 LTBI_SUSCEPTIBLE_HIV = 'ltbi_susceptible_hiv'
 LTBI_POSITIVE_HIV = 'ltbi_positive_hiv'
 PROTECTED_TB_SUSCEPTIBLE_HIV = 'protected_tb_susceptible_hiv'
 PROTECTED_TB_POSITIVE_HIV = 'protected_tb_positive_hiv'
-SUSCEPTIBLE_TB_POSITIVE_HIV = 'susceptible_tb_positive_hiv'
 SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV = 'susceptible_tb_susceptible_hiv'
-
+SUSCEPTIBLE_TB_POSITIVE_HIV = 'susceptible_tb_positive_hiv'
 
 # transition names (from, to)
 ACTIVETB_SUSCEPTIBLE_HIV_TO_ACTIVETB_POSITIVE_HIV = 'activetb_susceptible_hiv_to_activetb_positive_hiv'
