@@ -15,7 +15,7 @@ class LTBITreatmentCoverage:
         return 'ltbi_treatment_coverage'
 
     def setup(self, builder):
-        self.time = builder.time.clock()
+        self.clock = builder.time.clock()
 
         self.treatment_stream = builder.randomness.get_stream(f'{self.name}.treatment_selection')
         self.adherence_stream = builder.randomness.get_stream(f'{self.name}.adherence_propensity')
@@ -23,26 +23,28 @@ class LTBITreatmentCoverage:
         self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
 
         # NOTE: Just write these into the same key, later
-        three_hp_adherence_data = builder.data.load("three_hp.adherence")
-        six_h_adherence_data = builder.data.load("six_h.adherence")
+        three_hp_adherence_data = builder.data.load("treatment.three_hp.adherence")
+        six_h_adherence_data = builder.data.load("treatment.six_h.adherence")
         self.adherence = builder.lookup.build_table(pd.concat([three_hp_adherence_data, six_h_adherence_data], axis=0),
                                                     parameter_columns=['age', 'year'],
                                                     key_columns=['sex', 'treatment_type'],
                                                     value_columns=['value'])
 
-        six_h_coverage_data = builder.data.load("six_h.coverage.proportion")
+        six_h_coverage_data = builder.data.load("treatment.six_h.coverage")
         self.six_h_with_hiv, self.six_h_under_five_hhtb = self.setup_coverage_tables(builder, six_h_coverage_data)
-        three_hp_coverage_data = builder.data.load("three_hp.coverage.proportion")
+        three_hp_coverage_data = builder.data.load("treatment.three_hp.coverage")
         self.three_hp_with_hiv, self.three_hp_under_five_hhtb = self.setup_coverage_tables(builder,
                                                                                            three_hp_coverage_data)
 
-        self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage', source=self.get_coverage,
+        self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage',
+                                                              source=self.get_coverage,
+                                                              requires_columns=['age', self.disease_state_column],
+                                                              requires_values=['household_tuberculosis.exposure'],
                                                               preferred_post_processor=self.enforce_not_eligible)
 
-        self._treatment_status = pd.Series()
-        self.treatment_status = builder.value.register_value_producer('treatment_status.category',
-                                                                      source=lambda index:
-                                                                      self._treatment_status[index])
+        self._ltbi_treatment_status = pd.Series()
+        self.ltbi_treatment_status = builder.value.register_value_producer('treatment_status.category',
+                                                                           source=lambda index: self._ltbi_treatment_status[index])
 
         self.columns_created = ['treatment_date', 'treatment_type', 'adherence_propensity']
         builder.population.initializes_simulants(self.on_initialize_simulants,
@@ -52,13 +54,13 @@ class LTBITreatmentCoverage:
         self.disease_state_column = "tuberculosis_and_hiv"
         self.population_view = builder.population.get_view([self.disease_state_column, 'age', 'sex', 'alive'] +
                                                            self.columns_created,
-                                                           query="alive == 'alive' & treatment_type == 'untreated'")
+                                                           query="alive == 'alive'")
 
         builder.event.register_listener('time_step__prepare', self.on_time_step_prepare)
 
     def on_initialize_simulants(self, pop_data):
 
-        self._treatment_status = self._treatment_status.append(pd.Series('untreated', index=pop_data.index))
+        self._ltbi_treatment_status = self._ltbi_treatment_status.append(pd.Series('untreated', index=pop_data.index))
         initialized = pd.DataFrame({'treatment_date': pd.NaT,
                                     'treatment_type': 'untreated',
                                     'adherence_propensity': self.adherence_stream.get_draw(pop_data.index)},
@@ -66,14 +68,14 @@ class LTBITreatmentCoverage:
         self.population_view.update(initialized)
 
     def on_time_step_prepare(self, event):
-        pop = self.population_view.get(event.index)
+        pop = self.population_view.get(event.index, query="treatment_type == 'untreated'")
 
         coverage = self.coverage(pop)
 
         treatment_type = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
         pop.loc[newly_treated, 'treatment_type'] = treatment_type
-        pop.loc[newly_treated, 'treatment_date'] = self.time()
+        pop.loc[newly_treated, 'treatment_date'] = self.clock()
         self.population_view.update(pop)
 
         are_adherent = pop.loc[newly_treated, 'adherence_propensity'] <= self.adherence(pop.loc[newly_treated].index)
@@ -81,7 +83,7 @@ class LTBITreatmentCoverage:
         treatment_status.loc[are_adherent] += '_adherent'
         treatment_status.loc[~are_adherent] += '_nonadherent'
 
-        self._treatment_status.update(pd.Series(treatment_status, index=treatment_status.index))
+        self._ltbi_treatment_status.update(pd.Series(treatment_status, index=treatment_status.index))
 
     def get_coverage(self, pop):
         coverage = pd.DataFrame(data={'3HP': 0.0, '6H': 0.0, 'untreated': 1.0},
@@ -118,7 +120,7 @@ class LTBITreatmentCoverage:
         return coverage
 
     def enforce_not_eligible(self, data, timestep):
-        pop = self.population_view.get(data.index)
+        pop = self.population_view.subview(['age', self.disease_state_column]).get(data.index)
 
         with_hiv = self.get_hiv_positive_subgroup(pop)
         under_five_hhtb = self.get_under_five_hhtb_subgroup(pop)
