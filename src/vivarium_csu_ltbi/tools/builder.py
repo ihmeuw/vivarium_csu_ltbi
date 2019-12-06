@@ -364,19 +364,23 @@ def write_treatment_relative_risk_data(art, location):
         full_cat_data.append(data)
 
     full_cat_data = pd.concat(full_cat_data, axis=0)
-    full_cat_data['affected_entity'] = 'tuberculosis_and_hiv'
+    full_cat_data['affected_measure'] = 'transition_rate'
 
     affects_hiv_pos = full_cat_data.copy()
-    affects_hiv_pos['affected_measure'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
+    affects_hiv_pos['affected_entity'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
 
     affects_hiv_neg = full_cat_data.copy()
-    affects_hiv_neg['affected_measure'] = 'ltbi_susceptible_hiv_to_activetb_susceptible_hiv'
+    affects_hiv_neg['affected_entity'] = 'ltbi_susceptible_hiv_to_activetb_susceptible_hiv'
 
     full_rr_data = pd.concat([affects_hiv_pos, affects_hiv_neg], axis=0)
     full_rr_data = full_rr_data.set_index(['affected_entity', 'affected_measure'], append=True)
 
-    write(art, 'ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
-
+    write(art, 'risk_factor.ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
+    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.relative_risk', full_rr_data, skip_interval_processing=True)
+    
+    write(art, 'risk_factor.ltbi_treatment.distribution', 'ordered_polytomous', skip_interval_processing=True)
+    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.distribution', 'ordered_polytomous', skip_interval_processing=True)
+    
 
 def write_population_attributable_fraction_data(art, location):
     logger.info(f"Computing population attributable fraction...")
@@ -409,7 +413,9 @@ def write_population_attributable_fraction_data(art, location):
                      .drop(['parameter'], axis=1)
                      .droplevel(['year_start', 'year_end']))
 
-    treatment_relative_risk = art.load("ltbi_treatment.relative_risk").reset_index()
+    # NOTE: These relative risks are the same, they are duplicated because we will have two different
+    # risk effects
+    treatment_relative_risk = art.load("risk_factor.ltbi_treatment.relative_risk").reset_index()
     relative_risks = {}
     for parameter in ['untreated', '6H_adherent', '6H_nonadherent']:
         rr = (treatment_relative_risk
@@ -452,9 +458,17 @@ def write_population_attributable_fraction_data(art, location):
 
     paf_hiv_pos = (mean_rr_hiv_pos - 1.) / mean_rr_hiv_pos
     paf_hiv_neg = (mean_rr_hiv_neg - 1.) / mean_rr_hiv_neg
+    
+    paf_hiv_pos['affected_measure'] = 'transition_rate'
+    paf_hiv_pos['affected_entity'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
+    paf_hiv_neg['affected_measure'] = 'transition_rate'
+    paf_hiv_neg['affected_entity'] = 'ltbi_susceptible_hiv_to_activetb_susceptible_hiv'
 
-    write(art, 'ltbi_treatment.hiv_positive.population_attributable_fraction', paf_hiv_pos)
-    write(art, 'ltbi_treatment.hiv_negative.population_attributable_fraction', paf_hiv_neg)
+    paf = pd.concat([paf_hiv_pos, paf_hiv_neg], axis=0)
+    paf = paf.set_index(['affected_entity', 'affected_measure'], append=True)
+
+    write(art, 'risk_factor.ltbi_treatment.population_attributable_fraction', paf)
+    # write(art, 'risk_factor.ltbi_treatment_hiv_negative.population_attributable_fraction', paf_hiv_neg)
 
 
 def compute_prevalence(art, data):

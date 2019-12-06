@@ -30,7 +30,7 @@ class LTBITreatmentCoverage:
         self.three_hp_with_hiv, self.three_hp_under_five_hhtb = self.setup_coverage_tables(builder,
                                                                                            three_hp_coverage_data)
 
-        self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage',
+        self.coverage = builder.value.register_value_producer('ltbi_treatment.exposure',
                                                               source=self.get_coverage,
                                                               requires_columns=['age', ltbi_globals.TUBERCULOSIS_AND_HIV],
                                                               requires_values=['household_tuberculosis.exposure'],
@@ -66,7 +66,7 @@ class LTBITreatmentCoverage:
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index, query="treatment_type == 'untreated'")
 
-        coverage = self.coverage(pop)
+        coverage = self.coverage(event.index)
 
         treatment_type = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
@@ -81,7 +81,9 @@ class LTBITreatmentCoverage:
 
         self._ltbi_treatment_status.update(pd.Series(treatment_status, index=treatment_status.index))
 
-    def get_coverage(self, pop):
+    def get_coverage(self, index):
+        pop = self.population_view.get(index, query="treatment_type == 'untreated'") 
+
         coverage = pd.DataFrame(data={'3HP': 0.0, '6H': 0.0, 'untreated': 1.0},
                                 index=pop.index)
 
