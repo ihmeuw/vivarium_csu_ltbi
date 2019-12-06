@@ -89,11 +89,12 @@ def TuberculosisAndHIV():
 
     activetb_positive_hiv.add_transition(susceptible_tb_positive_hiv)
 
-    return DiseaseModel(ltbi_globals.TUBERCULOSIS_AND_HIV,
-                        states=[susceptible,
-                                ltbi_susceptible_hiv,
-                                activetb_susceptible_hiv,
-                                susceptible_tb_positive_hiv,
-                                ltbi_positive_hiv,
-                                activetb_positive_hiv
-                                ])
+    return BetterDiseaseModel(ltbi_globals.TUBERCULOSIS_AND_HIV,
+                              states=[susceptible,
+                                      ltbi_susceptible_hiv,
+                                      activetb_susceptible_hiv,
+                                      susceptible_tb_positive_hiv,
+                                      ltbi_positive_hiv,
+                                      activetb_positive_hiv
+                                      ]
+                              )
