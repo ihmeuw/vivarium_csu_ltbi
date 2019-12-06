@@ -16,18 +16,20 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
     def setup(self, builder):
         super().setup(builder)
 
+        self.total_population = {}
+
         disease_component = builder.components.get_component(f"disease_model.{ltbi_globals.TUBERCULOSIS_AND_HIV}")
         self.states = [state.name.split('.')[1] for state in disease_component.states]
 
         self.previous_state_column = f'previous_{self.disease}'
         builder.population.initializes_simulants(self.initialize_previous_state,
-                                                 requires_columns=['alive'],
                                                  creates_columns=[self.previous_state_column])
 
         # This overrides an attribute in the parent
         columns_required = ['alive', f'{self.disease}', f'{self.disease}_event_time', self.previous_state_column]
         for state in self.states:
             columns_required.append(f'{state}_event_time')
+
         if self.config.by_age:
             columns_required += ['age']
         if self.config.by_sex:
@@ -37,13 +39,12 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
 
     def initialize_previous_state(self, pop_data):
-        population = self.population_view.subview(['alive']).get(pop_data.index)
-        self.population_view.update(pd.Series('', index=population.index, name=self.previous_state_column))
+        self.population_view.update(pd.Series('', index=pop_data.index, name=self.previous_state_column))
 
     @staticmethod
     def get_state_person_time(pop, config, disease, state, current_year, step_size, age_bins):
         """Custom person time getter that handles state column name assumptions"""
-        base_key = get_output_template(**config).substitute(measure=f'{state}_person_time',
+        base_key = get_output_template(**config).substitute(measure=f'{state}_susceptible_person_time',
                                                             year=current_year)
         base_filter = QueryString(f'alive == "alive" and {disease} == "{state}"')
         person_time = get_group_counts(pop, base_filter, base_key, config, age_bins,
@@ -56,6 +57,14 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         config['by_year'] = True  # This is always an annual point estimate
         base_key = get_output_template(**config).substitute(measure=f'{state}_prevalent_cases', year=event_time.year)
         base_filter = QueryString(f'alive == "alive" and {disease} == "{state}"')
+        return get_group_counts(pop, base_filter, base_key, config, age_bins)
+
+    @staticmethod
+    def get_population(pop, config, event_time, age_bins):
+        config = config.copy()
+        config['by_year'] = True  # This is always an annual point estimate
+        base_key = get_output_template(**config).substitute(measure=f'population_point_estimate', year=event_time.year)
+        base_filter = QueryString(f'alive == "alive"')
         return get_group_counts(pop, base_filter, base_key, config, age_bins)
 
     def on_time_step_prepare(self, event):
@@ -77,6 +86,12 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
             for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
                 exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
                 pop_in_category = pop.loc[pop_exposure_category == category]
+
+                point_population = self.get_population(pop_in_category, self.config.to_dict(),
+                                                       event.time, self.age_bins)
+                point_population = {f'{k}_{exposure_state}': v for k, v in point_population.items()}
+                self.total_population.update(point_population)
+
                 for state in self.states:
                     state_point_prevalence = self.get_state_prevalent_cases(pop_in_category, self.config.to_dict(),
                                                                             self.disease, state, event.time,
@@ -117,6 +132,11 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
                     state_counts = {f"{k}_from_{previous_state}_{exposure_state}": v for k, v in state_counts.items()}
                     state_counts = self.fix_susceptible_state_name(state, state_counts)
                     self.counts.update(state_counts)
+
+    def metrics(self, index, metrics):
+        metrics = super().metrics(index, metrics)
+        metrics.update(self.total_population)
+        return metrics
 
 
 class HouseholdTuberculosisMortalityObserver(MortalityObserver):
