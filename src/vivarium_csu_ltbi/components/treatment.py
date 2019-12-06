@@ -67,7 +67,6 @@ class LTBITreatmentCoverage:
 
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index)
-        assert '6H' not in pop.treatment_type
 
         coverage = self.coverage(pop)
 
