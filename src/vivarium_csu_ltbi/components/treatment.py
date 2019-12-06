@@ -3,7 +3,6 @@ import pandas as pd
 from vivarium_csu_ltbi.components.names import (ACTIVETB_SUSCEPTIBLE_HIV,
                                                 ACTIVETB_POSITIVE_HIV,
                                                 LTBI_POSITIVE_HIV,
-                                                PROTECTED_TB_POSITIVE_HIV,
                                                 SUSCEPTIBLE_TB_POSITIVE_HIV)
 
 
@@ -16,6 +15,8 @@ class LTBITreatmentCoverage:
 
     def setup(self, builder):
         self.clock = builder.time.clock()
+
+        self.disease_state_column = "tuberculosis_and_hiv"
 
         self.treatment_stream = builder.randomness.get_stream(f'{self.name}.treatment_selection')
         self.adherence_stream = builder.randomness.get_stream(f'{self.name}.adherence_propensity')
@@ -50,7 +51,6 @@ class LTBITreatmentCoverage:
                                                  requires_columns=[],
                                                  creates_columns=self.columns_created)
 
-        self.disease_state_column = "tuberculosis_and_hiv"
         self.population_view = builder.population.get_view([self.disease_state_column, 'age', 'sex', 'alive'] +
                                                            self.columns_created,
                                                            query="alive == 'alive'")
@@ -136,7 +136,6 @@ class LTBITreatmentCoverage:
         to untreated."""
         with_hiv = (pop[self.disease_state_column] == ACTIVETB_POSITIVE_HIV) | \
                    (pop[self.disease_state_column] == LTBI_POSITIVE_HIV) | \
-                   (pop[self.disease_state_column] == PROTECTED_TB_POSITIVE_HIV) | \
                    (pop[self.disease_state_column] == SUSCEPTIBLE_TB_POSITIVE_HIV)
 
         return with_hiv
