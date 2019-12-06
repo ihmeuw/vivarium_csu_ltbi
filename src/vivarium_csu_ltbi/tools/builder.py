@@ -3,13 +3,14 @@ from loguru import logger
 import pandas as pd
 import numpy as np
 
-from gbd_mapping import causes, risk_factors
+from gbd_mapping import causes
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
 from vivarium_inputs.data_artifact.utilities import split_interval
 from vivarium_inputs.data_artifact.loaders import loader
 from vivarium_inputs import get_measure, utilities, globals, utility_data, get_demographic_dimensions
 from vivarium_gbd_access import gbd
 
+import vivarium_csu_ltbi
 from vivarium_csu_ltbi.components.names import *
 
 
@@ -249,6 +250,132 @@ def write_exposure_risk_data(art, data):
           skip_interval_processing=True)
 
 
+def write_baseline_coverage_levels(art, loc):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f'Reading baseline coverage data from {data_path} and writing')
+
+    data = pd.read_csv(data_path / 'baseline_coverage.csv')
+    data = data.rename(columns={'year': 'year_start'})
+    data['year_end'] = data['year_start'] + 1
+    data = data.set_index(['location'])
+    data['value'] /= 100.
+
+    demog = get_demographic_dimensions(loc)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = demog.reset_index().drop(['year'], axis=1)
+    demog = demog.drop_duplicates()
+    demog = demog.set_index(['location'])
+
+    duplicated = pd.merge(demog, data, left_index=True, right_index=True)
+
+    six_h = duplicated.copy()
+    six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                            append=True)
+
+    three_hp = duplicated.copy()
+    three_hp['value'] = 0.0
+    three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
+                                  append=True)
+
+    six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
+    three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
+
+    write(art, 'six_h.coverage.proportion', six_h, skip_interval_processing=True)
+    write(art, 'three_hp.coverage.proportion', three_hp, skip_interval_processing=True)
+
+
+def sample_from_normal(mean, std, index_name):
+    draw = np.random.normal(mean, std, size=1000)
+    return pd.DataFrame(data={f'draw_{i}': draw[i] for i in range(1000)},
+                        index=pd.Index([index_name], name='treatment_type'))
+
+
+def write_adherence_data(art, location):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f"Reading adherence from {data_path}")
+    data = pd.read_csv(data_path / "treatment_adherence_draws.csv", usecols=['adherence_3hp_real_world',
+                                                                             'adherence_6h_real_world'])
+
+    three_hp_adherence = data['adherence_3hp_real_world']
+    three_hp_adherence = pd.DataFrame(data={f'draw_{i}': three_hp_adherence.iloc[i] for i in range(1000)},
+                                      index=pd.Index(['3HP'], name='treatment_type'))
+
+    six_h_adherence = data['adherence_6h_real_world']
+    six_h_adherence = pd.DataFrame(data={f'draw_{i}': six_h_adherence.iloc[i] for i in range(1000)},
+                                   index=pd.Index(['6H'], name='treatment_type'))
+
+    demog = get_demographic_dimensions(location)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = split_interval(demog, interval_column='year', split_column_prefix='year')
+    demog['treatment_type'] = '3HP'
+    three_hp_index = demog.set_index('treatment_type', append=True)
+    three_hp_data = three_hp_index.join(three_hp_adherence)
+
+    demog['treatment_type'] = '6H'
+    six_h_index = demog.set_index('treatment_type', append=True)
+    six_h_data = six_h_index.join(six_h_adherence)
+
+    write(art, 'three_hp.adherence', three_hp_data, skip_interval_processing=True)
+    write(art, 'six_h.adherence', six_h_data, skip_interval_processing=True)
+
+
+def write_relative_risk_data(art, location):
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f"Reading relative risk data from {data_path}")
+    data = pd.read_csv(data_path / "treatment_adherence_draws.csv", usecols=['RR_no_tx',
+                                                                             'RR_NA'])
+
+    untreated_relative_risk = data['RR_no_tx']
+    untreated_rr = pd.DataFrame(data={f'draw_{i}': untreated_relative_risk.iloc[i] for i in range(1000)},
+                                index=pd.Index(['untreated'], name='parameter'))
+
+    # NOTE: Currently, each relative risk is the same for each drug
+    nonadherent_relative_risk = data['RR_NA']
+    nonadherent_six_h_rr = pd.DataFrame(data={f'draw_{i}': nonadherent_relative_risk.iloc[i] for i in range(1000)},
+                                        index=pd.Index(['6H_nonadherent'], name='parameter'))
+    nonadherent_three_hp_rr = pd.DataFrame(data={f'draw_{i}': nonadherent_relative_risk.iloc[i] for i in range(1000)},
+                                           index=pd.Index(['3HP_nonadherent'], name='parameter'))
+
+    adherent_relative_risk = 1.0
+    adherent_six_h_rr = pd.DataFrame(data={f'draw_{i}': adherent_relative_risk for i in range(1000)},
+                                     index=pd.Index(['6H_adherent'], name='parameter'))
+    adherent_three_hp_rr = pd.DataFrame(data={f'draw_{i}': adherent_relative_risk for i in range(1000)},
+                                        index=pd.Index(['3HP_adherent'], name='parameter'))
+
+    demog = get_demographic_dimensions(location)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = split_interval(demog, interval_column='year', split_column_prefix='year')
+
+    individual_rr_data = {
+        'untreated': untreated_rr,
+        '6H_nonadherent': nonadherent_six_h_rr,
+        '3HP_nonadherent': nonadherent_three_hp_rr,
+        '6H_adherent': adherent_six_h_rr,
+        '3HP_adherent': adherent_three_hp_rr
+    }
+
+    full_cat_data = []
+    for cat in ['untreated', '6H_nonadherent', '3HP_nonadherent', '6H_adherent', '3HP_adherent']:
+        demog['parameter'] = cat
+        data_demog = demog.set_index('parameter', append=True)
+        data = data_demog.join(individual_rr_data[cat])
+        full_cat_data.append(data)
+
+    full_cat_data = pd.concat(full_cat_data, axis=0)
+    full_cat_data['affected_entity'] = 'tuberculosis_and_hiv'
+
+    affects_hiv_pos = full_cat_data.copy()
+    affects_hiv_pos['affected_measure'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
+
+    affects_hiv_neg = full_cat_data.copy()
+    affects_hiv_neg['affected_measure'] = 'ltbi_susceptible_hiv_to_activetb_susceptible_hiv'
+
+    full_rr_data = pd.concat([affects_hiv_pos, affects_hiv_neg], axis=0)
+    full_rr_data = full_rr_data.set_index(['affected_entity', 'affected_measure'], append=True)
+
+    write(art, 'ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
+
+
 def compute_prevalence(art, data):
     logger.info('Computing prevalence...')
 
@@ -402,7 +529,9 @@ def build_ltbi_artifact(loc, output_dir=None):
     compute_excess_mortality(art, data)
     compute_disability_weight(art, data)
     compute_transition_rates(art, data)
-
     write_exposure_risk_data(art, data)
+    write_baseline_coverage_levels(art, loc)
+    write_adherence_data(art, loc)
+    write_relative_risk_data(art, loc)
 
     logger.info('!!! Done !!!')
