@@ -140,7 +140,7 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
             (get_years_of_life_lost, (self.life_expectancy, self.causes)),
         )
 
-        for category in ['cat1', 'cat2']:
+        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
             exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
             category_pop = pop.loc[exposure_category == category]
             base_args = (category_pop, self.config.to_dict(), self.start_time, self.clock(), self.age_bins)
