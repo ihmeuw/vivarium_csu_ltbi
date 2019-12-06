@@ -6,10 +6,11 @@ from loguru import logger
 from vivarium import Artifact
 from vivarium_cluster_tools.psimulate.utilities import get_drmaa
 
+from vivarium_csu_ltbi import paths as ltbi_paths
 from vivarium_csu_ltbi import globals as ltbi_globals
-from vivarium_csu_ltbi.data import ltbi_incidence_paths, ltbi_incidence_model
+from vivarium_csu_ltbi.data import ltbi_incidence_model
 import vivarium_csu_ltbi.data.ltbi_incidence_scripts as ltbi_script
-from vivarium_csu_ltbi.data import household_tb_paths, household_tb_model
+from vivarium_csu_ltbi.data import household_tb_model
 import vivarium_csu_ltbi.data.household_tb_scripts as hh_tb_script
 
 drmaa = get_drmaa()
@@ -19,16 +20,16 @@ drmaa = get_drmaa()
 def get_ltbi_incidence_input_data():
     """Collect the data necessary to model incidence using dismod and save
     it to an Artifact. This severs our database dependency and avoids
-    num_countries * 1k simultaneous requests."""
+    num_locations * 1k simultaneous requests."""
     for location in ltbi_globals.LOCATIONS:
         logger.info(f"Removing old LTBI incidence input data for {location}.")  # to avoid stale data
-        input_artifact_path = ltbi_incidence_paths.get_input_artifact_path(location)
+        input_artifact_path = ltbi_paths.get_ltbi_inc_input_artifact_path(location)
         if input_artifact_path.is_file():
             input_artifact_path.unlink()
 
     for location in ltbi_globals.LOCATIONS:
         logger.info(f"Processing {location}.")
-        input_artifact_path = ltbi_incidence_paths.get_input_artifact_path(location)
+        input_artifact_path = ltbi_paths.get_ltbi_inc_input_artifact_path(location)
         art = Artifact(str(input_artifact_path))
 
         logger.info("Pulling data.")
@@ -47,10 +48,10 @@ def get_ltbi_incidence_parallel(location):
     and collect it in a single artifact.
     """
     logger.info(f"Removing old LTBI incidence results for {location}.")  # to avoid stale data
-    intermediate_output_path = ltbi_incidence_paths.get_intermediate_output_dir_path(location)
+    intermediate_output_path = ltbi_paths.get_ltbi_inc_intermediate_output_dir_path(location)
     for f in intermediate_output_path.iterdir():
         f.unlink()
-    output_artifact_path = ltbi_incidence_paths.get_output_artifact_path(location)
+    output_artifact_path = ltbi_paths.get_ltbi_inc_output_artifact_path(location)
     if output_artifact_path.is_file():
         output_artifact_path.unlink()
 
@@ -83,7 +84,7 @@ def restart_ltbi_incidence_parallel(location):
     """Examine existing LTBI incidence data for ``location`` and submit jobs for
     any missing draws that may be present."""
 
-    intermediate_output_path = ltbi_incidence_paths.get_intermediate_output_dir_path(location)
+    intermediate_output_path = ltbi_paths.get_ltbi_inc_intermediate_output_dir_path(location)
     logger.info(f"Looking for missing draws in {intermediate_output_path}.")
 
     exists = [int(f.stem.split('.')[0]) for f in intermediate_output_path.iterdir()]
@@ -126,13 +127,13 @@ def restart_ltbi_incidence_parallel(location):
 def get_household_tb_input_data():
     for location in ltbi_globals.LOCATIONS:
         logger.info(f"Removing old household TB input data for {location}.")  # to avoid stale data
-        input_artifact_path = household_tb_paths.get_input_artifact_path(location)
+        input_artifact_path = ltbi_paths.get_hh_tb_input_artifact_path(location)
         if input_artifact_path.is_file():
             input_artifact_path.unlink()
 
     for location in ltbi_globals.LOCATIONS:
         logger.info(f"Processing {location}.")
-        input_artifact_path = household_tb_paths.get_input_artifact_path(location)
+        input_artifact_path = ltbi_paths.get_hh_tb_input_artifact_path(location)
         art = Artifact(str(input_artifact_path))
 
         logger.info("Pulling data.")
@@ -148,10 +149,10 @@ def get_household_tb_input_data():
 @click.argument("location", type=click.Choice(ltbi_globals.LOCATIONS))
 def get_household_tb_parallel(location):
     logger.info(f"Removing old household TB results for {location}.")  # to avoid stale data
-    intermediate_output_path = household_tb_paths.get_intermediate_output_dir_path(location)
+    intermediate_output_path = ltbi_paths.get_hh_tb_intermediate_output_dir_path(location)
     for f in intermediate_output_path.iterdir():
         f.unlink()
-    output_artifact_path = household_tb_paths.get_output_artifact_path(location)
+    output_artifact_path = ltbi_paths.get_hh_tb_output_artifact_path(location)
     if output_artifact_path.is_file():
         output_artifact_path.unlink()
 

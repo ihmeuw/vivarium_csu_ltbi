@@ -36,7 +36,7 @@ def build_cache():
             vivarium_inputs.get_measure(entity, 'cause_specific_mortality_rate', loc)
 
     # Incidence
-    # NOTE: ID 954 fails for all countries -- no non-zero data!
+    # NOTE: ID 954 fails for all locations -- no non-zero data!
     for id in [300, 934, 946, 947, 948, 949, 950]:
         logger.info(f"Pulling incidence data for id={id}")
         entity = [c for c in gbd_mapping.causes if c.gbd_id == id][0]

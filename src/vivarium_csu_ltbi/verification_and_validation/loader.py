@@ -12,7 +12,7 @@ TEMPLATE_COLUMNS = ['cause', 'sex', 'age_group', 'measure', 'input_draw']
 
 
 def get_results(location: str, timestamp: str = None) -> pd.DataFrame:
-    """Retrieves the results for a country.
+    """Retrieves the results for a location.
 
     Parameters
     ----------
@@ -24,7 +24,7 @@ def get_results(location: str, timestamp: str = None) -> pd.DataFrame:
 
     Returns
     -------
-    The results for the country if they exist.
+    The results for the location if they exist.
 
     Raises
     ------
