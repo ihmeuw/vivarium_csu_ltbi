@@ -1,5 +1,11 @@
 import pandas as pd
 
+from vivarium_csu_ltbi.components.names import (ACTIVETB_SUSCEPTIBLE_HIV,
+                                                ACTIVETB_POSITIVE_HIV,
+                                                LTBI_POSITIVE_HIV,
+                                                PROTECTED_TB_POSITIVE_HIV,
+                                                SUSCEPTIBLE_TB_POSITIVE_HIV)
+
 
 # noinspection PyAttributeOutsideInit
 class LTBITreatmentCoverage:
@@ -9,9 +15,18 @@ class LTBITreatmentCoverage:
         return 'ltbi_treatment_coverage'
 
     def setup(self, builder):
-        self.treatment_stream = builder.randomness.get_stream(f'{self.name}.treatment_propensity')
+        self.treatment_stream = builder.randomness.get_stream(f'{self.name}.treatment_selection')
+        self.adherence_stream = builder.randomness.get_stream(f'{self.name}.adherence_propensity')
 
         self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
+
+        # NOTE: Just write these into the same key, later
+        three_hp_adherence_data = builder.data.load("three_hp.adherence")
+        six_h_adherence_data = builder.data.load("six_h.adherence")
+        self.adherence = builder.lookup.build_table(pd.concat([three_hp_adherence_data, six_h_adherence_data], axis=0),
+                                                    parameter_columns=['age', 'year'],
+                                                    key_columns=['sex', 'treatment_type'],
+                                                    value_columns=['value'])
 
         six_h_coverage_data = builder.data.load("six_h.coverage.proportion")
         self.six_h_with_hiv, self.six_h_under_five_hhtb = self.setup_coverage_tables(builder, six_h_coverage_data)
@@ -22,36 +37,52 @@ class LTBITreatmentCoverage:
         self.coverage = builder.value.register_value_producer('ltbi_treatment.coverage', source=self.get_coverage,
                                                               preferred_post_processor=self.enforce_not_eligible)
 
-        self.columns_created = ['treatment_date', 'treatment_type']
+        self._treatment_status = pd.Series()
+        self.treatment_status = builder.value.register_value_producer('treatment_status.category',
+                                                                      source=lambda index:
+                                                                      self._treatment_status[index])
+
+        self.columns_created = ['treatment_date', 'treatment_type', 'adherence_propensity']
         builder.population.initializes_simulants(self.on_initialize_simulants,
                                                  requires_columns=[],
                                                  creates_columns=self.columns_created)
 
         self.disease_state_column = "tuberculosis_and_hiv"
-        self.population_view = builder.population.get_view([self.disease_state_column, 'age', 'alive'] +
+        self.population_view = builder.population.get_view([self.disease_state_column, 'age', 'sex', 'alive'] +
                                                            self.columns_created,
-                                                           query="alive == 'alive'")
+                                                           query="alive == 'alive' & treatment_type == 'untreated'")
 
-        builder.event.register_listener('time_step', self.on_time_step)
+        builder.event.register_listener('time_step__prepare', self.on_time_step_prepare)
 
-    @staticmethod
-    def setup_coverage_tables(builder, coverage_data):
-        with_hiv = coverage_data.loc[coverage_data.treatment_subgroup == 'with_hiv'].drop(['treatment_subgroup'], axis=1)
-        under_five_hhtb = coverage_data.loc[coverage_data.treatment_subgroup == 'under_five_hhtb'].drop(['treatment_subgroup'], axis=1)
-        coverage_table_with_hiv = builder.lookup.build_table(with_hiv, parameter_columns=['age', 'year'],
-                                                             key_columns=['sex'],
-                                                             value_columns=['value'])
+    def on_initialize_simulants(self, pop_data):
 
-        coverage_table_under_five_hhtb = builder.lookup.build_table(under_five_hhtb, parameter_columns=['age', 'year'],
-                                                                    key_columns=['sex'],
-                                                                    value_columns=['value'])
-        return coverage_table_with_hiv, coverage_table_under_five_hhtb
+        self._treatment_status = self._treatment_status.append(pd.Series('untreated', index=pop_data.index))
+        initialized = pd.DataFrame({'treatment_date': pd.NaT,
+                                    'treatment_type': 'untreated',
+                                    'adherence_propensity': self.adherence_stream.get_draw(pop_data.index)},
+                                   index=pop_data.index)
+        self.population_view.update(initialized)
 
-    def get_coverage(self, index):
-        pop = self.population_view.get(index)
+    def on_time_step_prepare(self, event):
+        pop = self.population_view.get(event.index)
+        assert '6H' not in pop.treatment_type
 
-        # TODO: Switch to a dataframe of zeroes with index = index, overwrite
-        #  with the below
+        coverage = self.coverage(pop)
+
+        treatment_type = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
+        newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
+        pop.loc[newly_treated, 'treatment_type'] = treatment_type
+        pop.loc[newly_treated, 'treatment_date'] = event.time
+        self.population_view.update(pop)
+
+        are_adherent = pop.loc[newly_treated, 'adherence_propensity'] <= self.adherence(pop.loc[newly_treated].index)
+        treatment_status = treatment_type.loc[newly_treated].copy()
+        treatment_status.loc[are_adherent] += '_adherent'
+        treatment_status.loc[~are_adherent] += '_nonadherent'
+
+        self._treatment_status.update(pd.Series(treatment_status, index=treatment_status.index))
+
+    def get_coverage(self, pop):
         coverage = pd.DataFrame(data={'3HP': 0.0, '6H': 0.0, 'untreated': 1.0},
                                 index=pop.index)
 
@@ -97,43 +128,36 @@ class LTBITreatmentCoverage:
 
         return data
 
-    def on_initialize_simulants(self, pop_data):
-        initialized = pd.DataFrame({'treatment_date': pd.NaT,
-                                    'treatment_type': 'untreated'}, index=pop_data.index)
-        self.population_view.update(initialized)
-
-    def on_time_step(self, event):
-        pop = self.population_view.get(event.index)
-
-        coverage = self.coverage(event.index)
-
-        treatment_choices = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
-        pop['treatment_type'] = treatment_choices
-        pop.loc[treatment_choices != 'untreated', 'treatment_date'] = event.time
-
-        self.population_view.update(pop)
-
     def get_hiv_positive_subgroup(self, pop):
         """Returns a bit mask of simulants in the treatment subgroup that is
-        HIV+."""
-        with_hiv = pop[self.disease_state_column].str.contains('positive_hiv')
-        no_active_tb = self.get_not_active_tb(pop)
-        not_previously_treated = self.get_not_previously_treated(pop)
-        return with_hiv & no_active_tb & not_previously_treated
+        HIV+ and does not have active TB. The population is already filtered
+        to untreated."""
+        with_hiv = (pop[self.disease_state_column] == ACTIVETB_POSITIVE_HIV) | \
+                   (pop[self.disease_state_column] == LTBI_POSITIVE_HIV) | \
+                   (pop[self.disease_state_column] == PROTECTED_TB_POSITIVE_HIV) | \
+                   (pop[self.disease_state_column] == SUSCEPTIBLE_TB_POSITIVE_HIV)
+
+        return with_hiv
 
     def get_under_five_hhtb_subgroup(self, pop):
         """Returns a bit mask of simulants in the treatment subgroup that is
-        under 5 and exposed to HHTB."""
+        under 5, exposed to household TB, and does not have active TB. The
+        population is already filtered to untreated."""
         age_five_and_under = pop['age'] <= 5.0
         exposed_hhtb = self.household_tb_exposure(pop.index) == 'cat1'
-        no_active_tb = self.get_not_active_tb(pop)
-        not_previously_treated = self.get_not_previously_treated(pop)
-        return age_five_and_under & exposed_hhtb & no_active_tb & not_previously_treated
-
-    def get_not_active_tb(self, pop):
-        """Returns a bit mask of simulants that do not have active TB."""
-        return ~pop[self.disease_state_column].str.contains('activetb')
+        no_active_tb = (pop[self.disease_state_column] != ACTIVETB_POSITIVE_HIV) & \
+                       (pop[self.disease_state_column] != ACTIVETB_SUSCEPTIBLE_HIV)
+        return age_five_and_under & exposed_hhtb & no_active_tb
 
     @staticmethod
-    def get_not_previously_treated(pop):
-        return pd.isnull(pop['treatment_date'])
+    def setup_coverage_tables(builder, coverage_data):
+        with_hiv = coverage_data.loc[coverage_data.treatment_subgroup == 'with_hiv'].drop(['treatment_subgroup'], axis=1)
+        under_five_hhtb = coverage_data.loc[coverage_data.treatment_subgroup == 'under_five_hhtb'].drop(['treatment_subgroup'], axis=1)
+        coverage_table_with_hiv = builder.lookup.build_table(with_hiv, parameter_columns=['age', 'year'],
+                                                             key_columns=['sex'],
+                                                             value_columns=['value'])
+
+        coverage_table_under_five_hhtb = builder.lookup.build_table(under_five_hhtb, parameter_columns=['age', 'year'],
+                                                                    key_columns=['sex'],
+                                                                    value_columns=['value'])
+        return coverage_table_with_hiv, coverage_table_under_five_hhtb

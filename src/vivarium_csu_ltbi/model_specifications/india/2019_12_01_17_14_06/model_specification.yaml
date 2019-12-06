@@ -1,0 +1,61 @@
+components:
+    vivarium_public_health:
+        population:
+            - BasePopulation()
+            - Mortality()
+
+        risks:
+            - Risk("risk_factor.household_tuberculosis")
+            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv.transition_rate")
+            - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_positive_hiv_to_ltbi_positive_hiv.transition_rate")
+
+    vivarium_csu_ltbi.components:
+        - TuberculosisAndHIV()
+        - HouseholdTuberculosisMortalityObserver()
+        - HouseholdTuberculosisDisabilityObserver()
+        - HouseholdTuberculosisDiseaseObserver("tuberculosis_and_hiv")
+
+configuration:
+    input_data:
+        location: India
+        input_draw_number: 0
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/india.hdf
+    interpolation:
+        order: 0
+        extrapolate: True
+    randomness:
+        map_size: 1_000_000
+        key_columns: ['entrance_time']
+        random_seed: 0
+    time:
+        start:
+            year: 2019
+            month: 6
+            day: 1
+        end:
+            year: 2019
+            month: 7
+            day: 14
+        step_size: 7 # Days
+    population:
+        population_size: 5_000
+        age_start: 0
+        age_end: 100
+        exit_age: 100
+
+    metrics:
+        disability:
+            by_age: True
+            by_sex: True
+            by_year: False
+        mortality:
+            by_age: True
+            by_sex: True
+            by_year: False
+        tuberculosis_and_hiv_observer:
+            by_age: True
+            by_age: True
+            by_year: False
+            prevalence_sample_date:
+                month: 7
+                day: 1
