@@ -389,9 +389,6 @@ def compute_prevalence(art, data):
     state_act_tb_sus_hiv = data.prev_934 + data.prev_946 + data.prev_947
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.prevalence', state_act_tb_sus_hiv)
 
-    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.prevalence', data.get_zeros())
-    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.prevalence', data.get_zeros())
-
     state_sus_tb_hiv_plus = (1 - data.prev_954) * data.prev_300
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.prevalence', state_sus_tb_hiv_plus)
 
@@ -412,8 +409,6 @@ def compute_excess_mortality(art, data):
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.excess_mortality_rate', state_act_tb_sus_hiv)
 
     emr_300 = data.csmr_300 / data.prev_300
-    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
-    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.excess_mortality_rate', emr_300)
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV}.excess_mortality_rate', data.get_zeros())
     write(art, f'sequela.{LTBI_POSITIVE_HIV}.excess_mortality_rate', emr_300)
@@ -439,8 +434,6 @@ def compute_disability_weight(art, data):
         [data.prev_934, data.prev_946, data.prev_947], [data.dw_934, data.dw_946, data.dw_947])
 
     write(art, f'sequela.{ACTIVETB_SUSCEPTIBLE_HIV}.disability_weight', total_disability_weight)
-    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV}.disability_weight', data.dw_300)
-    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV}.disability_weight', data.dw_300)
     write(art, f'sequela.{LTBI_POSITIVE_HIV}.disability_weight', data.dw_300)
 
@@ -468,22 +461,12 @@ def compute_transition_rates(art, data):
           data.incidence_ltbi, skip_interval_processing=True)
     write(art, f'sequela.{SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_PROTECTED_TB_SUSCEPTIBLE_HIV}.transition_rate',
-                data.get_zeros())
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_ACTIVETB_SUSCEPTIBLE_HIV}.transition_rate',
           (data.i_934 + data.i_946 + data.i_947) / (data.prev_954 * (1 - data.prev_300)))
     write(art, f'sequela.{LTBI_SUSCEPTIBLE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.i_300)
-    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV_TO_SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV}.transition_rate',
-          data.get_zeros())
-    write(art, f'sequela.{PROTECTED_TB_SUSCEPTIBLE_HIV_TO_PROTECTED_TB_POSITIVE_HIV}.transition_rate',
-          data.i_300)
-    write(art, f'sequela.{PROTECTED_TB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
-          data.get_zeros())
     write(art, f'sequela.{SUSCEPTIBLE_TB_POSITIVE_HIV_TO_LTBI_POSITIVE_HIV}.transition_rate',
           data.incidence_ltbi, skip_interval_processing=True)
-    write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_PROTECTED_TB_POSITIVE_HIV}.transition_rate',
-          data.get_zeros())
     write(art, f'sequela.{LTBI_POSITIVE_HIV_TO_ACTIVETB_POSITIVE_HIV}.transition_rate',
           (data.i_948 + data.i_949 + data.i_950) / (data.prev_954 * data.prev_300))
     write(art, f'sequela.{ACTIVETB_POSITIVE_HIV_TO_SUSCEPTIBLE_TB_POSITIVE_HIV}.transition_rate',
