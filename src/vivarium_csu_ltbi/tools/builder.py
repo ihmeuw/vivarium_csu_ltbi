@@ -33,7 +33,8 @@ class DataRepo:
 
     @staticmethod
     def get_and_package_dismod_ltbi_incidence(loc):
-        datafile = ltbi_paths.get_ltbi_inc_input_artifact_path(loc)
+        datafile = ltbi_paths.get_ltbi_inc_output_artifact_path(loc)
+
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
@@ -67,7 +68,7 @@ class DataRepo:
         cat1['parameter'] = 'cat1'
         cat2 = df.copy()
         cat2['parameter'] = 'cat2'
-        cat1['value'] = 1 - cat2['value']
+        cat2['value'] = 1 - cat1['value']
 
         complete = pd.concat([cat1, cat2], axis=0).reset_index(drop=True)
         complete = complete.set_index(['location', 'parameter', 'sex', 'age_start',
@@ -319,7 +320,7 @@ def write_adherence_data(art, location):
     write(art, 'ltbi_treatment.adherence', adherence_data, skip_interval_processing=True)
 
 
-def write_relative_risk_data(art, location):
+def write_treatment_relative_risk_data(art, location):
     import vivarium_csu_ltbi
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f"Reading relative risk data from {data_path}")
@@ -375,6 +376,85 @@ def write_relative_risk_data(art, location):
     full_rr_data = full_rr_data.set_index(['affected_entity', 'affected_measure'], append=True)
 
     write(art, 'ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
+
+
+def write_population_attributable_fraction_data(art, location):
+    logger.info(f"Computing population attributable fraction...")
+
+    # Read and format dependent data
+
+    # 6H is the only treatment in the baseline, so no 3HP
+    six_h_coverage = art.load("ltbi_treatment.six_h.coverage").reset_index('treatment_subgroup')
+    hiv_coverage = (six_h_coverage
+                    .loc[six_h_coverage['treatment_subgroup'] == "with_hiv"]
+                    .drop(['treatment_subgroup'], axis=1))
+    under_five_hhtb_coverage = (six_h_coverage
+                                .loc[six_h_coverage['treatment_subgroup'] == "under_five_hhtb"]
+                                .drop(['treatment_subgroup'], axis=1))
+
+    # adherence does not vary by year so we need to remove it and have the math broadcast
+    adherence = art.load("ltbi_treatment.adherence").reset_index()
+    adherence = (adherence
+                 .drop(['year_start', 'year_end'], axis=1)
+                 .drop_duplicates()
+                 .set_index(['location', 'sex', 'age_start', 'age_end']))
+    adherence = (adherence
+                 .loc[adherence['treatment_type'] == '6H']
+                 .drop(['treatment_type'], axis=1))
+
+    # we will extrapolate the exposure forward, we have no data for coverage years
+    hhtb_exposure = art.load(f"risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure").reset_index(['parameter'])
+    hhtb_exposure = (hhtb_exposure
+                     .loc[hhtb_exposure['parameter'] == 'cat1']
+                     .drop(['parameter'], axis=1)
+                     .droplevel(['year_start', 'year_end']))
+
+    treatment_relative_risk = art.load("ltbi_treatment.relative_risk").reset_index()
+    relative_risks = {}
+    for parameter in ['untreated', '6H_adherent', '6H_nonadherent']:
+        rr = (treatment_relative_risk
+              .drop(['year_start', 'year_end', 'affected_entity', 'affected_measure'], axis=1)
+              .drop_duplicates()
+              .set_index(['location', 'sex', 'age_start', 'age_end']))
+        relative_risks[parameter] = (rr
+                                     .loc[rr['parameter'] == parameter]
+                                     .drop(['parameter'], axis=1))
+
+    # Compute group probabilities
+    probabilities = {}
+    # P(A | HIV+)
+    probabilities['p_adherent_hiv_pos'] = adherence * hiv_coverage
+    # P(NA | HIV+)
+    probabilities['p_nonadherent_hiv_pos'] = (1. - adherence) * hiv_coverage
+    # P(noTX | HIV+)
+    probabilities['p_no_tx_hiv_pos'] = 1. - probabilities['p_adherent_hiv_pos'] - probabilities['p_nonadherent_hiv_pos']
+    # P(A | HIV-)
+    probabilities['p_adherent_hiv_neg'] = adherence * (under_five_hhtb_coverage - (hiv_coverage * under_five_hhtb_coverage)) * hhtb_exposure
+    # P(NA | HIV-)
+    probabilities['p_nonadherent_hiv_neg'] = (1. - adherence) * (under_five_hhtb_coverage - (hiv_coverage * under_five_hhtb_coverage)) * hhtb_exposure
+    # P(noTX | HIV-)
+    probabilities['p_no_tx_hiv_neg'] = 1. - probabilities['p_adherent_hiv_neg'] - probabilities['p_nonadherent_hiv_neg']
+
+    for name, prob in probabilities.items():
+        assert prob.max().max() <= 1.0, f"Computed probability {name} has a value > 1.0"
+        assert prob.min().min() >= 0.0, f"Computed probability {name} has a value < 0.0"
+
+    # Compute mean relative risk by HIV status
+
+    mean_rr_hiv_pos = ((probabilities['p_adherent_hiv_pos'] * relative_risks['6H_adherent'])
+                       + (probabilities['p_nonadherent_hiv_pos'] * relative_risks['6H_nonadherent'])
+                       + (probabilities['p_no_tx_hiv_pos'] * relative_risks['untreated']))
+    mean_rr_hiv_neg = ((probabilities['p_adherent_hiv_neg'] * relative_risks['6H_adherent'])
+                       + (probabilities['p_nonadherent_hiv_neg'] * relative_risks['6H_nonadherent'])
+                       + (probabilities['p_no_tx_hiv_neg'] * relative_risks['untreated']))
+
+    # Compute population attributable fraction
+
+    paf_hiv_pos = (mean_rr_hiv_pos - 1.) / mean_rr_hiv_pos
+    paf_hiv_neg = (mean_rr_hiv_neg - 1.) / mean_rr_hiv_neg
+
+    write(art, 'ltbi_treatment.hiv_positive.population_attributable_fraction', paf_hiv_pos)
+    write(art, 'ltbi_treatment.hiv_negative.population_attributable_fraction', paf_hiv_neg)
 
 
 def compute_prevalence(art, data):
@@ -513,6 +593,9 @@ def build_ltbi_artifact(loc, output_dir=None):
     write_exposure_risk_data(art, data)
     write_baseline_coverage_levels(art, loc)
     write_adherence_data(art, loc)
-    write_relative_risk_data(art, loc)
+    write_treatment_relative_risk_data(art, loc)
+
+    # This depends on coverage, adherence, relative risk and hhtb exposure
+    write_population_attributable_fraction_data(art, loc)
 
     logger.info('!!! Done !!!')
