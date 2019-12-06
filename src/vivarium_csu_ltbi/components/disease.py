@@ -38,6 +38,11 @@ class BetterDiseaseState(DiseaseState):
 
 
 class BetterSusceptibleState(SusceptibleState):
+
+    def __init__(self, cause, *args, **kwargs):
+        # skip the initializer that adds the redundant prefix
+        super(SusceptibleState, self).__init__(cause, *args, name_prefix='', **kwargs)
+
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
         if get_data_functions == None:
             get_data_functions = {'transition_rate': lambda cause, builder: builder.data.load(
