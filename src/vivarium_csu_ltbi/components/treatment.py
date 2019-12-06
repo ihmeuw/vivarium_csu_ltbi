@@ -22,17 +22,15 @@ class LTBITreatmentCoverage:
 
         self.household_tb_exposure = builder.value.get_value('household_tuberculosis.exposure')
 
-        # NOTE: Just write these into the same key, later
-        three_hp_adherence_data = builder.data.load("treatment.three_hp.adherence")
-        six_h_adherence_data = builder.data.load("treatment.six_h.adherence")
-        self.adherence = builder.lookup.build_table(pd.concat([three_hp_adherence_data, six_h_adherence_data], axis=0),
+        adherence_data = builder.data.load("ltbi_treatment.adherence")
+        self.adherence = builder.lookup.build_table(adherence_data,
                                                     parameter_columns=['age', 'year'],
                                                     key_columns=['sex', 'treatment_type'],
                                                     value_columns=['value'])
 
-        six_h_coverage_data = builder.data.load("treatment.six_h.coverage")
+        six_h_coverage_data = builder.data.load("ltbi_treatment.six_h.coverage")
         self.six_h_with_hiv, self.six_h_under_five_hhtb = self.setup_coverage_tables(builder, six_h_coverage_data)
-        three_hp_coverage_data = builder.data.load("treatment.three_hp.coverage")
+        three_hp_coverage_data = builder.data.load("ltbi_treatment.three_hp.coverage")
         self.three_hp_with_hiv, self.three_hp_under_five_hhtb = self.setup_coverage_tables(builder,
                                                                                            three_hp_coverage_data)
 
@@ -44,7 +42,8 @@ class LTBITreatmentCoverage:
 
         self._ltbi_treatment_status = pd.Series()
         self.ltbi_treatment_status = builder.value.register_value_producer('treatment_status.category',
-                                                                           source=lambda index: self._ltbi_treatment_status[index])
+                                                                           source=lambda index: self._ltbi_treatment_status[index],
+                                                                           requires_streams=[f'{self.name}.adherence_propensity'])
 
         self.columns_created = ['treatment_date', 'treatment_type', 'adherence_propensity']
         builder.population.initializes_simulants(self.on_initialize_simulants,
