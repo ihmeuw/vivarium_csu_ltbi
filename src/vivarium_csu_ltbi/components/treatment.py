@@ -1,10 +1,5 @@
 import pandas as pd
 
-<<<<<<< HEAD
-from vivarium_csu_ltbi.components.names import (ACTIVETB_SUSCEPTIBLE_HIV,
-                                                ACTIVETB_POSITIVE_HIV,
-                                                LTBI_POSITIVE_HIV,
-                                                SUSCEPTIBLE_TB_POSITIVE_HIV)
 from vivarium_csu_ltbi import globals as ltbi_globals
 
 
