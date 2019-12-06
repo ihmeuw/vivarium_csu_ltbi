@@ -33,7 +33,8 @@ class DataRepo:
 
     @staticmethod
     def get_and_package_dismod_ltbi_incidence(loc):
-        datafile = ltbi_paths.get_ltbi_inc_input_artifact_path(loc)
+        datafile = ltbi_paths.get_ltbi_inc_output_artifact_path(loc)
+
         if datafile.exists():
             store = pd.HDFStore(datafile)
             data = store.get('/cause/latent_tuberculosis_infection/incidence')
