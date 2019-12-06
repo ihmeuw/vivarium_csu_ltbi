@@ -61,11 +61,9 @@ def formatted_location(location):
 # Results columns and variables #
 #################################
 
-
 TOTAL_POP_COLUMN = 'total_population'
 TOTAL_YLLS_COLUMN = 'years_of_life_lost'
 TOTAL_YLDS_COLUMN = 'years_lived_with_disability'
-
 
 TOTAL_POP_COLUMN_TEMPLATE = 'total_population_{pop_state}'
 PERSON_TIME_COLUMN_TEMPLATE = 'person_time_among_{sex}_in_age_group_{age_group}_{exposure_group}'
@@ -100,9 +98,6 @@ CAUSE_OF_DISABILITY_STATES = [ACTIVETB_POSITIVE_HIV, ACTIVETB_SUSCEPTIBLE_HIV,
 CAUSE_OF_DEATH_STATES = CAUSE_OF_DISABILITY_STATES + ['other_causes']
 TRANSITIONS = HIV_TB_TRANSITIONS[:]
 DISEASE_STATES = HIV_TB_STATES[:]
-
-
-
 
 
 ########################
