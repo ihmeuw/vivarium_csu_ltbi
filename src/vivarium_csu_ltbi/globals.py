@@ -136,8 +136,6 @@ def RESULT_COLUMNS(kind='all'):
         columns = list(STANDARD_COLUMNS.values()) + columns
     else:
         template = COLUMN_TEMPLATES[kind]
-        fields = []
-        values = []
         filtered_field_map = {field: values for field, values in TEMPLATE_FIELD_MAP.items() if field in template}
         fields, value_groups = filtered_field_map.keys(), itertools.product(*filtered_field_map.values())
         for value_group in value_groups:
