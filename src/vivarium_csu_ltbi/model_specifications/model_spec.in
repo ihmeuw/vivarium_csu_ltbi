@@ -8,6 +8,8 @@ components:
             - Risk("risk_factor.household_tuberculosis")
             - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv.transition_rate")
             - RiskEffect("risk_factor.household_tuberculosis", "sequela.susceptible_tb_positive_hiv_to_ltbi_positive_hiv.transition_rate")
+            - RiskEffect("risk_factor.ltbi_treatment", "sequela.ltbi_susceptible_hiv_to_activetb_susceptible_hiv.transition_rate")
+            - RiskEffect("risk_factor.ltbi_treatment", "sequela.ltbi_positive_hiv_to_activetb_positive_hiv.transition_rate")
 
     vivarium_csu_ltbi.components:
         - TuberculosisAndHIV()
@@ -43,7 +45,9 @@ configuration:
         age_start: 0
         age_end: 100
         exit_age: 100
-
+    ltbi_treatment:
+        exposure: data
+        rebinned_exposed: []
     metrics:
         disability:
             by_age: True
