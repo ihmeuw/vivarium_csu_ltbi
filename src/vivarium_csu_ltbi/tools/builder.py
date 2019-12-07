@@ -290,6 +290,32 @@ def write_baseline_coverage_levels(art, loc):
     write(art, 'risk_factor.ltbi_treatment.coverage', all_coverage, skip_interval_processing=True)
 
 
+def write_intevention_coverage_shift(artifact, location):
+    import vivarium_csu_ltbi
+    data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
+    logger.info(f"Reading intervention coverage shift from {data_path}")
+    data = pd.read_csv(data_path / "intervention_coverage_shift.csv")
+
+    data = data.rename(columns={'year': 'year_start', 'medication': 'treatment_type'})
+    data['year_end'] = data['year_start'] + 1
+    data = data.set_index(['location'])
+    data['value'] /= 100.
+
+    demog = get_demographic_dimensions(location)
+    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
+    demog = demog.reset_index().drop(['year'], axis=1)
+    demog = demog.drop_duplicates()
+    demog = demog.set_index(['location'])
+
+    data = pd.merge(demog, data, left_index=True, right_index=True)
+    data = data.set_index(
+        ['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup', 'treatment_type', 'scenario'],
+        append=True)
+    data = pd.DataFrame(data={f'draw_{i}': data['value'] for i in range(1000)}, index=data.index)
+
+    write(artifact, 'ltbi_treatment.intervention_coverage_shift', data, skip_interval_processing=True)
+
+
 def sample_from_normal(mean, std, index_name):
     draw = np.random.normal(mean, std, size=1000)
     return pd.DataFrame(data={f'draw_{i}': draw[i] for i in range(1000)},
@@ -385,7 +411,6 @@ def write_treatment_relative_risk_data(art, location):
     write(art, 'risk_factor.ltbi_treatment.relative_risk', full_rr_data, skip_interval_processing=True)
     write(art, 'risk_factor.ltbi_treatment.distribution', 'ordered_polytomous', skip_interval_processing=True)
 
-    
 
 def write_population_attributable_fraction_data(art, location):
     logger.info(f"Computing population attributable fraction...")
@@ -465,7 +490,7 @@ def write_population_attributable_fraction_data(art, location):
 
     paf_hiv_pos = (mean_rr_hiv_pos - 1.) / mean_rr_hiv_pos
     paf_hiv_neg = (mean_rr_hiv_neg - 1.) / mean_rr_hiv_neg
-    
+
     paf_hiv_pos['affected_measure'] = 'transition_rate'
     paf_hiv_pos['affected_entity'] = 'ltbi_positive_hiv_to_activetb_positive_hiv'
     paf_hiv_neg['affected_measure'] = 'transition_rate'
@@ -613,6 +638,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     write_exposure_risk_data(art, data)
     write_baseline_coverage_levels(art, loc)
     write_adherence_data(art, loc)
+    write_intevention_coverage_shift(art, loc)
     write_treatment_relative_risk_data(art, loc)
 
     # This depends on coverage, adherence, relative risk and hhtb exposure

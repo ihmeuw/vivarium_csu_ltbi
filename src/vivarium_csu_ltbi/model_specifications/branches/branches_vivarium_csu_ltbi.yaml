@@ -1,0 +1,7 @@
+input_draw_count: 100
+random_seed_count: 10
+
+branches:
+  - ltbi_treatment_scale_up:
+      scenario: ['baseline', '6H_scale_up', '3HP_scale_up']
+
