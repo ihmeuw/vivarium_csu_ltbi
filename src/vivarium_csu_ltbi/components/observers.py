@@ -44,7 +44,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
     @staticmethod
     def get_state_person_time(pop, config, disease, state, current_year, step_size, age_bins):
         """Custom person time getter that handles state column name assumptions"""
-        base_key = get_output_template(**config).substitute(measure=f'{state}_susceptible_person_time',
+        base_key = get_output_template(**config).substitute(measure=f'{state}_person_time',
                                                             year=current_year)
         base_filter = QueryString(f'alive == "alive" and {disease} == "{state}"')
         person_time = get_group_counts(pop, base_filter, base_key, config, age_bins,
@@ -147,8 +147,8 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
 
         measure_getters = (
             (get_person_time, ()),
-            (get_deaths, (self.causes,)),
-            (get_years_of_life_lost, (self.life_expectancy, self.causes)),
+            (get_deaths, (ltbi_globals.CAUSE_OF_DEATH_STATES,)),
+            (get_years_of_life_lost, (self.life_expectancy, ltbi_globals.CAUSE_OF_DEATH_STATES)),
         )
 
         for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
@@ -178,6 +178,8 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
     def setup(self, builder):
         super().setup(builder)
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
+        self.disability_weight_pipelines = {k: v for k, v in self.disability_weight_pipelines
+                                            if k in ltbi_globals.CAUSE_OF_DISABILITY_STATES}
 
     def on_time_step_prepare(self, event):
         pop = self.population_view.get(event.index, query='tracked == True and alive == "alive"')

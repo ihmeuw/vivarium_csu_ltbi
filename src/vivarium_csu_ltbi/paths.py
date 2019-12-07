@@ -98,7 +98,7 @@ def get_output_directory(location: str, timestamp: Union[str, None]):
         raise FileNotFoundError(f'Cannot find the results directory {str(RESULT_DIRECTORY)}. '
                                 f'Are you on the cluster?  Make sure you have access to the share drive.')
     sanitized_location = ltbi_globals.formatted_location(location)
-    location_directory = RESULT_DIRECTORY / sanitized_location
+    location_directory = RESULT_DIRECTORY / 'subminimal-with-risk' / sanitized_location
     location_results = sorted(location_directory.iterdir(), key=lambda path: path.name)
     if timestamp is not None:
         if timestamp not in location_results:
