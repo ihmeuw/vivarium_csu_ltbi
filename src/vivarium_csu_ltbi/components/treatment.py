@@ -83,7 +83,7 @@ class LTBITreatmentCoverage:
         self._ltbi_treatment_status.update(pd.Series(treatment_status, index=treatment_status.index))
 
     def get_coverage(self, index):
-        pop = self.population_view.get(index, query="treatment_type == 'untreated'") 
+        pop = self.population_view.get(index, query="treatment_type == 'untreated'")
 
         coverage = pd.DataFrame(data={'3HP': 0.0, '6H': 0.0, 'untreated': 1.0},
                                 index=pop.index)
@@ -150,5 +150,4 @@ class LTBITreatmentCoverage:
         key_cols = ['sex', 'age_start', 'age_end', 'year_start', 'year_end']
         coverage_data = coverage_data.pivot_table(index=key_cols, columns=['treatment_group'], values='value').reset_index()
         coverage_data.columns.name = None
-
         return coverage_data
