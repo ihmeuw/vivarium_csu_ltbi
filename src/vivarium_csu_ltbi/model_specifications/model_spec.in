@@ -50,7 +50,7 @@ configuration:
         exposure: data
         rebinned_exposed: []
     ltbi_treatment_scale_up:
-        scenario: '3HP_scale_up'  # [baseline, 6H_scale_up, 3HP_scale_up]
+        scenario: 'baseline'  # [baseline, 6H_scale_up, 3HP_scale_up]
     metrics:
         disability:
             by_age: True
