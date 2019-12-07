@@ -2,7 +2,7 @@ import pandas as pd
 import yaml
 import warnings
 
-result_dir = '/share/costeffectiveness/results/vivarium_csu_ltbi/subminimal-with-risk/'
+result_dir = '/share/costeffectiveness/results/vivarium_csu_ltbi/full-model/'
 
 # update it as needed
 path_for_location = {'Ethiopia': result_dir + 'ethiopia/2019_12_07_02_10_18',
