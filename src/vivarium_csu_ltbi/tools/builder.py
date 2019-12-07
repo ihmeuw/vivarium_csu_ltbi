@@ -279,8 +279,15 @@ def write_baseline_coverage_levels(art, loc):
     six_h = pd.DataFrame(data={f'draw_{i}': six_h['value'] for i in range(1000)}, index=six_h.index)
     three_hp = pd.DataFrame(data={f'draw_{i}': three_hp['value'] for i in range(1000)}, index=three_hp.index)
 
-    write(art, 'ltbi_treatment.six_h.coverage', six_h, skip_interval_processing=True)
-    write(art, 'ltbi_treatment.three_hp.coverage', three_hp, skip_interval_processing=True)
+    six_h['treatment_type'] = '6H'
+    six_h = six_h.set_index(['treatment_type'], append=True)
+
+    three_hp['treatment_type'] = '3HP'
+    three_hp = three_hp.set_index(['treatment_type'], append=True)
+
+    all_coverage = pd.concat([six_h, three_hp], axis=0)
+
+    write(art, 'risk_factor.ltbi_treatment.coverage', all_coverage, skip_interval_processing=True)
 
 
 def sample_from_normal(mean, std, index_name):
@@ -386,12 +393,14 @@ def write_population_attributable_fraction_data(art, location):
     # Read and format dependent data
 
     # 6H is the only treatment in the baseline, so no 3HP
-    six_h_coverage = art.load("ltbi_treatment.six_h.coverage").reset_index('treatment_subgroup')
-    hiv_coverage = (six_h_coverage
-                    .loc[six_h_coverage['treatment_subgroup'] == "with_hiv"]
+    coverage = art.load("risk_factor.ltbi_treatment.coverage").reset_index(['treatment_subgroup',
+                                                                                  'treatment_type'])
+    coverage = coverage.loc[coverage['treatment_type']=='6H'].drop(['treatment_type'], axis=1)
+    hiv_coverage = (coverage
+                    .loc[coverage['treatment_subgroup'] == "with_hiv"]
                     .drop(['treatment_subgroup'], axis=1))
-    under_five_hhtb_coverage = (six_h_coverage
-                                .loc[six_h_coverage['treatment_subgroup'] == "under_five_hhtb"]
+    under_five_hhtb_coverage = (coverage
+                                .loc[coverage['treatment_subgroup'] == "under_five_hhtb"]
                                 .drop(['treatment_subgroup'], axis=1))
 
     # adherence does not vary by year so we need to remove it and have the math broadcast
