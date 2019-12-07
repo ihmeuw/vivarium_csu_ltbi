@@ -308,7 +308,7 @@ def write_intevention_coverage_shift(artifact, location):
     demog = demog.set_index(['location'])
 
     data = pd.merge(demog, data, left_index=True, right_index=True)
-    data.set_index(
+    data = data.set_index(
         ['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup', 'treatment_type', 'scenario'],
         append=True)
     data = pd.DataFrame(data={f'draw_{i}': data['value'] for i in range(1000)}, index=data.index)
