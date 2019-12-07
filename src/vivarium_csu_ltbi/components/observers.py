@@ -178,7 +178,7 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
     def setup(self, builder):
         super().setup(builder)
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
-        self.disability_weight_pipelines = {k: v for k, v in self.disability_weight_pipelines
+        self.disability_weight_pipelines = {k: v for k, v in self.disability_weight_pipelines.items()
                                             if k in ltbi_globals.CAUSE_OF_DISABILITY_STATES}
 
     def on_time_step_prepare(self, event):
@@ -198,6 +198,6 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
             ylds_this_step = get_years_lived_with_disability(category_pop, self.config.to_dict(),
                                                              self.clock().year, self.step_size(),
                                                              self.age_bins, self.disability_weight_pipelines,
-                                                             self.causes)
+                                                             ltbi_globals.CAUSE_OF_DISABILITY_STATES)
             ylds_this_step = {f'{k}_{exposure_state}': v for k, v in ylds_this_step.items()}
             self.years_lived_with_disability.update(ylds_this_step)
