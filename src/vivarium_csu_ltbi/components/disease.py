@@ -21,6 +21,7 @@ class BetterDiseaseModel(DiseaseModel):
 
     def metrics(self, index, metrics):
         """Suppress unnecessary columns."""
+        return metrics
 
 
 class BetterDiseaseState(DiseaseState):
