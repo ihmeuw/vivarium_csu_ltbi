@@ -1,6 +1,7 @@
-import pandas as pd
 import yaml
 import warnings
+import pandas as pd
+from db_queries import get_ids
 
 result_dir = '/share/costeffectiveness/results/vivarium_csu_ltbi/full-model/'
 
@@ -174,6 +175,46 @@ def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
 
     return g.reset_index()
 
+def get_age_group_dict():
+    """pairwise age group name and age group id"""
+    age_group_ids = list(range(2, 21)) + [30, 31, 32, 235]
+
+    age_table = get_ids('age_group')
+    age_table = age_table[age_table.age_group_id.isin(age_group_ids)]
+    age_table['age_group_name'] = age_table.age_group_name.map(lambda x: x.replace(' ', '_').lower())
+
+    age_group_dict = dict(zip(age_table.age_group_name, age_table.age_group_id))
+    age_group_dict.update({'all_ages': 1})
+    
+    return age_group_dict
+
+def format_for_table_shell(data: pd.DataFrame, location_name: str, age_group_dict: dict):
+    """sort the non-value index columns for table shell"""
+    age_group_dict_swap = dict((v, k) for k, v in age_group_dict.items())
+    
+    df = data.copy()
+    df['location'] = location_name
+    df['age_group'] = df.age_group.map(age_group_dict)
+    df = df.set_index(['location'] + template_cols[:-1]).sort_index().reset_index()
+    df['age_group'] = df.age_group.map(age_group_dict_swap)
+    
+    return df
+
+def append_country_estimates(path_for_location: dict, cause_names: list):
+    """get all country estimates into one big dataframe"""
+    data = pd.DataFrame()
+    for location, path in path_for_location.items():
+        df = load_data(path)
+        pt = get_person_time(df)
+        output = get_disaggregated_results(df, cause_names)
+        results = append_cause_aggregates(append_demographic_aggregates(output, by_cause=True))
+        results = filter_by_causes(results)
+        table_shell = get_table_shell(results, pt)
+        table_shell = format_for_table_shell(table_shell, location, get_age_group_dict())
+        
+        data = pd.concat([data, table_shell], ignore_index=True)
+    return data
+
 def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str, measure_type: str, hiv_status: str):
     """pull hiv-specific activetb incidence counts or ltbi person time"""
     df = data[[c for c in data.columns if name1 in c and name2 in c]]
@@ -210,4 +251,3 @@ def get_type_specific_results(measure_type: str, col_names: list):
     total = append_demographic_aggregates(total, by_cause=True)
     
     return total
-
