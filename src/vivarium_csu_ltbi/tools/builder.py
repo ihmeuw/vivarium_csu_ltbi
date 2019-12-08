@@ -233,6 +233,9 @@ def write_demographic_data(artifact, location, data):
     key = 'cause.all_causes.cause_specific_mortality_rate'
     write(artifact, key, load(key))
 
+    key = 'covariate.live_births_by_sex.estimate'
+    write(artifact, key, load(key))
+
     key = f'cause.{ltbi_globals.TUBERCULOSIS_AND_HIV}.cause_specific_mortality_rate'
     write(artifact, key, (data.csmr_298 + data.csmr_297))
 
@@ -615,11 +618,9 @@ def write(artifact, key, data, skip_interval_processing=False):
     if skip_interval_processing:
         tmp = data
     else:
-        tmp = data.copy(deep='all') if isinstance(data, pd.core.frame.DataFrame) else data
+        tmp = data.copy(deep='all') if isinstance(data, pd.DataFrame) else data
         tmp = split_interval(tmp, interval_column='age', split_column_prefix='age')
         tmp = split_interval(tmp, interval_column='year', split_column_prefix='year')
-    if isinstance(tmp, pd.core.frame.DataFrame):
-        assert 'age_end' in tmp.index.names
     artifact.write(key, tmp)
 
 

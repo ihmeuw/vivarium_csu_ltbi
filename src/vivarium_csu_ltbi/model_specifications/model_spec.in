@@ -3,6 +3,7 @@ components:
         population:
             - BasePopulation()
             - Mortality()
+            - FertilityCrudeBirthRate()
 
         risks:
             - Risk("risk_factor.household_tuberculosis")
@@ -55,15 +56,15 @@ configuration:
         disability:
             by_age: True
             by_sex: True
-            by_year: False
+            by_year: True
         mortality:
             by_age: True
             by_sex: True
-            by_year: False
+            by_year: True
         tuberculosis_and_hiv_observer:
             by_age: True
             by_sex: True
-            by_year: False
+            by_year: True
             prevalence_sample_date:
                 month: 7
                 day: 1
