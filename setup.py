@@ -17,11 +17,11 @@ if __name__ == "__main__":
         long_description = f.read()
 
     install_requirements = [
-        'vivarium==0.9.2',
+        'vivarium==0.9.3',
         'vivarium_public_health==0.10.2',
-        'vivarium_cluster_tools==1.1.0',
+        'vivarium_cluster_tools==1.1.1',
         'vivarium_inputs[data]==3.1.0',
-        
+
         # These are pinned for internal dependencies on IHME libraries
         'numpy<=1.15.4',
         'tables<=3.4.0',
