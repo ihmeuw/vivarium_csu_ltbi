@@ -16,7 +16,7 @@ cause_names = ['ltbi_susceptible_hiv', 'activetb_susceptible_hiv',
                'ltbi_positive_hiv', 'activetb_positive_hiv',
                'susceptible_tb_positive_hiv', 'other_causes']
 
-template_cols = ['cause', 'sex', 'age_group', 'risk_group', 'measure', 'scenario', 'input_draw']
+template_cols = ['cause', 'year', 'sex', 'age_group', 'risk_group', 'measure', 'scenario', 'input_draw']
 
 def load_data(country_path: str):
     """load data and drop uncompleted draws if exists"""
@@ -43,6 +43,9 @@ def get_age_group_from_template(template_string: str):
 def get_risk_group_from_template(template_string: str):
     return '_'.join(template_string.split('_')[-3:])
 
+def get_year_from_template(template_string):
+    return template_string.split('_in_')[1].split('_among_')[0]
+
 def standardize_shape(data: pd.DataFrame, measure: str):
     """select specific measure of data and unpivot it into long-format dataframe"""
     if 'due_to' in measure:
@@ -56,6 +59,7 @@ def standardize_shape(data: pd.DataFrame, measure: str):
         measure_data = measure_data.reset_index().melt(id_vars=['input_draw', 'scenario'], var_name=['label'])
         measure_data['measure'] = measure
     
+    measure_data['year'] = measure_data.label.map(get_year_from_template)
     measure_data['sex'] = measure_data.label.map(get_sex_from_template)
     measure_data['age_group'] = measure_data.label.map(get_age_group_from_template)
     measure_data['risk_group'] = measure_data.label.map(get_risk_group_from_template)
@@ -100,6 +104,11 @@ def append_demographic_aggregates(data: pd.DataFrame, by_cause=False):
     """aggregate results on demographic groups and append it to input data"""
     extra_cols = ['cause'] if by_cause else []
     
+    year_aggregate = data.groupby(extra_cols + [c for c in template_cols[1:] if c != 'year']).value.sum().reset_index()
+    year_aggregate['year'] = 'all_years'
+
+    data = pd.concat([data, year_aggregate])
+
     sex_aggregate = data.groupby(extra_cols + [c for c in template_cols[1:] if c != 'sex']).value.sum().reset_index()
     sex_aggregate['sex'] = 'both'
 
@@ -159,7 +168,7 @@ def get_table_shell(results: pd.DataFrame, person_time: pd.DataFrame):
     """calculate averted measures and convert to rate space,
     then summarize mean, lower bound, and upper bound
     """
-    results_w_pt = pd.merge(results, person_time, on=['sex', 'age_group', 'risk_group', 'scenario', 'input_draw'])
+    results_w_pt = pd.merge(results, person_time, on=['year', 'sex', 'age_group', 'risk_group', 'scenario', 'input_draw'])
     bau = results_w_pt.loc[results_w_pt.scenario == 'baseline'].drop(columns=['scenario', 'person_time'])
     
     t = pd.merge(results_w_pt, bau, on=[c for c in template_cols if c != 'scenario'], suffixes=['', '_bau'])
@@ -224,7 +233,8 @@ def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str, measure
         df['cause'] = 'activetb'
     if measure_type == 'person_time':
         df['cause'] ='ltbi'
-        
+    
+    df['year'] = df.label.map(get_year_from_template)    
     df['sex'] = df.label.map(get_sex_from_template)
     df['age_group'] = df.label.map(get_age_group_from_template)
     df['risk_group'] = df.label.map(get_risk_group_from_template)
@@ -235,16 +245,16 @@ def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str, measure
     
     return df
 
-def get_type_specific_results(measure_type: str, col_names: list):
+def get_type_specific_results(data: pd.DataFrame, measure_type: str, col_names: list):
     """sum up hiv positive and hiv negative measure,
     then append demographic aggregates to it
     """
     if measure_type == 'activetb_incidence_count':
-        positive_hiv = get_hiv_specific_measure(df, 'ltbi_positive_hiv', 'activetb_positive_hiv', 'incidence_count', 'positive').set_index(col_names)
-        susceptible_hiv = get_hiv_specific_measure(df, 'ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'incidence_count', 'susceptible').set_index(col_names)
+        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'activetb_positive_hiv', 'incidence_count', 'positive').set_index(col_names)
+        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'incidence_count', 'susceptible').set_index(col_names)
     if measure_type == 'ltbi_person_time':
-        positive_hiv = get_hiv_specific_measure(df, 'ltbi_positive_hiv', 'person_time', 'person_time', 'positive').set_index(col_names)
-        susceptible_hiv = get_hiv_specific_measure(df, 'ltbi_susceptible_hiv', 'person_time', 'person_time', 'susceptible').set_index(col_names)
+        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'person_time', 'person_time', 'positive').set_index(col_names)
+        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'person_time', 'person_time', 'susceptible').set_index(col_names)
     
     total = positive_hiv + susceptible_hiv
     total = total.drop(columns='hiv_status').reset_index()
