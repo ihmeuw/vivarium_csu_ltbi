@@ -1,7 +1,9 @@
+import itertools
+
 import pandas as pd
 
 from vivarium_public_health.metrics import (DiseaseObserver, MortalityObserver, DisabilityObserver)
-from vivarium_public_health.metrics.utilities import (get_output_template, get_disease_event_counts, QueryString,
+from vivarium_public_health.metrics.utilities import (get_output_template, QueryString,
                                                       get_group_counts, to_years, get_years_lived_with_disability,
                                                       get_person_time, get_deaths, get_years_of_life_lost)
 
@@ -73,7 +75,8 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         pop_exposure_category = self.household_tb_exposure(event.index)
         pop_treatment_group = self.treatment_group(event.index)
 
-        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        groups = itertools.product(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES,
+                                   ltbi_globals.TREATMENT_GROUPS)
         for exposure_category, treatment_group in groups:
             exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
             pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
@@ -111,7 +114,8 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
         pop_exposure_category = self.household_tb_exposure(event.index)
         pop_treatment_group = self.treatment_group(event.index)
 
-        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        groups = itertools.product(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES,
+                                   ltbi_globals.TREATMENT_GROUPS)
         for exposure_category, treatment_group in groups:
             exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
             pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
@@ -160,7 +164,8 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
             (get_years_of_life_lost, (self.life_expectancy, ltbi_globals.CAUSE_OF_DEATH_STATES)),
         )
 
-        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        groups = itertools.product(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES,
+                                   ltbi_globals.TREATMENT_GROUPS)
         for exposure_category, treatment_group in groups:
             exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
             pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
@@ -206,7 +211,8 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
         pop_exposure_category = self.household_tb_exposure(pop.index)
         pop_treatment_group = self.treatment_group(pop.index)
 
-        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        groups = itertools.product(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES,
+                                   ltbi_globals.TREATMENT_GROUPS)
         for exposure_category, treatment_group in groups:
             exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
             pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
