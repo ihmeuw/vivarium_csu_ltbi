@@ -72,21 +72,24 @@ TOTAL_POP_COLUMN = 'total_population'
 TOTAL_YLLS_COLUMN = 'years_of_life_lost'
 TOTAL_YLDS_COLUMN = 'years_lived_with_disability'
 RANDOM_SEED_COLUMN = 'random_seed'
+INPUT_DRAW_COLUMN = 'input_draw'
+
 
 STANDARD_COLUMNS = {'total_population': TOTAL_POP_COLUMN,
                     'total_ylls': TOTAL_YLLS_COLUMN,
                     'total_ylds': TOTAL_YLDS_COLUMN,
-                    'random_seed': RANDOM_SEED_COLUMN}
+                    'random_seed': RANDOM_SEED_COLUMN,
+                    'input_draw': INPUT_DRAW_COLUMN}
 
 TOTAL_POP_COLUMN_TEMPLATE = 'total_population_{POP_STATE}'
-PERSON_TIME_COLUMN_TEMPLATE = 'person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-YLDS_COLUMN_TEMPLATE = 'ylds_due_to_{CAUSE_OF_DISABILITY_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-DEATH_COLUMN_TEMPLATE = 'death_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-YLLS_COLUMN_TEMPLATE = 'ylls_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-TRANSITION_EVENT_COLUMN_TEMPLATE = '{TRANSITION}_event_count_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-PREVALENT_CASES_COLUMN_TEMPLATE = '{DISEASE_STATE}_prevalent_cases_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-POPULATION_COUNT_COLUMN_TEMPLATE = 'population_point_estimate_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
-STATE_PERSON_TIME_COLUMN_TEMPLATE = '{DISEASE_STATE}_person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}'
+PERSON_TIME_COLUMN_TEMPLATE = 'person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+YLDS_COLUMN_TEMPLATE = 'ylds_due_to_{CAUSE_OF_DISABILITY_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+DEATH_COLUMN_TEMPLATE = 'death_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+YLLS_COLUMN_TEMPLATE = 'ylls_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+TRANSITION_EVENT_COLUMN_TEMPLATE = '{TRANSITION}_event_count_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+PREVALENT_CASES_COLUMN_TEMPLATE = '{DISEASE_STATE}_prevalent_cases_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+POPULATION_COUNT_COLUMN_TEMPLATE = 'population_point_estimate_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+STATE_PERSON_TIME_COLUMN_TEMPLATE = '{DISEASE_STATE}_person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
 
 COLUMN_TEMPLATES = {'total_population': TOTAL_POP_COLUMN_TEMPLATE,
                     'person_time': PERSON_TIME_COLUMN_TEMPLATE,
@@ -127,11 +130,12 @@ TEMPLATE_FIELD_MAP = {'SEX': SEXES,
                       'AGE_GROUP': AGE_GROUPS,
                       'YEAR': YEARS,
                       'EXPOSURE_GROUP': EXPOSURE_GROUPS,
+                      'TREATMENT_GROUP': TREATMENT_GROUPS,
                       'POP_STATE': POP_STATES,
                       'CAUSE_OF_DISABILITY_STATE': CAUSE_OF_DISABILITY_STATES,
                       'CAUSE_OF_DEATH_STATE': CAUSE_OF_DEATH_STATES,
                       'TRANSITION': TRANSITIONS,
-                      'DISEASE_STATE': DISEASE_STATES}
+                      'DISEASE_STATE': DISEASE_STATES, }
 
 
 def RESULT_COLUMNS(kind='all'):
@@ -149,7 +153,6 @@ def RESULT_COLUMNS(kind='all'):
         for value_group in value_groups:
             columns.append(template.format(**{field: value for field, value in zip(fields, value_group)}))
     return columns
-
 
 
 ########################
