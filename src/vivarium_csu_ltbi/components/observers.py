@@ -152,14 +152,13 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
         pop.loc[pop.exit_time.isnull(), 'exit_time'] = self.clock()
 
         pop_exposure_category = self.household_tb_exposure(index)
+        pop_treatment_group = self.treatment_group(index)
 
         measure_getters = (
             (get_person_time, ()),
             (get_deaths, (ltbi_globals.CAUSE_OF_DEATH_STATES,)),
             (get_years_of_life_lost, (self.life_expectancy, ltbi_globals.CAUSE_OF_DEATH_STATES)),
         )
-
-        pop_treatment_group = self.treatment_group(index)
 
         groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
         for exposure_category, treatment_group in groups:
