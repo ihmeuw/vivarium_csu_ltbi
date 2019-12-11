@@ -113,7 +113,7 @@ class HouseholdTuberculosisDiseaseObserver(DiseaseObserver):
 
             for transition in ltbi_globals.HIV_TB_TRANSITIONS:
                 from_state, to_state = transition.split('_to_')
-                event_this_step = ((pop_in_category[f'{to_state}_event_time'] == self.clock())
+                event_this_step = ((pop_in_category[f'{to_state}_event_time'] == event.time)
                                    & (pop_in_category[self.previous_state_column] == from_state))
                 transitioned_pop = pop_in_category.loc[event_this_step]
                 base_key = get_output_template(**self.config.to_dict()).substitute(measure=f'{transition}_event_count',
