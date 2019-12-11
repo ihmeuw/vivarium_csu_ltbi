@@ -145,12 +145,13 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
     def setup(self, builder):
         super().setup(builder)
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
+        self.treatment_group = builder.value.get_value('ltbi_treatment.exposure')
 
     def metrics(self, index, metrics):
         pop = self.population_view.get(index)
         pop.loc[pop.exit_time.isnull(), 'exit_time'] = self.clock()
 
-        exposure_category = self.household_tb_exposure(index)
+        pop_exposure_category = self.household_tb_exposure(index)
 
         measure_getters = (
             (get_person_time, ()),
@@ -158,14 +159,19 @@ class HouseholdTuberculosisMortalityObserver(MortalityObserver):
             (get_years_of_life_lost, (self.life_expectancy, ltbi_globals.CAUSE_OF_DEATH_STATES)),
         )
 
-        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
-            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
-            category_pop = pop.loc[exposure_category == category]
-            base_args = (category_pop, self.config.to_dict(), self.start_time, self.clock(), self.age_bins)
+        pop_treatment_group = self.treatment_group(index)
+
+        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        for exposure_category, treatment_group in groups:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
+            pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
+                                   & (pop_treatment_group == treatment_group)]
+            base_args = (pop_in_group, self.config.to_dict(), self.start_time, self.clock(), self.age_bins)
 
             for measure_getter, extra_args in measure_getters:
                 measure_data = measure_getter(*base_args, *extra_args)
-                measure_data = {f'{k}_{exposure_state}': v for k, v in measure_data.items()}
+                measure_data = {f'{k}_{exposure_state}_treatment_group_{treatment_group}': v
+                                for k, v in measure_data.items()}
                 metrics.update(measure_data)
 
         the_living = pop[(pop.alive == 'alive') & pop.tracked]
