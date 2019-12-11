@@ -190,6 +190,7 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
     def setup(self, builder):
         super().setup(builder)
         self.household_tb_exposure = builder.value.get_value(f'{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.exposure')
+        self.treatment_group = builder.value.get_value('ltbi_treatment.exposure')
         self.disability_weight_pipelines = {k: v for k, v in self.disability_weight_pipelines.items()
                                             if k in ltbi_globals.CAUSE_OF_DISABILITY_STATES}
 
@@ -202,14 +203,19 @@ class HouseholdTuberculosisDisabilityObserver(DisabilityObserver):
         self.population_view.update(pop)
 
     def update_metrics(self, pop):
-        exposure_category = self.household_tb_exposure(pop.index)
+        pop_exposure_category = self.household_tb_exposure(pop.index)
+        pop_treatment_group = self.treatment_group(pop.index)
 
-        for category in ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES:
-            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[category]
-            category_pop = pop.loc[exposure_category == category]
-            ylds_this_step = get_years_lived_with_disability(category_pop, self.config.to_dict(),
+        groups = zip(ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_CATEGORIES, ltbi_globals.TREATMENT_GROUPS)
+        for exposure_category, treatment_group in groups:
+            exposure_state = ltbi_globals.HOUSEHOLD_TUBERCULOSIS_EXPOSURE_MAP[exposure_category]
+            pop_in_group = pop.loc[(pop_exposure_category == exposure_category)
+                                   & (pop_treatment_group == treatment_group)]
+
+            ylds_this_step = get_years_lived_with_disability(pop_in_group, self.config.to_dict(),
                                                              self.clock().year, self.step_size(),
                                                              self.age_bins, self.disability_weight_pipelines,
                                                              ltbi_globals.CAUSE_OF_DISABILITY_STATES)
-            ylds_this_step = {f'{k}_{exposure_state}': v for k, v in ylds_this_step.items()}
+            ylds_this_step = {f'{k}_{exposure_state}_treatment_group_{treatment_group}': v
+                              for k, v in ylds_this_step.items()}
             self.years_lived_with_disability.update(ylds_this_step)
