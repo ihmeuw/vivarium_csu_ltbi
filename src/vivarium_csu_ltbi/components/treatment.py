@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from vivarium_csu_ltbi import globals as ltbi_globals
@@ -44,7 +45,7 @@ class LTBITreatmentCoverage:
             requires_streams=[f'{self.name}.adherence_propensity']
         )
 
-        self.columns_created = ['treatment_date', 'treatment_type', 'adherence_propensity']
+        self.columns_created = ['treatment_date', 'treatment_type', 'adherence_propensity', 'treatment_propensity']
         builder.population.initializes_simulants(self.on_initialize_simulants,
                                                  requires_columns=[],
                                                  creates_columns=self.columns_created)
@@ -60,7 +61,8 @@ class LTBITreatmentCoverage:
         self._ltbi_treatment_status = self._ltbi_treatment_status.append(pd.Series('untreated', index=pop_data.index))
         initialized = pd.DataFrame({'treatment_date': pd.NaT,
                                     'treatment_type': 'untreated',
-                                    'adherence_propensity': self.adherence_stream.get_draw(pop_data.index)},
+                                    'adherence_propensity': self.adherence_stream.get_draw(pop_data.index),
+                                    'treatment_propensity': self.treatment_stream.get_draw(pop_data.index)},
                                    index=pop_data.index)
         self.population_view.update(initialized)
 
@@ -68,8 +70,12 @@ class LTBITreatmentCoverage:
         pop = self.population_view.get(event.index, query="treatment_type == 'untreated'")
 
         coverage = self.coverage_filtered(event.index)
-
-        treatment_type = self.treatment_stream.choice(pop.index, coverage.columns, coverage)
+        p = np.array(coverage)
+        p = p / p.sum(axis=1, keepdims=True)
+        p_bins = np.cumsum(p, axis=1)
+        draw = pop['treatment_propensity']
+        choice_index = (draw.values[np.newaxis].T > p_bins).sum(axis=1)
+        treatment_type = pd.Series(np.array(coverage.columns)[choice_index], index=pop.index)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
         pop.loc[newly_treated, 'treatment_type'] = treatment_type
         pop.loc[newly_treated, 'treatment_date'] = self.clock()
