@@ -230,16 +230,16 @@ def append_country_estimates(path_for_location: dict, cause_names: list):
         data = pd.concat([data, table_shell], ignore_index=True)
     return data
 
-def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str, measure_type: str, hiv_status: str):
-    """pull hiv-specific activetb incidence counts or ltbi person time"""
+def get_hiv_specific_measure(data: pd.DataFrame, name1: str, name2: str,  cause_name: str, measure_type: str, hiv_status: str):
+    """measure options:
+    hiv-specific activetb incidence counts
+    hiv-specific ltbi person time
+    positive hiv person time
+    """
     df = data[[c for c in data.columns if name1 in c and name2 in c]]
     df = df.reset_index().melt(id_vars=['input_draw', 'scenario'], var_name='label')
     
-    if measure_type == 'incidence_count':
-        df['cause'] = 'activetb'
-    if measure_type == 'person_time':
-        df['cause'] ='ltbi'
-    
+    df['cause'] = cause_name
     df['year'] = df.label.map(get_year_from_template)    
     df['sex'] = df.label.map(get_sex_from_template)
     df['age_group'] = df.label.map(get_age_group_from_template)
@@ -256,11 +256,11 @@ def get_type_specific_results(data: pd.DataFrame, measure_type: str, col_names: 
     then append demographic aggregates to it
     """
     if measure_type == 'activetb_incidence_count':
-        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'activetb_positive_hiv', 'incidence_count', 'positive').set_index(col_names)
-        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'incidence_count', 'susceptible').set_index(col_names)
+        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'activetb_positive_hiv', 'activetb', 'incidence_count', 'positive').set_index(col_names)
+        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'activetb_susceptible_hiv', 'activetb', 'incidence_count', 'susceptible').set_index(col_names)
     if measure_type == 'ltbi_person_time':
-        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'person_time', 'person_time', 'positive').set_index(col_names)
-        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'person_time', 'person_time', 'susceptible').set_index(col_names)
+        positive_hiv = get_hiv_specific_measure(data, 'ltbi_positive_hiv', 'person_time', 'ltbi', 'person_time', 'positive').set_index(col_names)
+        susceptible_hiv = get_hiv_specific_measure(data, 'ltbi_susceptible_hiv', 'person_time', 'ltbi', 'person_time', 'susceptible').set_index(col_names)
     
     total = positive_hiv + susceptible_hiv
     total = total.drop(columns='hiv_status').reset_index()
