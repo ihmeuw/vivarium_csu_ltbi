@@ -102,11 +102,11 @@ class DataRepo:
 
         cat1 = demog.copy()
         cat1['parameter'] = 'cat1'
-        cat1 = pd.concat([cat1, pd.DataFrame(data={f'draw_{i}': [1.0] * len(cat1.index) for i in range(1000)})], axis=1)
+        cat1 = pd.concat([cat1, pd.DataFrame(data={f'draw_{i}': [draws[i]] * len(cat1.index) for i in range(1000)})], axis=1)
 
         cat2 = demog.copy()
         cat2['parameter'] = 'cat2'
-        cat2 = pd.concat([cat2, pd.DataFrame(data={f'draw_{i}': [draws[i]] * len(cat2.index) for i in range(1000)})],
+        cat2 = pd.concat([cat2, pd.DataFrame(data={f'draw_{i}': [1.0] * len(cat2.index) for i in range(1000)})],
                          axis=1)
 
         hiv_positive = pd.concat([cat1, cat2], axis=0, ignore_index=True)
