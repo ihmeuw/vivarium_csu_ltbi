@@ -118,7 +118,7 @@ AGE_GROUPS = [
 YEARS = ['2019', '2020', '2021', '2022', '2023', '2024']
 EXPOSURE_GROUPS = [HOUSEHOLD_TUBERCULOSIS_EXPOSED, HOUSEHOLD_TUBERCULOSIS_UNEXPOSED]
 TREATMENT_GROUPS = ['untreated', '6H_adherent', '6H_nonadherent', '3HP_adherent', '3HP_nonadherent']
-POP_STATES = ['treated', 'untreated', 'living', 'dead']
+POP_STATES = ['tracked', 'untracked', 'living', 'dead']
 CAUSE_OF_DISABILITY_STATES = [ACTIVETB_POSITIVE_HIV, ACTIVETB_SUSCEPTIBLE_HIV,
                               LTBI_POSITIVE_HIV,
                               SUSCEPTIBLE_TB_POSITIVE_HIV]
