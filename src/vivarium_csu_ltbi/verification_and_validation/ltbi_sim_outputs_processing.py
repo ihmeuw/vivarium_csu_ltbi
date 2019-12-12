@@ -140,18 +140,24 @@ def append_cause_aggregates(data: pd.DataFrame):
 def filter_by_causes(data: pd.DataFrame):
     """calculate hiv_other by sum up two states:
     susceptible_tb_positive_hiv and ltbi_positive_hiv,
+    calculate activetb by sum up two states:
+    activetb_susceptible_hiv and activetb_positive_hiv;
     then select wanted causes.
     """
     wanted_causes = ['all_causes', 'activetb_susceptible_hiv', 'activetb_positive_hiv',
-                     'hiv_aids_resulting_in_other_diseases', 'other_causes']
+                     'activetb', 'hiv_aids_resulting_in_other_diseases', 'other_causes']
     
     susceptible_tb_positive_hiv = data.loc[data.cause == 'susceptible_tb_positive_hiv'].set_index(template_cols[1:])
     ltbi_positive_hiv = data.loc[data.cause == 'ltbi_positive_hiv'].set_index(template_cols[1:])
-
     hiv_other = susceptible_tb_positive_hiv + ltbi_positive_hiv
     hiv_other['cause'] = 'hiv_aids_resulting_in_other_diseases'
     
-    data = pd.concat([data, hiv_other.reset_index()])
+    activetb_susceptible_hiv = data.loc[data.cause == 'activetb_susceptible_hiv'].set_index(template_cols[1:])
+    activetb_positive_hiv = data.loc[data.cause == 'activetb_positive_hiv'].set_index(template_cols[1:])
+    activetb = activetb_susceptible_hiv + activetb_positive_hiv
+    activetb['cause'] = 'activetb'
+    
+    data = pd.concat([data, hiv_other.reset_index(), activetb.reset_index()])
     data = data.loc[data.cause.isin(wanted_causes)]
     data = data.set_index(template_cols).sort_index()
     
