@@ -82,14 +82,14 @@ STANDARD_COLUMNS = {'total_population': TOTAL_POP_COLUMN,
                     'input_draw': INPUT_DRAW_COLUMN}
 
 TOTAL_POP_COLUMN_TEMPLATE = 'total_population_{POP_STATE}'
-PERSON_TIME_COLUMN_TEMPLATE = 'person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-YLDS_COLUMN_TEMPLATE = 'ylds_due_to_{CAUSE_OF_DISABILITY_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-DEATH_COLUMN_TEMPLATE = 'death_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-YLLS_COLUMN_TEMPLATE = 'ylls_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-TRANSITION_EVENT_COLUMN_TEMPLATE = '{TRANSITION}_event_count_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-PREVALENT_CASES_COLUMN_TEMPLATE = '{DISEASE_STATE}_prevalent_cases_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-POPULATION_COUNT_COLUMN_TEMPLATE = 'population_point_estimate_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
-STATE_PERSON_TIME_COLUMN_TEMPLATE = '{DISEASE_STATE}_person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_in_treatment_group_{TREATMENT_GROUP}'
+PERSON_TIME_COLUMN_TEMPLATE = 'person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+YLDS_COLUMN_TEMPLATE = 'ylds_due_to_{CAUSE_OF_DISABILITY_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+DEATH_COLUMN_TEMPLATE = 'death_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+YLLS_COLUMN_TEMPLATE = 'ylls_due_to_{CAUSE_OF_DEATH_STATE}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+TRANSITION_EVENT_COLUMN_TEMPLATE = '{TRANSITION}_event_count_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+PREVALENT_CASES_COLUMN_TEMPLATE = '{DISEASE_STATE}_prevalent_cases_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+POPULATION_COUNT_COLUMN_TEMPLATE = 'population_point_estimate_in_{YEAR}_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
+STATE_PERSON_TIME_COLUMN_TEMPLATE = '{DISEASE_STATE}_person_time_among_{SEX}_in_age_group_{AGE_GROUP}_{EXPOSURE_GROUP}_treatment_group_{TREATMENT_GROUP}'
 
 COLUMN_TEMPLATES = {'total_population': TOTAL_POP_COLUMN_TEMPLATE,
                     'person_time': PERSON_TIME_COLUMN_TEMPLATE,
