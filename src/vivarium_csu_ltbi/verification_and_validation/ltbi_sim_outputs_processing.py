@@ -3,9 +3,9 @@ import warnings
 import pandas as pd
 from db_queries import get_ids
 
-master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/
 # update it as needed
 result_dir = '/share/costeffectiveness/results/vivarium_csu_ltbi/full-model/'
+
 path_for_location = {'Ethiopia': result_dir + 'ethiopia/2019_12_07_02_10_18',
                      'India': result_dir + 'india/2019_12_07_02_10_34',
                      'Peru': result_dir + 'peru/2019_12_07_02_11_30',
