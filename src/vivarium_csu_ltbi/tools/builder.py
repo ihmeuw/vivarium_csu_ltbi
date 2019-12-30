@@ -86,9 +86,9 @@ class DataRepo:
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
         # From Yaqi via Abie. Preliminary, not age- or sex-specific.
-        mean = 2.108823418
-        ui_lb = 1.488734097
-        ui_ub = 2.98719309
+        mean = 2.21666279818842
+        ui_lb = 1.8480215658356
+        ui_ub = 2.65884016275036
         std = (ui_ub - ui_lb) / (2 * 1.96)
 
         np.random.seed(12221990)
