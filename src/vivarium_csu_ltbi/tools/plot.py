@@ -7,6 +7,7 @@ master_dir = '/home/j/Project/simulation_science/ \
              latent_tuberculosis_infection/result/interim_results_plot/'
 
 location_names = ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']
+age_groups = ['all', '0_to_5', '5_to_15', '15_to_60', '60+']
 # disease burden
 outcomes = ['actb_incidence_count', 'actb_incidence_rate',
             'deaths_due_to_all_form_tb', 'dalys_due_to_all_form_tb',
