@@ -239,11 +239,11 @@ def plot_coverage(df, location, risk_group):
     age = 'all' if risk_group == 'plwhiv' else '0_to_5'
     
     t = df.loc[(df.outcome == 'treatment_coverage') 
-                & (df.location == location) 
-                & (df.year != 'all') 
-                & (df.age == age) 
-                & (df.sex == 'all') 
-                & (df.risk_group == risk_group)]
+               & (df.location == location) 
+               & (df.year != 'all') 
+               & (df.age == age) 
+               & (df.sex == 'all') 
+               & (df.risk_group == risk_group)]
     t.rename(columns={'year': 'Year', 'mean': 'Coverage'}, inplace=True)
 
     sns.set(font_scale=3)
