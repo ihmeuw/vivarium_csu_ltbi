@@ -4,6 +4,3 @@ random_seed_count: 30
 branches:
   - ltbi_treatment_scale_up:
       scenario: ['baseline', '6H_scale_up', '3HP_scale_up']
-  - population:
-      age_end: [5, 100]
-
