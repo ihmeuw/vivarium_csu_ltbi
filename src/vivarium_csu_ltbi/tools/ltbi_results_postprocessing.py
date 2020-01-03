@@ -350,14 +350,15 @@ def make_person_time_table(mdata: MeasureData):
     return pd.concat([raw_summary, delta_summary], axis=1)
 
 if __name__ == '__main__':
-    output = []
-    for location in ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']:
-        df = pd.read_hdf(output_dir + f'sim_raw_hdf/{location}_indexed.hdf').reset_index()
-        df = make_raw_aggregates(df)
-        measure_data = split_measures(df, location)
-        loc_data = []
-        for f in [make_coverage_table, make_tb_table, make_deaths_table, make_dalys_table, make_person_time_table]:
-            loc_data.append(f(measure_data))
-        output.append(pd.concat(loc_data))
-    pd.concat(output).to_csv(output_dir + 'ltbi_final_results.csv')
-    pd.concat(output).to_hdf(output_dir + 'ltbi_final_results.hdf', key='data')
+    for age_end in ['end_100', 'end_10']:
+        output = []
+        for location in ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']:
+            df = pd.read_hdf(output_dir + f'sim_raw_hdf/{location}_{age_end}_indexed.hdf').reset_index()
+            df = make_raw_aggregates(df)
+            measure_data = split_measures(df, location)
+            loc_data = []
+            for f in [make_coverage_table, make_tb_table, make_deaths_table, make_dalys_table, make_person_time_table]:
+                loc_data.append(f(measure_data))
+            output.append(pd.concat(loc_data))
+        pd.concat(output).to_csv(output_dir + f'ltbi_final_results_{age_end}.csv')
+        pd.concat(output).to_hdf(output_dir + f'ltbi_final_results_{age_end}.hdf', key='data')
