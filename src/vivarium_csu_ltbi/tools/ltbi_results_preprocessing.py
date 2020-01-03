@@ -4,7 +4,7 @@ result_dir = '/ihme/costeffectiveness/results/vivarium_csu_ltbi/updated-input-da
 
 # to-do: creare two sub-values for each location, one for age_end = 10 and another for age_end = 100
 path_for_location = {
-    'ethiopia': result_dir + 'ethiopia//2019_12_30_16_29_23',
+    'ethiopia': result_dir + 'ethiopia/2019_12_30_16_29_23',
     'india': result_dir + 'india/2019_12_30_16_30_19',
     'peru': result_dir + 'peru/2019_12_30_16_30_19',
     'philippines': result_dir + 'philippines/2020_01_02_12_05_32',
@@ -19,9 +19,10 @@ def load_data(country_path):
     df.rename(columns={'configuration.ltbi_treatment_scale_up.scenario': 'scenario'},
               inplace=True)
     
-    scenario_count = (df.groupby(['input_draw', 'random_seed'])
-                        .scenario
-                        .count())
+    scenario_count = (df
+                      .groupby(['input_draw', 'random_seed'])
+                      .scenario
+                      .count())
     idx_completed = scenario_count[scenario_count == 3].reset_index()
     idx_completed = idx_completed[['input_draw', 'random_seed']]
     df_completed = pd.merge(df,
@@ -60,18 +61,20 @@ def format_data(df):
                 wanted_cols.append(i)
     
     df = df[wanted_cols]
-    df = (df.reset_index()
-            .melt(id_vars=['input_draw', 'scenario'],
-                  var_name='label'))
+    df = (df
+          .reset_index()
+          .melt(id_vars=['input_draw', 'scenario'],
+                var_name='label'))
     df['year'] = df.label.map(get_year_from_template)
     df['sex'] = df.label.map(get_sex_from_template)
     df['age'] = df.label.map(get_age_group_from_template)
     df['hhtb'] = df.label.map(get_risk_group_from_template)
     df['treatment_group'] =  df.label.map(get_treatment_group_from_template)
     df['measure'] = df.label.map(get_measure_from_template)
-    df = (df.rename(columns={'input_draw': 'draw'})
-            .drop(columns='label')
-            .set_index(idx_cols))
+    df = (df
+          .rename(columns={'input_draw': 'draw'})
+          .drop(columns='label')
+          .set_index(idx_cols))
 
     return df
 
