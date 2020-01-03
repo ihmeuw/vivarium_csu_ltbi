@@ -1,14 +1,18 @@
 import pandas as pd
 
-result_dir = '/ihme/costeffectiveness/results/vivarium_csu_ltbi/updated-input-data/'
+result_dir = '/ihme/costeffectiveness/results/vivarium_csu_ltbi/'
 
-# to-do: creare two sub-values for each location, one for age_end = 10 and another for age_end = 100
 path_for_location = {
-    'ethiopia': result_dir + 'ethiopia/2019_12_30_16_29_23',
-    'india': result_dir + 'india/2019_12_30_16_30_19',
-    'peru': result_dir + 'peru/2019_12_30_16_30_19',
-    'philippines': result_dir + 'philippines/2020_01_02_12_05_32',
-    'south_africa': result_dir + 'south_africa/2019_12_30_16_30_19'
+    'ethiopia_end_100': result_dir + 'updated-input-data-end-100/ethiopia/2020_01_02_16_41_59',
+    'india_end_100': result_dir + 'updated-input-data-end-100/india/2020_01_02_16_36_19',
+    'peru_end_100': result_dir + 'updated-input-data-end-100/peru/2020_01_02_16_36_14',
+    'philippines_end_100': result_dir + 'updated-input-data-end-100/philippines/2020_01_02_16_36_14',
+    'south_africa_end_100': result_dir + 'updated-input-data-end-100/south_africa/2020_01_02_16_36_27',
+    'ethiopia_end_10': result_dir + 'updated-input-data-end-10/ethiopia/2020_01_02_17_00_21',
+    'india_end_10': result_dir + 'updated-input-data-end-10/india/2020_01_02_17_00_23',
+    'peru_end_10': result_dir + 'updated-input-data-end-10/peru/2020_01_02_17_01_17',
+    'philippines_end_10': result_dir + 'updated-input-data-end-10/philippines/2020_01_02_17_01_17',
+    'south_africa_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26'
 }
 
 output_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/sim_raw_hdf/'
@@ -52,7 +56,7 @@ def get_measure_from_template(template_string):
     return template_string.split('_in_')[0]
 
 def format_data(df):
-	idx_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
+    idx_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
     items = ['death', 'ylls', 'ylds', 'event_count', 'prevalent_cases', 'person_time', 'population_point_estimate']
     wanted_cols = []
     for i in df.columns:
