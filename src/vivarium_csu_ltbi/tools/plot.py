@@ -5,7 +5,7 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
 
-master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/interim_results_plot/'
+master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/interim2_results_plot/'
 
 location_names = ['Ethiopia', 'India', 'Peru', 'Philippines', 'South Africa']
 age_groups = ['0 to 5', '5 to 15', '15 to 60', '60 plus']
@@ -233,9 +233,10 @@ def plot_coverage(df, location, risk_group):
 
 if __name__ == '__main__':
     result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
-    df = pd.read_csv(result_dir + 'intermediate_results.csv')
+    age_end = 100
+    df = pd.read_csv(result_dir + f'ltbi_final_results_end_{age_end}.csv')
     df, t = format_data(df)
-    t.to_csv(result_dir + 'intermediate_results_formatted.csv', index=False)
+    t.to_csv(result_dir + f'ltbi_final_results_end_{age_end}_formatted.csv', index=False)
     # make plot for outcome by year
     for location in location_names:
         for risk_group in ['PLWHIV', 'U5 HHTB']:
