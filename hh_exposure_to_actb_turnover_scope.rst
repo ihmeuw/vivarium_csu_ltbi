@@ -14,7 +14,7 @@ Methods
 Definition of turnover time
 ---------------------------
 
-The _turnover rate_ is jargon we have adapted for this scoping document, and it refers to the amount of time an individual spends in the higher-risk category of the hh_exposure_to_actb risk factor exposure.  To be precise, we define it analogously to a remission rate:
+The *turnover rate* is jargon we have adapted for this scoping document, and it refers to the amount of time an individual spends in the higher-risk category of the hh_exposure_to_actb risk factor exposure.  To be precise, we define it analogously to a remission rate:
 
 Turnover rate = (# individuals who transition from cat1 to cat2) / (person-years of individuals observed in cat1)
 
@@ -55,6 +55,10 @@ Results
 Our current approach to modeling the hh_exposure_to_actb risk factor includes some change over time; as individuals age, their propensity is compared to an age-group-specific threshold, and therefore some individuals will transition between exposed and unexposed during the course of the simulation. However, the average turnover time in this approach is years, not months. (Table X)
 
 *Validation Criteria/Criteria for Success:* In either approach sketched above, or any other acceptible approach, the exposure category for hh_exposure_to_actb will change at random times, and the turnover rate of transitioning from the high-risk category to the low-risk category will match the turnover parameter, providing the modeler explicit control of the average turnover time. (Table X)
+
+There is a way to conduct an *internal validation* by calculating an incidence rate of hh_expousre_to_actb in a manner analogous to the calculation of the prevalence rate. Actually, this logic suggests that the turnover time should be calculable from the remission rate, as well.
+
+There is a way to do some amount of *external valuation* by following the calculation our collaborator used to check our work by comparing the AcTB incidence and mortality from simulation with that reported or implied by the WHO TB report.
 
 Discussion
 ==========
