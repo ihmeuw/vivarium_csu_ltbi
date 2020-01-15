@@ -233,8 +233,8 @@ def plot_coverage(df, location, risk_group):
 
 if __name__ == '__main__':
     result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
-    age_end = 100
-    df = pd.read_csv(result_dir + f'ltbi_final_results_end_{age_end}.csv')
+    age_end = 'merged_ages'
+    df = pd.read_csv(result_dir + f'ltbi_final_results_{age_end}.csv')
     df, t = format_data(df)
     t.to_csv(result_dir + f'ltbi_final_results_end_{age_end}_formatted.csv', index=False)
     # make plot for outcome by year
