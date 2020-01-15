@@ -253,7 +253,7 @@ def make_tb_table(mdata: MeasureData):
     
     counts['outcome'] = 'actb_incidence_rate'
     delta['outcome'] = 'actb_incidence_rate'
-    pt = mdata.ltbi_person_time.drop(columns='cause')
+    pt = mdata.person_time.drop(columns='cause')
     pt['location'] = mdata.location
     pt['outcome'] = 'actb_incidence_rate'
     pt = aggregate_over_treatment_group(pt)
