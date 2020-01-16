@@ -91,9 +91,9 @@ class DataRepo:
         under_five_ui_ub = 5.76
         under_five_std = (under_five_ui_ub - under_five_ui_lb) / (2 * 1.96)
 
-        over_five_mean = 2.21666279818842
-        over_five_ui_lb = 1.8480215658356
-        over_five_ui_ub = 2.65884016275036
+        over_five_mean = 1.75
+        over_five_ui_lb = 1.60
+        over_five_ui_ub = 1.91
         over_five_std = (over_five_ui_ub - over_five_ui_lb) / (2 * 1.96)
 
         np.random.seed(12221990)
