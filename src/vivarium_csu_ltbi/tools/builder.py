@@ -85,11 +85,10 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
-        # From Yaqi via Abie. Not sex-specific, but different under/over 5
-        # FIXME: PLACEHOLDER VALUES
-        under_five_mean = 1.0
-        under_five_ui_lb = 1.0
-        under_five_ui_ub = 1.0
+        # From Yaqi's modeling. shared over slack.
+        under_five_mean = 4.72
+        under_five_ui_lb = 3.87
+        under_five_ui_ub = 5.76
         under_five_std = (under_five_ui_ub - under_five_ui_lb) / (2 * 1.96)
 
         over_five_mean = 2.21666279818842
