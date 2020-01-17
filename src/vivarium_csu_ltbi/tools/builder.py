@@ -85,14 +85,20 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_risk(loc):
-        # From Yaqi via Abie. Preliminary, not age- or sex-specific.
-        mean = 2.21666279818842
-        ui_lb = 1.8480215658356
-        ui_ub = 2.65884016275036
-        std = (ui_ub - ui_lb) / (2 * 1.96)
+        # From Yaqi's modeling. shared over slack.
+        under_five_mean = 4.72
+        under_five_ui_lb = 3.87
+        under_five_ui_ub = 5.76
+        under_five_std = (under_five_ui_ub - under_five_ui_lb) / (2 * 1.96)
+
+        over_five_mean = 1.75
+        over_five_ui_lb = 1.60
+        over_five_ui_ub = 1.91
+        over_five_std = (over_five_ui_ub - over_five_ui_lb) / (2 * 1.96)
 
         np.random.seed(12221990)
-        draws = np.random.normal(mean, std, 1000)
+        under_five_draws = np.random.normal(under_five_mean, under_five_std, 1000)
+        over_five_draws = np.random.normal(over_five_mean, over_five_std, 1000)
 
         demog = get_demographic_dimensions(loc)
         demog = split_interval(demog, interval_column='age', split_column_prefix='age')
@@ -100,9 +106,24 @@ class DataRepo:
         demog['affected_entity'] = "susceptible_tb_positive_hiv_to_ltbi_positive_hiv"
         demog['affected_measure'] = 'transition_rate'
 
-        cat1 = demog.copy()
-        cat1['parameter'] = 'cat1'
-        cat1 = pd.concat([cat1, pd.DataFrame(data={f'draw_{i}': [draws[i]] * len(cat1.index) for i in range(1000)})], axis=1)
+        under_five_idx = demog.loc[demog['age_end'] <= 5.0].index
+        over_five_idx = demog.index.difference(under_five_idx)
+
+        under_five_cat1 = demog.loc[under_five_idx].copy()
+        under_five_cat1['parameter'] = 'cat1'
+        under_five_cat1 = pd.concat([under_five_cat1,
+                                     pd.DataFrame(data={f'draw_{i}': [under_five_draws[i]] *
+                                                                     len(under_five_idx) for i in range(1000)})],
+                                    axis=1)
+
+        over_five_cat1 = demog.log[over_five_idx].copy()
+        over_five_cat1['parameter'] = 'cat1'
+        over_five_cat1 = pd.concat([over_five_cat1,
+                                    pd.DataFrame(data={f'draw_{i}': [over_five_draws[i]] *
+                                                                    len(over_five_idx) for i in range(1000)})],
+                                   axis=1)
+
+        cat1 = pd.concat([under_five_cat1, over_five_cat1], axis=0)
 
         cat2 = demog.copy()
         cat2['parameter'] = 'cat2'
