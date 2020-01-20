@@ -113,14 +113,16 @@ class DataRepo:
         under_five_cat1['parameter'] = 'cat1'
         under_five_cat1 = pd.concat([under_five_cat1,
                                      pd.DataFrame(data={f'draw_{i}': [under_five_draws[i]] *
-                                                                     len(under_five_idx) for i in range(1000)})],
+                                                                     len(under_five_idx) for i in range(1000)},
+                                                  index=under_five_idx)],
                                     axis=1)
 
-        over_five_cat1 = demog.log[over_five_idx].copy()
+        over_five_cat1 = demog.loc[over_five_idx].copy()
         over_five_cat1['parameter'] = 'cat1'
         over_five_cat1 = pd.concat([over_five_cat1,
                                     pd.DataFrame(data={f'draw_{i}': [over_five_draws[i]] *
-                                                                    len(over_five_idx) for i in range(1000)})],
+                                                                    len(over_five_idx) for i in range(1000)},
+                                                 index=over_five_idx)],
                                    axis=1)
 
         cat1 = pd.concat([under_five_cat1, over_five_cat1], axis=0)
