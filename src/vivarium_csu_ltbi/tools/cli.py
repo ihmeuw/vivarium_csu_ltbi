@@ -24,6 +24,9 @@ import click
 from jinja2 import Template
 from loguru import logger
 
+from vivarium_csu_ltbi.tools import results
+from vivarium_csu_ltbi import globals as ltbi_globals
+
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 Location = namedtuple('Location', ['proper', 'sanitized'])
@@ -162,3 +165,19 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
             outfile.write(jinja_temp.render(
                 location_proper=location.proper,
                 location_sanitized=location.sanitized))
+
+
+@click.command()
+@click.argument('scenario', type=click.STRING)
+@click.argument('location', type=click.Choice(ltbi_globals.LOCATIONS))
+def make_results(scenario, location):
+    """Generate count-space results in *.hdf and *.csv format as well as the
+    final outputs in tabular form. In the event of unfinished results, draws
+    deficient in random seeds are excluded from the analysis.
+
+    The results to be processed are the most recent outputs from the run defined
+    by the scenario name and the country. The processed results are saved in the
+    current working directory.
+
+    """
+    results.main(scenario, location)

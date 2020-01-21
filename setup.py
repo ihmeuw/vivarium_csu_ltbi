@@ -69,6 +69,7 @@ if __name__ == "__main__":
         entry_points='''
             [console_scripts]
             make_specs=vivarium_csu_ltbi.tools.cli:make_specs
+            make_results=vivarium_csu_ltbi.tools.cli:make_results
             build_ltbi_artifact=vivarium_csu_ltbi.tools.build_ltbi_artifact:build_artifact
             get_ltbi_incidence_input_data=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_input_data
             get_ltbi_incidence_parallel=vivarium_csu_ltbi.data.cli:get_ltbi_incidence_parallel
