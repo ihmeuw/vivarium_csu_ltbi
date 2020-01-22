@@ -11,12 +11,6 @@ def wrap_data_getter(id):
     }
 
 
-def get_disease_state(id):
-    ds = BetterDiseaseState(id, cause_type='sequela', get_data_functions=wrap_data_getter(id))
-    ds.allow_self_transitions()
-    return ds
-
-
 class BetterDiseaseModel(DiseaseModel):
 
     def metrics(self, index, metrics):
@@ -36,6 +30,29 @@ class BetterDiseaseState(DiseaseState):
     def metrics(self, index, metrics):
         """Suppress unnecessary columns."""
         return metrics
+
+
+class CorrelatedHHTBBetterDiseaseState(BetterDiseaseState):
+    """BetterDiseaseState but includes pipelines for prevalence and birth
+    prevalence. These pipelines will be modified to alter the effective
+    prevalence based on household tb exposure.
+
+    This disease state presupposed birth prevalence data.
+    """
+    def setup(self, builder):
+        super().setup(builder)
+
+        self.prevalence_pipeline = builder.value.register_value_producer(
+            f'{self.state_id}.prevalence',
+            source=self.prevalence,
+            requires_columns=[]
+        )
+
+        self.birth_prevalence_pipeline = builder.value.register_value_producer(
+            f'{self.state_id}.birth_prevalence',
+            source=self.birth_prevalence,
+            requires_columns=[]
+        )
 
 
 class BetterSusceptibleState(SusceptibleState):
@@ -67,19 +84,56 @@ class BetterRateTransition(RateTransition):
         return rate_data, pipeline_name
 
 
+def wrapped_builder_getter(id):
+    return {
+        id: lambda _, builder: builder.data.load(
+            f'sequela.{id}.prevalence'
+        )
+    }
+
+
+def wrapped_birth_prevalence_getter(id):
+    def _load_birth_prev(_, builder):
+        prev = builder.data.load(f'sequela.{id}.prevalence')
+        prev = prev.loc[prev.age_start == 0]
+        prev = prev.drop(['age_start', 'age_end'], axis=1)
+        return prev
+
+    return {
+        'birth_prevalence': _load_birth_prev
+    }
+
+
+def get_disease_state(id, state_class, getters):
+    ds = state_class(id, cause_type='sequela', get_data_functions=getters)
+    ds.allow_self_transitions()
+    return ds
+
+
 def TuberculosisAndHIV():
     # the non-disease state
     susceptible = BetterSusceptibleState(ltbi_globals.SUSCEPTIBLE_TB_SUSCEPTIBLE_HIV)
     susceptible.allow_self_transitions()
 
-    # states
-    ltbi_susceptible_hiv = get_disease_state(ltbi_globals.LTBI_SUSCEPTIBLE_HIV)
-    activetb_susceptible_hiv = get_disease_state(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV)
-    susceptible_tb_positive_hiv = get_disease_state(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV)
-    ltbi_positive_hiv = get_disease_state(ltbi_globals.LTBI_POSITIVE_HIV)
-    activetb_positive_hiv = get_disease_state(ltbi_globals.ACTIVETB_POSITIVE_HIV)
+    # the 'disease 'states
+    ltbi_susceptible_hiv = get_disease_state(ltbi_globals.LTBI_SUSCEPTIBLE_HIV, CorrelatedHHTBBetterDiseaseState,
+                                             {**wrapped_builder_getter(ltbi_globals.LTBI_SUSCEPTIBLE_HIV),
+                                              **wrapped_birth_prevalence_getter(ltbi_globals.LTBI_SUSCEPTIBLE_HIV)})
 
-    # transitions
+    activetb_susceptible_hiv = get_disease_state(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV, BetterDiseaseState,
+                                                 wrapped_builder_getter(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV))
+
+    susceptible_tb_positive_hiv = get_disease_state(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV, BetterDiseaseState,
+                                                    wrapped_builder_getter(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV))
+
+    ltbi_positive_hiv = get_disease_state(ltbi_globals.LTBI_POSITIVE_HIV, CorrelatedHHTBBetterDiseaseState,
+                                          {**wrapped_builder_getter(ltbi_globals.LTBI_POSITIVE_HIV),
+                                           **wrapped_birth_prevalence_getter(ltbi_globals.LTBI_POSITIVE_HIV)})
+
+    activetb_positive_hiv = get_disease_state(ltbi_globals.ACTIVETB_POSITIVE_HIV, BetterDiseaseState,
+                                              wrapped_builder_getter(ltbi_globals.ACTIVETB_POSITIVE_HIV))
+
+    # the transitions
     susceptible.add_transition(ltbi_susceptible_hiv)
     susceptible_tb_positive_hiv.add_transition(ltbi_positive_hiv)
 
