@@ -45,13 +45,13 @@ class CorrelatedHHTBBetterDiseaseState(BetterDiseaseState):
         self.prevalence_pipeline = builder.value.register_value_producer(
             f'{self.state_id}.prevalence',
             source=self.prevalence,
-            requires_columns=[]
+            requires_columns=['year', 'age', 'sex']
         )
 
         self.birth_prevalence_pipeline = builder.value.register_value_producer(
             f'{self.state_id}.birth_prevalence',
             source=self.birth_prevalence,
-            requires_columns=[]
+            requires_columns=['year', 'sex']
         )
 
 
