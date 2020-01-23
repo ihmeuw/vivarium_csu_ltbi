@@ -125,14 +125,14 @@ def TuberculosisAndHIV():
 
     # the 'disease 'states
     ltbi_susceptible_hiv = get_disease_state(ltbi_globals.LTBI_SUSCEPTIBLE_HIV)
-    # ltbi_susceptible_hiv._get_data_functions.update(wrapped_birth_prevalence_getter(ltbi_globals.LTBI_SUSCEPTIBLE_HIV))
+    ltbi_susceptible_hiv._get_data_functions.update(wrapped_birth_prevalence_getter(ltbi_globals.LTBI_SUSCEPTIBLE_HIV))
 
     activetb_susceptible_hiv = get_disease_state(ltbi_globals.ACTIVETB_SUSCEPTIBLE_HIV)
 
     susceptible_tb_positive_hiv = get_disease_state(ltbi_globals.SUSCEPTIBLE_TB_POSITIVE_HIV)
 
     ltbi_positive_hiv = get_disease_state(ltbi_globals.LTBI_POSITIVE_HIV)
-    # ltbi_positive_hiv._get_data_functions.update(wrapped_birth_prevalence_getter(ltbi_globals.LTBI_POSITIVE_HIV))
+    ltbi_positive_hiv._get_data_functions.update(wrapped_birth_prevalence_getter(ltbi_globals.LTBI_POSITIVE_HIV))
 
     activetb_positive_hiv = get_disease_state(ltbi_globals.ACTIVETB_POSITIVE_HIV)
 
