@@ -350,15 +350,20 @@ def make_person_time_table(mdata: MeasureData):
     return pd.concat([raw_summary, delta_summary], axis=1)
 
 if __name__ == '__main__':
-    for age_end in ['end_100', 'end_10']:
-        output = []
-        for location in ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']:
-            df = pd.read_hdf(output_dir + f'sim_raw_hdf/{location}_{age_end}_indexed.hdf').reset_index()
-            df = make_raw_aggregates(df)
-            measure_data = split_measures(df, location)
-            loc_data = []
-            for f in [make_coverage_table, make_tb_table, make_deaths_table, make_dalys_table, make_person_time_table]:
-                loc_data.append(f(measure_data))
-            output.append(pd.concat(loc_data))
-        pd.concat(output).to_csv(output_dir + f'ltbi_final_results_{age_end}.csv')
-        pd.concat(output).to_hdf(output_dir + f'ltbi_final_results_{age_end}.hdf', key='data')
+    output = []
+    for location in ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']:
+        age_end = 'end_10'
+        df10 = pd.read_hdf(output_dir + f'sim_raw_hdf/{location}_{age_end}_indexed.hdf').reset_index()
+
+        age_end = 'end_100'
+        df100 = pd.read_hdf(output_dir + f'sim_raw_hdf/{location}_{age_end}_indexed.hdf').reset_index()
+
+        index_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
+        df = make_raw_aggregates(df100.set_index(index_cols).add(df10.set_index(index_cols), fill_value=0).reset_index())
+        measure_data = split_measures(df, location)
+        loc_data = []
+        for f in [make_coverage_table, make_tb_table, make_deaths_table, make_dalys_table, make_person_time_table]:
+            loc_data.append(f(measure_data))
+        output.append(pd.concat(loc_data))
+    pd.concat(output).to_csv(output_dir + f'ltbi_final_results_merged_ages.csv')
+    pd.concat(output).to_hdf(output_dir + f'ltbi_final_results_merged_ages.hdf', key='data')
