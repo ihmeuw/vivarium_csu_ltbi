@@ -13,6 +13,7 @@ def wrap_data_getter(id):
 
 class BetterDiseaseModel(DiseaseModel):
 
+    # TODO: Handle new dependency on prevalence pipelines
     def metrics(self, index, metrics):
         """Suppress unnecessary columns."""
         return metrics
