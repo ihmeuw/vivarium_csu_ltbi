@@ -155,31 +155,23 @@ class DataRepo:
 
     @staticmethod
     def get_hh_tuberculosis_paf(exposure, relative_risk):
+        # Ordering the indices makes the multiplication work. 
         e = exposure.reset_index().set_index(['location', 'parameter', 'sex', 'age_start', 'age_end',
                                               'year_start', 'year_end'])
         r = relative_risk.reset_index().set_index(['location', 'parameter', 'sex', 'age_start',
-                                                   'age_end', 'year_start', 'year_end'])
+                                                   'age_end', 'year_start', 'year_end', 'affected_entity',
+                                                   'affected_measure'])
 
-        weighted_rrs = []
-        for affected_entity in r.affected_entity.unique():
-            ae_rr = r.loc[r.affected_entity == affected_entity]
-            affected_measure = list(ae_rr.affected_measure.unique())
-            # assert len(affected_measure) == 1  # FIXME: Re-confirm this calculation
-            weighted_rr = e * ae_rr
-            weighted_rr['affected_entity'] = affected_entity
-            weighted_rr['affected_measure'] = affected_measure * len(weighted_rr)
-            weighted_rrs.append(weighted_rr)
+        weighted_rr = e * r
+        weighted_rr = weighted_rr.loc[pd.notnull(weighted_rr).all(axis=1)]  # r has full years, e does not
+        # weighted_rr = weighted_rr.set_index(['affected_entity', 'affected_measure'], append=True)
+        weighted_rr = weighted_rr.droplevel('parameter') 
 
-        weighted_rrs = pd.concat(weighted_rrs, axis=0)
-        weighted_rrs = weighted_rrs.set_index(['affected_entity', 'affected_measure'], append=True)
-        weighted_rrs = weighted_rrs.loc[pd.notnull(weighted_rrs).all(axis=1)]  # RR has full years, exposure does not
-        weighted_rrs = weighted_rrs.droplevel('parameter')
+        idx_names = weighted_rr.index.names
+        avg_rr = weighted_rr.reset_index().groupby(idx_names).sum()  # sums over categories 
 
-        names = weighted_rrs.index.names
-        avg_rr = weighted_rrs.reset_index().groupby(names).sum()  # sums over categories
-
-        paf = (avg_rr - 1) / avg_rr
-        paf = utilities.sort_hierarchical_data(paf)
+        paf = (avg_rr - 1.) / avg_rr
+        pf = utilities.sort_hierarchical_data(paf)
 
         return paf
 
