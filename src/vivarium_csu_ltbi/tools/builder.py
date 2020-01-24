@@ -164,7 +164,6 @@ class DataRepo:
 
         weighted_rr = e * r
         weighted_rr = weighted_rr.loc[pd.notnull(weighted_rr).all(axis=1)]  # r has full years, e does not
-        # weighted_rr = weighted_rr.set_index(['affected_entity', 'affected_measure'], append=True)
         weighted_rr = weighted_rr.droplevel('parameter') 
 
         idx_names = weighted_rr.index.names
