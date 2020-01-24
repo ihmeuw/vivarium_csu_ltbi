@@ -43,12 +43,12 @@ class BetterDiseaseState(DiseaseState):
         self.prevalence = builder.value.register_value_producer(
             f'{self.state_id}.prevalence',
             source=self._prevalence,
-            requires_columns=['year', 'age', 'sex']
+            requires_columns=['age', 'sex']
         )
         self.birth_prevalence = builder.value.register_value_producer(
             f'{self.state_id}.birth_prevalence',
             source=self._birth_prevalence,
-            requires_columns=['year', 'sex']
+            requires_columns=['sex']
         )
 
     def add_transition(self, output, source_data_type=None, get_data_functions=None, **kwargs):
