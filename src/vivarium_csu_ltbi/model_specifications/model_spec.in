@@ -14,6 +14,10 @@ components:
 
     vivarium_csu_ltbi.components:
         - TuberculosisAndHIV()
+        - HHTBCorrelatedRiskEffect("sequela.ltbi_susceptible_hiv.birth_prevalence")
+        - HHTBCorrelatedRiskEffect("sequela.ltbi_positive_hiv.birth_prevalence")
+        - HHTBCorrelatedRiskEffect("sequela.ltbi_susceptible_hiv.prevalence")
+        - HHTBCorrelatedRiskEffect("sequela.ltbi_positive_hiv.prevalence")
         - LTBITreatmentCoverage()
         - HouseholdTuberculosisMortalityObserver()
         - HouseholdTuberculosisDisabilityObserver()

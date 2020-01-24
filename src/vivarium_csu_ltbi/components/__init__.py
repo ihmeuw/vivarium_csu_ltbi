@@ -1,4 +1,5 @@
 from .disease import TuberculosisAndHIV
+from.risk import HHTBCorrelatedRiskEffect
 from .observers import (HouseholdTuberculosisDisabilityObserver,
                         HouseholdTuberculosisDiseaseObserver,
                         HouseholdTuberculosisMortalityObserver)
