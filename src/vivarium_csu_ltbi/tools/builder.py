@@ -1,7 +1,9 @@
+import itertools
 from pathlib import Path
-from loguru import logger
+
 import pandas as pd
 import numpy as np
+from loguru import logger
 
 from gbd_mapping import causes
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
@@ -136,7 +138,15 @@ class DataRepo:
         hiv_negative = hiv_positive.copy()
         hiv_negative['affected_entity'] = "susceptible_tb_susceptible_hiv_to_ltbi_susceptible_hiv"
 
-        complete = pd.concat([hiv_negative, hiv_positive], axis=0)
+        prevalence_effects = []
+        for entity, measure in itertools.product(['ltbi_susceptible_hiv', 'ltbi_positive_hiv'],
+                                                 ['prevalence', 'birth_prevalence']):
+            data = hiv_positive.copy()
+            data['affected_entity'] = entity
+            data['affected_measure'] = measure
+            prevalence_effects.append(data)
+
+        complete = pd.concat([hiv_negative, hiv_positive] + prevalence_effects, axis=0)
         complete = complete.set_index(['location', 'parameter', 'sex', 'age_start', 'age_end', 'year_start', 'year_end',
                                        'affected_entity', 'affected_measure'])
         rr = utilities.sort_hierarchical_data(complete)
