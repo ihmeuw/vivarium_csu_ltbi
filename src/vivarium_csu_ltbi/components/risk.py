@@ -33,7 +33,7 @@ class HHTBCorrelatedRiskEffect:
             f'effect_of_{self.risk.name}_on_{self.target.name}.{self.target.measure}'
         )
 
-        self.relative_risk = self._get_relative_risk_date(builder)
+        self.relative_risk = self._get_relative_risk_data(builder)
         self.exposed_exposure_probability = self._get_exposed_exposure_probability_data(builder)
         self.exposure = builder.value.get_value(f'{self.risk.name}.exposure')
         self.population_attributable_fraction = self._get_population_attributable_fraction_data(builder)
@@ -43,7 +43,7 @@ class HHTBCorrelatedRiskEffect:
                                               requires_values=[f'{self.risk.name}.exposure'],
                                               requires_columns=['age', 'sex'])
 
-    def _get_relative_risk_date(self, builder):
+    def _get_relative_risk_data(self, builder):
         relative_risk_data = get_relative_risk_data(builder, self.risk, self.target, self.randomness)
         relative_risk = builder.lookup.build_table(relative_risk_data, key_columns=['sex'],
                                                    parameter_columns=['age', 'year'])
