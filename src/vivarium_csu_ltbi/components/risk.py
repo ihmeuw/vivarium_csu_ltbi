@@ -34,7 +34,6 @@ class HHTBCorrelatedRiskEffect:
         )
 
         self.relative_risk = self._get_relative_risk_data(builder)
-        self.exposed_exposure_probability = self._get_exposed_exposure_probability_data(builder)
         self.exposure = builder.value.get_value(f'{self.risk.name}.exposure')
         self.population_attributable_fraction = self._get_population_attributable_fraction_data(builder)
 
@@ -49,14 +48,6 @@ class HHTBCorrelatedRiskEffect:
                                                    parameter_columns=['age', 'year'])
         return relative_risk
 
-    def _get_exposed_exposure_probability_data(self, builder):
-        exposure_data = builder.data.load(f'risk_factor.{self.risk.name}.exposure')
-        exposure_data = exposure_data.loc[exposure_data['parameter'] == 'cat1']
-        exposure_data = exposure_data.drop(['parameter'], axis=1)
-        exposure = builder.lookup.build_table(exposure_data, key_columns=['sex'],
-                                              parameter_columns=['age', 'year'])
-        return exposure
-
     def _get_population_attributable_fraction_data(self, builder):
         paf_data = get_population_attributable_fraction_data(builder, self.risk, self.target, self.randomness)
         paf = builder.lookup.build_table(paf_data, key_columns=['sex'],
@@ -66,8 +57,7 @@ class HHTBCorrelatedRiskEffect:
     def adjust_target(self, index, target):
         is_exposed = self.exposure(index) == 'cat1'
         target.loc[is_exposed] *= ((1. - self.population_attributable_fraction(index)) *
-                                   self.relative_risk(index)['cat1'] *
-                                   self.exposed_exposure_probability(index))
-        target.loc[~is_exposed] *= ((1. - self.population_attributable_fraction(index)) *
-                                    (1. - self.exposed_exposure_probability(index)))
+                                   self.relative_risk(index)['cat1'])
+        target.loc[~is_exposed] *= 1. - self.population_attributable_fraction(index)
+        target.loc[target > 1.0] = 1.0
         return target
