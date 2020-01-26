@@ -2,6 +2,8 @@ from vivarium_public_health.utilities import EntityString, TargetString
 from vivarium_public_health.risks.data_transformations import (get_relative_risk_data,
                                                                get_population_attributable_fraction_data)
 
+from vivarium_csu_ltbi import globals as ltbi_globals
+
 
 class HHTBCorrelatedRiskEffect:
     """A custom risk effect that targets prevalence and birth
@@ -15,7 +17,7 @@ class HHTBCorrelatedRiskEffect:
     }
 
     def __init__(self, target):  # sequela.ltbi_susceptible_hiv, sequela.ltbi_positive_hiv
-        self.risk = EntityString('risk_factor.household_tuberculosis')
+        self.risk = EntityString(f'risk_factor.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}')
         self.target = TargetString(target)
         self.configuration_defaults = {
             f'effect_of_{self.risk.name}_on_{self.target.name}': {
@@ -26,7 +28,7 @@ class HHTBCorrelatedRiskEffect:
 
     @property
     def name(self):
-        return f'risk_effect.household_tuberculosis.{self.target.name}.{self.target.measure}'
+        return f'risk_effect.{ltbi_globals.HOUSEHOLD_TUBERCULOSIS}.{self.target.name}.{self.target.measure}'
 
     def setup(self, builder):
         self.randomness = builder.randomness.get_stream(
@@ -55,9 +57,9 @@ class HHTBCorrelatedRiskEffect:
         return paf
 
     def adjust_target(self, index, target):
-        is_exposed = self.exposure(index) == 'cat1'
-        target.loc[is_exposed] *= ((1. - self.population_attributable_fraction(index)) *
-                                   self.relative_risk(index)['cat1'])
-        target.loc[~is_exposed] *= 1. - self.population_attributable_fraction(index)
+        exposure = self.exposure(index)
+        paf = self.population_attributable_fraction(index)
+        rr = self.relative_risk(index).lookup(index, exposure)
+        target *= (1. - paf) * rr
         target.loc[target > 1.0] = 1.0
         return target
