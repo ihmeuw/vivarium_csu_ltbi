@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/interim2_results_plot/'
 
 location_names = ['Ethiopia', 'India', 'Peru', 'Philippines', 'South Africa']
-age_groups = ['0 to 5', '5 to 15', '15 to 60', '60 plus']
+age_groups = ['0 to 4', '5 to 14', '15 to 59', '60 plus']
 scenarios = ['3HP scale up', '6H scale up', 'Baseline']
 outcomes = [
     'Active TB Incidence count (cases)',
@@ -33,7 +33,7 @@ def format_data(df):
         'person_time': 'Person-Years'
     }
     locations = {'ethiopia': 'Ethiopia', 'india': 'India', 'peru': 'Peru', 'philippines': 'Philippines', 'south_africa': 'South Africa'}
-    age_groups = {'0_to_5': '0 to 5', '5_to_15': '5 to 15', '15_to_60': '15 to 60', '60+': '60 plus', 'all': 'All Ages'}
+    age_groups = {'0_to_5': '0 to 4', '5_to_15': '5 to 14', '15_to_60': '15 to 59', '60+': '60 plus', 'all': 'All Ages'}
     sexes = {'all': 'Both', 'female': 'Female', 'male': 'Male'}
     risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLWHIV', 'u5_hhtb': 'U5 HHTB'}
     scenarios = {'3HP_scale_up': '3HP scale up', '6H_scale_up': '6H scale up', 'baseline': 'Baseline'}
@@ -227,9 +227,9 @@ def plot_coverage(df, location, risk_group):
     g.fig.suptitle(f'{location}, {risk_group}')
     g._legend.set_title('Treatment Group')
     plt.subplots_adjust(wspace=0.1, top=0.85)
-    plt.savefig(master_dir + f'{location}/' + \
-                f'{risk_group} coverage.png',
-                bbox_inches='tight')
+    g.savefig(master_dir + f'{location}/' + \
+              f'{risk_group} coverage.png',
+              bbox_inches='tight')
 
 if __name__ == '__main__':
     result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
