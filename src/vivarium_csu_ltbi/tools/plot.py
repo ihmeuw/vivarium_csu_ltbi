@@ -35,7 +35,7 @@ def format_data(df):
     locations = {'ethiopia': 'Ethiopia', 'india': 'India', 'peru': 'Peru', 'philippines': 'Philippines', 'south_africa': 'South Africa'}
     age_groups = {'0_to_5': '0 to 4', '5_to_15': '5 to 14', '15_to_60': '15 to 59', '60+': '60 plus', 'all': 'All Ages'}
     sexes = {'all': 'Both', 'female': 'Female', 'male': 'Male'}
-    risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLWHIV', 'u5_hhtb': 'U5 HHTB'}
+    risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLHIV', 'u5_hhtb': 'U5 HHC'}
     scenarios = {'3HP_scale_up': '3HP scale up', '6H_scale_up': '6H scale up', 'baseline': 'Baseline'}
     treatment_groups = {
         '3HP_adherent': '3HP adherent', '3HP_nonadherent': '3HP non-adherent',
@@ -62,7 +62,7 @@ def format_data(df):
     return df, t
 
 def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
-    age = 'All Ages' if risk_group == 'PLWHIV' else '0 to 5'
+    age = 'All Ages' if risk_group == 'PLHIV' else '0 to 4'
 
     t = df.loc[(df['location'] == location)
                & (df['sex'] == 'Both')
@@ -110,7 +110,7 @@ def plot_averted_by_age(df, location, outcome):
     t = df.loc[(df['location'] == location)
                & (df['year'] == 'All Years')
                & (df['sex'] == 'Both')
-               & (df['risk_group'] == 'PLWHIV')
+               & (df['risk_group'] == 'PLHIV')
                & (df['outcome'] == outcome)]
     t = t.loc[t['age'] != 'All Ages']
     
@@ -138,11 +138,11 @@ def plot_averted_by_age(df, location, outcome):
     plt.xticks(xx+width/2, age_groups)
     plt.xlabel('Age Group', fontsize=12)
     plt.ylabel(f'Averted {outcome_name}\n({outcome_metric})', fontsize=12)
-    plt.title(f'{location}, PLWHIV, Averted {outcome_name} by Age', fontsize=12)
+    plt.title(f'{location}, PLHIV, Averted {outcome_name} by Age', fontsize=12)
     plt.legend(loc=(1.05, 0.05))
     plt.grid(axis='y', alpha=.5)
     fig.savefig(master_dir + f'{location}/' + \
-                f'PLWHIV {outcome_name} averted by age.png',
+                f'PLHIV {outcome_name} averted by age.png',
                 bbox_inches='tight')
 
 def plot_person_time_by_year(df, age_group, risk_group, location):
@@ -176,7 +176,7 @@ def plot_person_time_by_year(df, age_group, risk_group, location):
                 bbox_inches='tight')
 
 def compare_across_countries(df, location_names, outcome, risk_group, scenario):
-    age = 'All Ages' if risk_group == 'PLWHIV' else '0 to 5'
+    age = 'All Ages' if risk_group == 'PLHIV' else '0 to 4'
     
     t = df.loc[(df.year != 'All Years')
                & (df.sex == 'Both')
@@ -209,7 +209,7 @@ def compare_across_countries(df, location_names, outcome, risk_group, scenario):
                 bbox_inches='tight')
 
 def plot_coverage(df, location, risk_group):
-    age = 'All Ages' if risk_group == 'PLWHIV' else '0 to 5'
+    age = 'All Ages' if risk_group == 'PLHIV' else '0 to 4'
     
     t = df.loc[(df.outcome == 'Treatment Coverage (proportion)') 
                 & (df.location == location) 
@@ -239,7 +239,7 @@ if __name__ == '__main__':
     t.to_csv(result_dir + f'ltbi_final_results_end_{age_end}_formatted.csv', index=False)
     # make plot for outcome by year
     for location in location_names:
-        for risk_group in ['PLWHIV', 'U5 HHTB']:
+        for risk_group in ['PLHIV', 'U5 HHC']:
             for outcome in outcomes:
                 for outcome_type in ['value', 'averted']:
                     plot_outcome_by_year(df, location, risk_group, outcome, outcome_type)
@@ -249,14 +249,14 @@ if __name__ == '__main__':
             plot_averted_by_age(df, location, outcome)
     # make plot for population by year
     for location in location_names:
-        plot_person_time_by_year(df, 'All Ages', 'PLWHIV', location)
-        plot_person_time_by_year(df, '0 to 5', 'U5 HHTB', location)
+        plot_person_time_by_year(df, 'All Ages', 'PLHIV', location)
+        plot_person_time_by_year(df, '0 to 4', 'U5 HHC', location)
     # make plot for comparison across countries
     for outcome in outcomes:
-        for risk_group in ['PLWHIV', 'U5 HHTB']:
+        for risk_group in ['PLHIV', 'U5 HHC']:
             for scenario in ['3HP scale up', '6H scale up']:
                 compare_across_countries(df, location_names, outcome, risk_group, scenario)
     # make plot for coverage by year
     for location in location_names:
-        plot_coverage(df, location, 'PLWHIV')
-        plot_coverage(df, location, 'U5 HHTB')
+        plot_coverage(df, location, 'PLHIV')
+        plot_coverage(df, location, 'U5 HHC')
