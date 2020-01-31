@@ -95,8 +95,13 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
     
     prefix = 'Averted' if outcome_type == 'averted' else ''
     outcome_name = outcome.split(' (')[0]
-    outcome_metric = outcome.split(' (')[1][:-1]
-    
+    if outcome == 'Active TB Incidence count (cases)':
+        outcome_metric = 'cases'
+    elif outcome == 'Active TB Incidence rate (cases per 100,000 person-years)':
+        outcome_metric = f'cases per 100,000 {risk_group} person-years'
+    else:
+        outcome_metric = f'per 100,000 {risk_group} person-years'
+
     plt.xlabel('Year', fontsize=12)
     plt.ylabel(f'{prefix} {outcome_name}\n({outcome_metric})', fontsize=12)
     plt.title(f'{location}, {risk_group}, {prefix} {outcome_name} by Year', fontsize=12)
@@ -133,7 +138,12 @@ def plot_averted_by_age(df, location, outcome):
     plt.bar(xx+width, yy_6h, width, yerr=[ll_6h, uu_6h], label='6H scale up')
     
     outcome_name = outcome.split(' (')[0]
-    outcome_metric = outcome.split(' (')[1][:-1]
+    if outcome == 'Active TB Incidence count (cases)':
+        outcome_metric = 'cases'
+    elif outcome == 'Active TB Incidence rate (cases per 100,000 person-years)':
+        outcome_metric = 'cases per 100,000 PLHIV person-years'
+    else:
+        outcome_metric = 'per 100,000 PLHIV person-years'
     
     plt.xticks(xx+width/2, age_groups)
     plt.xlabel('Age Group', fontsize=12)
@@ -198,7 +208,12 @@ def compare_across_countries(df, location_names, outcome, risk_group, scenario):
         plt.fill_between(xx, lb, ub, alpha=.2)
 
     outcome_name = outcome.split(' (')[0]
-    outcome_metric = outcome.split(' (')[1][:-1]    
+    if outcome == 'Active TB Incidence count (cases)':
+        outcome_metric = 'cases'
+    elif outcome == 'Active TB Incidence rate (cases per 100,000 person-years)':
+        outcome_metric = f'cases per 100,000 {risk_group} person-years'
+    else:
+        outcome_metric = f'per 100,000 {risk_group} person-years'
     
     plt.xlabel('Year', fontsize=12)
     plt.ylabel(f'Averted {outcome_name}\n({outcome_metric})', fontsize=12)
