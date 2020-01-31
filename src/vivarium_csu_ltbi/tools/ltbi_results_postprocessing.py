@@ -366,4 +366,4 @@ if __name__ == '__main__':
             loc_data.append(f(measure_data))
         output.append(pd.concat(loc_data))
     pd.concat(output).to_csv(output_dir + f'ltbi_final_results_merged_ages.csv')
-    pd.concat(output).to_hdf(output_dir + f'ltbi_final_results_merged_ages.hdf', key='data')
+    pd.concat(output).to_hdf(output_dir + f'ltbi_final_results_merged_ages.hdf', mode='w', key='data')

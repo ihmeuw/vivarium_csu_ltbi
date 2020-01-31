@@ -86,4 +86,4 @@ if __name__ == '__main__':
     for location, path in path_for_location.items():
         df = load_data(path)
         df = format_data(df)
-        df.to_hdf(output_dir + f'{location}_indexed.hdf', key='data')
+        df.to_hdf(output_dir + f'{location}_indexed.hdf', mode='w', key='data')
