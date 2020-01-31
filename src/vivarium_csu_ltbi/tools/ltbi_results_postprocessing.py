@@ -241,7 +241,7 @@ def make_tb_table(mdata: MeasureData):
     counts = mdata.tb_cases
     counts['location'] = mdata.location
     counts['outcome'] = 'actb_incidence_count'
-    counts = aggregate_over_treatment_group(counts)
+    counts = aggregate_over_treatment_group(counts)  # FIXME: need to get the national count, not the simulation count
     
     delta_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'treatment_group', 'draw']
     delta = get_delta(counts, delta_join_columns)

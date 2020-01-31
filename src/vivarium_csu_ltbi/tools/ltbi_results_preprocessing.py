@@ -3,16 +3,16 @@ import pandas as pd
 result_dir = '/ihme/costeffectiveness/results/vivarium_csu_ltbi/'
 
 path_for_location = {
-    'ethiopia_end_100': result_dir + 'updated-input-data-end-100/ethiopia/2020_01_03_14_22_51',
-    'india_end_100': result_dir + 'updated-input-data-end-100/india/2020_01_03_14_23_42',
-    'peru_end_100': result_dir + 'updated-input-data-end-100/peru/2020_01_03_14_23_33',
-    'philippines_end_100': result_dir + 'updated-input-data-end-100/philippines/2020_01_03_14_23_28',
-    'south_africa_end_100': result_dir + 'updated-input-data-end-100/south_africa/2020_01_03_14_23_36',
-    'ethiopia_end_10': result_dir + 'updated-input-data-end-10/ethiopia/2020_01_02_17_00_21',
-    'india_end_10': result_dir + 'updated-input-data-end-10/india/2020_01_02_17_00_23',
-    'peru_end_10': result_dir + 'updated-input-data-end-10/peru/2020_01_02_17_01_17',
-    'philippines_end_10': result_dir + 'updated-input-data-end-10/philippines/2020_01_02_17_01_17',
-    'south_africa_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26'
+    'ethiopia_end_100': result_dir + 'hhtb_correlated_ltbi/ethiopia/2020_01_26_12_52_32',
+    'india_end_100': result_dir + 'hhtb_correlated_ltbi/india/2020_01_26_12_52_32',
+    'peru_end_100': result_dir + 'hhtb_correlated_ltbi/peru/2020_01_26_12_52_32',
+    'philippines_end_100': result_dir + 'hhtb_correlated_ltbi/philippines/2020_01_26_12_52_35',
+    'south_africa_end_100': result_dir + 'hhtb_correlated_ltbi/south_africa/2020_01_26_12_52_48',
+    'ethiopia_end_10': result_dir + 'hhtb_correlated_ltbi_end_age_10/ethiopia/2020_01_29_14_18_32',
+    'india_end_10': result_dir + 'hhtb_correlated_ltbi_end_age_10/india/2020_01_29_14_18_32',
+    'peru_end_10': result_dir + 'hhtb_correlated_ltbi_end_age_10/peru/2020_01_29_14_18_32',
+    'philippines_end_10': result_dir + 'hhtb_correlated_ltbi_end_age_10/philippines/2020_01_29_14_18_34',
+    'south_africa_end_10': result_dir + 'hhtb_correlated_ltbi_end_age_10/south_africa/2020_01_29_14_18_36',
 }
 
 output_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/sim_raw_hdf/'
