@@ -1,117 +1,122 @@
 from pathlib import Path
 
+import yaml
 import pandas as pd
 from loguru import logger
 
 import vivarium_csu_ltbi.paths as ltbi_paths
+from vivarium_csu_ltbi.data import outputs
 
 
-def main(scenario, location):
-    df = load_data(scenario, location)
-    formatted_df = format_data(df)
-    import pdb
-    pdb.set_trace()
+# TODO(chorst): Move this to a different file in data/
+def main(scenario: str = None, location: str = None, preceding_results_num: int = 0,
+         model_outputs_path: str = None, output_path: str = None, ):
+    """This is to be used as a click entrypoint, see cli.py. It must have one of
+    (scenario, location) or model_outputs_path."""
+    location = location.lower()
+    validate_make_results_arguments(scenario, location, model_outputs_path)
+
+    if model_outputs_path:
+        results_path = Path(model_outputs_path)
+    else:
+        results_path = find_most_recent_results(scenario, location, preceding_results_num)
+
+    if not output_path:
+        output_path = Path(f"./{scenario}_{location}_results").resolve()
+    else:
+        output_path = Path(output_path) / f"./{scenario}_{location}_results"
+    output_path.mkdir(exist_ok=True)
+
+    df = load_data(results_path)
+    df = outputs.format_data(df)
+    df = outputs.make_raw_aggregates(df)
+    measure_data = outputs.split_measures(df)
+
+    logger.info("Writing count-space data by measure.")
+    for measure in measure_data._fields:  # Is there a non-intrusive way to do this?
+        getattr(measure_data, measure).to_hdf(str(output_path / f"{scenario}_{location}_{measure}_count_data.hdf"), key='data')
+        getattr(measure_data, measure).to_csv(str(output_path / f"{scenario}_{location}_{measure}_count_data.csv"))
+
+    logger.info("Calculating data for the final results table.")
+    loc_data = []
+    for f in [outputs.make_coverage_table, outputs.make_tb_table, outputs.make_deaths_table,
+              outputs.make_dalys_table, outputs.make_person_time_table]:
+        loc_data.append(f(measure_data, location))
+    final_tables = pd.concat(loc_data)
+
+    final_tables.to_hdf(str(output_path / f"{scenario}_{location}_final_results.hdf"), key='data')
+    final_tables.to_csv(str(output_path / f"{scenario}_{location}_final_results.csv"))
 
 
-def find_most_recent_results(scenario, location):
+def validate_make_results_arguments(scenario, location, model_outputs_path):
+    if scenario is None and location is None and model_outputs_path is None:
+        raise ValueError("Please pass either a scenario and a location or a model outputs path. You passed none.")
+    if model_outputs_path:
+        if scenario or location:
+            raise ValueError("Please pass either a scenario and a location or a model outputs path, not both.")
+    if scenario and location is None:
+        raise ValueError("When passing a scenario, please pass a location as well.")
+    elif location and scenario is None:
+        raise ValueError("When passing a location, please pass a scenario as well.")
+
+
+def find_most_recent_results(scenario: str, location: str, preceding_results_num: int = 0) -> Path:
+    logger.info(f"Searching for most recent results relevant to {scenario} and {location}.")
     output_runs = Path(ltbi_paths.RESULT_DIRECTORY) / scenario / location
 
     if not output_runs.exists() or len(list(output_runs.iterdir())) == 0:
-        raise ValueError(f"No results present in {output_runs}.")
+        raise FileNotFoundError(f"No results present in {output_runs}.")
 
-    most_recent_results_dir = None
-    for run_dir in sorted(output_runs.iterdir(), reverse=True):
-        if (output_runs / run_dir / 'output.hdf').is_file():
-            most_recent_results_dir = run_dir
-            # TODO: Parse output.hdf and ensure results ?
-            #       it's possible to have an output.hdf but no intersecting data
-            break
+    try:
+        most_recent_run_dir = sorted(output_runs.iterdir())[-1 - preceding_results_num]  # yields full path
+    except IndexError:
+        logger.error(f"{1 + preceding_results_num} sets of results don't exist.")
+        raise IndexError
 
-    if most_recent_results_dir is None:
-        raise ValueError(f"No results present in {output_runs}.")
+    if not (most_recent_run_dir / 'output.hdf').exists():
+        raise FileNotFoundError(f"No data yet written for most recent run {most_recent_run_dir}f")
 
-    return most_recent_results_dir
-
-
-def parse_output_hdf(results_directory: Path):
-    # TODO: Determine how many seeds / draws should be present
-    #       select only those draws that have all seeds
-
-    pass
+    logger.info(f"Most recent results found at {most_recent_run_dir}.")
+    return most_recent_run_dir
 
 
-def load_data(country_path):
-    # TODO: PARSE RESULTS DIR
-    #       find most recent results, report on finish status
-    #       pare down to common set, report that too
-    df = pd.read_hdf(country_path + '/output.hdf')
-    df = df.drop(columns='random_seed').reset_index()
-    df.rename(columns={'ltbi_treatment_scale_up.scenario': 'scenario'},
-              inplace=True)
-
-    scenario_count = (df
-                      .groupby(['input_draw', 'random_seed'])
-                      .scenario
-                      .count())
-    idx_completed = scenario_count[scenario_count == 3].reset_index()
-    idx_completed = idx_completed[['input_draw', 'random_seed']]
-    df_completed = pd.merge(df,
-                            idx_completed,
-                            how='inner',
-                            on=['input_draw', 'random_seed'])
-    df_completed = df_completed.groupby(['input_draw', 'scenario']).sum()
-
-    return df_completed
+def get_random_seeds(results_directory: Path) -> list:
+    with open(results_directory / 'keyspace.yaml') as f:
+        data = yaml.load(f)
+    return data['random_seed']
 
 
-def get_year_from_template(template_string):
-    return template_string.split('_among_')[0].split('_')[-1]
+def find_common_subset(df: pd.DataFrame, expected_seeds: list) -> pd.DataFrame:
+    num_obs = df.shape[0]
 
+    valid_groups = []
+    df = df.reset_index(['random_seed'])
+    for draw, g in df.groupby(['input_draw']):
+        if ((set(df['random_seed']) == set(expected_seeds))
+           & (len(df['scenario'].unique()) == 3)):
+            valid_groups.append(g)
 
-def get_sex_from_template(template_string):
-    return template_string.split('_among_')[1].split('_in_')[0]
+    df = pd.concat(valid_groups, axis=0)
+    df = df.set_index('random_seed', append=True)
 
-
-def get_age_group_from_template(template_string):
-    return '_'.join(template_string.split('_age_group_')[1].split('_treatment_group_')[0].split('_')[:-3])
-
-
-def get_risk_group_from_template(template_string):
-    return template_string.split('_to_hhtb_')[0].split('_')[-1]
-
-
-def get_treatment_group_from_template(template_string):
-    return template_string.split('_treatment_group_')[1]
-
-
-def get_measure_from_template(template_string):
-    return template_string.split('_in_')[0]
-
-
-def format_data(df):
-    idx_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
-    items = ['death', 'ylls', 'ylds', 'event_count', 'prevalent_cases', 'person_time', 'population_point_estimate']
-    wanted_cols = []
-    for i in df.columns:
-        for j in items:
-            if j in i:
-                wanted_cols.append(i)
-
-    df = df[wanted_cols]
-    df = (df
-          .reset_index()
-          .melt(id_vars=['input_draw', 'scenario'],
-                var_name='label'))
-    df['year'] = df.label.map(get_year_from_template)
-    df['sex'] = df.label.map(get_sex_from_template)
-    df['age'] = df.label.map(get_age_group_from_template)
-    df['hhtb'] = df.label.map(get_risk_group_from_template)
-    df['treatment_group'] = df.label.map(get_treatment_group_from_template)
-    df['measure'] = df.label.map(get_measure_from_template)
-    df = (df
-          .rename(columns={'input_draw': 'draw'})
-          .drop(columns='label')
-          .set_index(idx_cols))
+    logger.info(f"{num_obs} total simulations in this output. {len(df)} represent full sets of "
+                f"scenarios and random seeds.")
 
     return df
 
+
+def load_data(results_path: Path) -> pd.DataFrame:
+    expected_seeds = get_random_seeds(results_path)
+    df = pd.read_hdf(results_path / 'output.hdf')
+
+    df = df.drop(columns=['random_seed', 'input_draw'])
+    df.index = df.index.set_names('input_draw', level=0)
+    df = df.rename(columns={'ltbi_treatment_scale_up.scenario': 'scenario'})
+
+    df = find_common_subset(df, expected_seeds)
+
+    df = df.reset_index()
+    df = df.drop(columns=['random_seed'])
+    df = df.groupby(['input_draw', 'scenario']).sum()
+
+    return df

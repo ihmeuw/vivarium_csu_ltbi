@@ -167,17 +167,24 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
                 location_sanitized=location.sanitized))
 
 
+# TODO(chorst): scenario should be model version
+#               so model version needs to be renamed or something
 @click.command()
-@click.argument('scenario', type=click.STRING)
-@click.argument('location', type=click.Choice(ltbi_globals.LOCATIONS))
-def make_results(scenario, location):
-    """Generate count-space results in *.hdf and *.csv format as well as the
-    final outputs in tabular form. In the event of unfinished results, draws
-    deficient in random seeds are excluded from the analysis.
+@click.option('-s', '--scenario', type=click.STRING)
+@click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
+@click.option('-p', '--preceding-results', type=click.INT, default=0)
+@click.option('-m', '--model-outputs-path', type=click.Path(exists=True, dir_okay=True))
+@click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
+def make_results(scenario, location, preceding_results, model_outputs_path,
+                 output_path=None):
+    """Generate count-space measure information and final outputs tables in
+    *.hdf and *.csv format. In the event of unfinished results, draws deficient
+    in random seeds or scenarios are excluded from the analysis.
 
     The results to be processed are the most recent outputs from the run defined
-    by the scenario name and the country. The processed results are saved in the
-    current working directory.
-
+    by SCENARIO and LOCATION or the results present in MODEL_OUTPUTS_PATH. The
+    option PRECEDING_RESULTS defines the results to be processed counting
+    backwards from the most recent results. The processed results are saved in
+    OUTPUT_PATH if specified, otherwise the current working directory.
     """
-    results.main(scenario, location)
+    results.main(scenario, location, preceding_results, model_outputs_path, output_path)
