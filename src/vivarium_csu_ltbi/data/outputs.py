@@ -6,8 +6,6 @@ warnings.filterwarnings('ignore')
 
 from typing import NamedTuple
 
-# output_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
-
 
 def get_year_from_template(template_string):
     return template_string.split('_among_')[0].split('_')[-1]
