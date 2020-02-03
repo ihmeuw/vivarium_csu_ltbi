@@ -35,14 +35,15 @@ def main(model_version: str = None, location: str = None, preceding_results_num:
     logger.info("Writing count-space data by measure.")
     for measure in measure_data._fields:  # Is there a non-intrusive way to do this?
         getattr(measure_data, measure).to_hdf(str(output_path /
-                                                  f"{model_version}_{location}_{measure}_count_data.hdf"), key='data')
+                                                  f"{model_version}_{location}_{measure}_count_data.hdf"),
+                                              mode='w', key='data')
         getattr(measure_data, measure).to_csv(str(output_path / f"{model_version}_{location}_{measure}_count_data.csv"))
 
     logger.info("Calculating data for the final results table.")
     final_tables = table_output.make_tables(measure_data, location)
 
     logger.info("Writing data for the final results table to csf and hdf formats.")
-    final_tables.to_hdf(str(output_path / f"{model_version}_{location}_final_results.hdf"), key='data')
+    final_tables.to_hdf(str(output_path / f"{model_version}_{location}_final_results.hdf"), mode='w', key='data')
     final_tables.to_csv(str(output_path / f"{model_version}_{location}_final_results.csv"))
 
 
