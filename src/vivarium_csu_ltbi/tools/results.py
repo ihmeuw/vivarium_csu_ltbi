@@ -5,10 +5,9 @@ import pandas as pd
 from loguru import logger
 
 import vivarium_csu_ltbi.paths as ltbi_paths
-from vivarium_csu_ltbi.data import outputs
+from vivarium_csu_ltbi.data import counts_output, table_output
 
 
-# TODO(chorst): Move this to a different file in data/
 def main(scenario: str = None, location: str = None, preceding_results_num: int = 0,
          model_outputs_path: str = None, output_path: str = None, ):
     """This is to be used as a click entrypoint, see cli.py. It must have one of
@@ -28,9 +27,8 @@ def main(scenario: str = None, location: str = None, preceding_results_num: int 
     output_path.mkdir(exist_ok=True)
 
     df = load_data(results_path)
-    df = outputs.format_data(df)
-    df = outputs.make_raw_aggregates(df)
-    measure_data = outputs.split_measures(df)
+    logger.info("Generating count-space data by measure.")
+    measure_data = counts_output.split_measures(df)
 
     logger.info("Writing count-space data by measure.")
     for measure in measure_data._fields:  # Is there a non-intrusive way to do this?
@@ -38,12 +36,9 @@ def main(scenario: str = None, location: str = None, preceding_results_num: int 
         getattr(measure_data, measure).to_csv(str(output_path / f"{scenario}_{location}_{measure}_count_data.csv"))
 
     logger.info("Calculating data for the final results table.")
-    loc_data = []
-    for f in [outputs.make_coverage_table, outputs.make_tb_table, outputs.make_deaths_table,
-              outputs.make_dalys_table, outputs.make_person_time_table]:
-        loc_data.append(f(measure_data, location))
-    final_tables = pd.concat(loc_data)
+    final_tables = table_output.make_tables(measure_data, location)
 
+    logger.info("Writing data for the final results table to csf and hdf formats.")
     final_tables.to_hdf(str(output_path / f"{scenario}_{location}_final_results.hdf"), key='data')
     final_tables.to_csv(str(output_path / f"{scenario}_{location}_final_results.csv"))
 
