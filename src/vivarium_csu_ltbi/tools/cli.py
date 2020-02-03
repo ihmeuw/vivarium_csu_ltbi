@@ -170,21 +170,22 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
 # TODO(chorst): scenario should be model version
 #               so model version needs to be renamed or something
 @click.command()
-@click.option('-s', '--scenario', type=click.STRING)
+@click.option('-m', '--model-version', type=click.STRING)
 @click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
 @click.option('-p', '--preceding-results', type=click.INT, default=0)
-@click.option('-m', '--model-outputs-path', type=click.Path(exists=True, dir_okay=True))
+@click.option('-s', '--model-outputs-path', type=click.Path(exists=True, dir_okay=True))
 @click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
-def make_results(scenario, location, preceding_results, model_outputs_path,
+def make_results(model_version, location, preceding_results, model_outputs_path,
                  output_path=None):
     """Generate count-space measure information and final outputs tables in
     *.hdf and *.csv format. In the event of unfinished results, draws deficient
     in random seeds or scenarios are excluded from the analysis.
 
     The results to be processed are the most recent outputs from the run defined
-    by SCENARIO and LOCATION or the results present in MODEL_OUTPUTS_PATH. The
-    option PRECEDING_RESULTS defines the results to be processed counting
-    backwards from the most recent results. The processed results are saved in
-    OUTPUT_PATH if specified, otherwise the current working directory.
+    by MODEL_VERSION and LOCATION *or* the results present in MODEL_OUTPUTS_PATH.
+    The option PRECEDING_RESULTS defines the results to be processed counting
+    backwards from the most recent results. This only works if MODEL_VERSION and
+    LOCATION are specified.  The processed results are saved in OUTPUT_PATH if
+    specified, otherwise the current working directory.
     """
-    results.main(scenario, location, preceding_results, model_outputs_path, output_path)
+    results.main(model_version, location, preceding_results, model_outputs_path, output_path)

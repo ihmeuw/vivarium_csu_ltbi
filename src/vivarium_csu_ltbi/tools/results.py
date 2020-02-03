@@ -8,22 +8,22 @@ import vivarium_csu_ltbi.paths as ltbi_paths
 from vivarium_csu_ltbi.data import counts_output, table_output
 
 
-def main(scenario: str = None, location: str = None, preceding_results_num: int = 0,
+def main(model_version: str = None, location: str = None, preceding_results_num: int = 0,
          model_outputs_path: str = None, output_path: str = None, ):
     """This is to be used as a click entrypoint, see cli.py. It must have one of
-    (scenario, location) or model_outputs_path."""
+    (model_version, location) or model_outputs_path."""
     location = location.lower()
-    validate_make_results_arguments(scenario, location, model_outputs_path)
+    validate_make_results_arguments(model_version, location, model_outputs_path)
 
     if model_outputs_path:
         results_path = Path(model_outputs_path)
     else:
-        results_path = find_most_recent_results(scenario, location, preceding_results_num)
+        results_path = find_most_recent_results(model_version, location, preceding_results_num)
 
     if not output_path:
-        output_path = Path(f"./{scenario}_{location}_results").resolve()
+        output_path = Path(f"./{model_version}_{location}_results").resolve()
     else:
-        output_path = Path(output_path) / f"./{scenario}_{location}_results"
+        output_path = Path(output_path) / f"./{model_version}_{location}_results"
     output_path.mkdir(exist_ok=True)
 
     df = load_data(results_path)
@@ -32,32 +32,33 @@ def main(scenario: str = None, location: str = None, preceding_results_num: int 
 
     logger.info("Writing count-space data by measure.")
     for measure in measure_data._fields:  # Is there a non-intrusive way to do this?
-        getattr(measure_data, measure).to_hdf(str(output_path / f"{scenario}_{location}_{measure}_count_data.hdf"), key='data')
-        getattr(measure_data, measure).to_csv(str(output_path / f"{scenario}_{location}_{measure}_count_data.csv"))
+        getattr(measure_data, measure).to_hdf(str(output_path /
+                                                  f"{model_version}_{location}_{measure}_count_data.hdf"), key='data')
+        getattr(measure_data, measure).to_csv(str(output_path / f"{model_version}_{location}_{measure}_count_data.csv"))
 
     logger.info("Calculating data for the final results table.")
     final_tables = table_output.make_tables(measure_data, location)
 
     logger.info("Writing data for the final results table to csf and hdf formats.")
-    final_tables.to_hdf(str(output_path / f"{scenario}_{location}_final_results.hdf"), key='data')
-    final_tables.to_csv(str(output_path / f"{scenario}_{location}_final_results.csv"))
+    final_tables.to_hdf(str(output_path / f"{model_version}_{location}_final_results.hdf"), key='data')
+    final_tables.to_csv(str(output_path / f"{model_version}_{location}_final_results.csv"))
 
 
-def validate_make_results_arguments(scenario, location, model_outputs_path):
-    if scenario is None and location is None and model_outputs_path is None:
-        raise ValueError("Please pass either a scenario and a location or a model outputs path. You passed none.")
+def validate_make_results_arguments(model_version, location, model_outputs_path):
+    if model_version is None and location is None and model_outputs_path is None:
+        raise ValueError("Please pass either a model_version and a location or a model outputs path. You passed none.")
     if model_outputs_path:
-        if scenario or location:
-            raise ValueError("Please pass either a scenario and a location or a model outputs path, not both.")
-    if scenario and location is None:
-        raise ValueError("When passing a scenario, please pass a location as well.")
-    elif location and scenario is None:
-        raise ValueError("When passing a location, please pass a scenario as well.")
+        if model_version or location:
+            raise ValueError("Please pass either a model_version and a location or a model outputs path, not both.")
+    if model_version and location is None:
+        raise ValueError("When passing a model_version, please pass a location as well.")
+    elif location and model_version is None:
+        raise ValueError("When passing a location, please pass a model_version as well.")
 
 
-def find_most_recent_results(scenario: str, location: str, preceding_results_num: int = 0) -> Path:
-    logger.info(f"Searching for most recent results relevant to {scenario} and {location}.")
-    output_runs = Path(ltbi_paths.RESULT_DIRECTORY) / scenario / location
+def find_most_recent_results(model_version: str, location: str, preceding_results_num: int = 0) -> Path:
+    logger.info(f"Searching for most recent results relevant to {model_version} and {location}.")
+    output_runs = Path(ltbi_paths.RESULT_DIRECTORY) / model_version / location
 
     if not output_runs.exists() or len(list(output_runs.iterdir())) == 0:
         raise FileNotFoundError(f"No results present in {output_runs}.")
