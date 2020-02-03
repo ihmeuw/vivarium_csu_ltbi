@@ -47,7 +47,7 @@ def main(model_version: str = None, location: str = None, preceding_results_num:
     final_tables.to_csv(str(output_path / f"{model_version}_{location}_final_results.csv"))
 
 
-def validate_make_results_arguments(model_version, location, model_outputs_path):
+def validate_make_results_arguments(model_version: str, location: str, model_outputs_path: str):
     if model_version is None and location is None and model_outputs_path is None:
         raise ValueError("Please pass either a model_version and a location or a model outputs path. You passed none.")
     if model_outputs_path:
