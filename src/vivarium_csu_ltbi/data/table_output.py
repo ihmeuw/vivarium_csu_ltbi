@@ -1,6 +1,7 @@
+import warnings
+
 import numpy as np
 import pandas as pd
-import warnings
 
 from vivarium_csu_ltbi.data.counts_output import MeasureData
 
