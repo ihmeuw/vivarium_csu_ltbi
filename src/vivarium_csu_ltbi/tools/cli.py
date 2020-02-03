@@ -167,8 +167,6 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
                 location_sanitized=location.sanitized))
 
 
-# TODO(chorst): scenario should be model version
-#               so model version needs to be renamed or something
 @click.command()
 @click.option('-m', '--model-version', type=click.STRING)
 @click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))

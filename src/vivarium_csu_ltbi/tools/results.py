@@ -5,6 +5,7 @@ import pandas as pd
 from loguru import logger
 
 import vivarium_csu_ltbi.paths as ltbi_paths
+from vivarium_csu_ltbi import globals as project_globals
 from vivarium_csu_ltbi.data import counts_output, table_output
 
 
@@ -27,6 +28,7 @@ def main(model_version: str = None, location: str = None, preceding_results_num:
     output_path.mkdir(exist_ok=True)
 
     df = load_data(results_path)
+
     logger.info("Generating count-space data by measure.")
     measure_data = counts_output.split_measures(df)
 
@@ -82,15 +84,19 @@ def get_random_seeds(results_directory: Path) -> list:
     return data['random_seed']
 
 
-def find_common_subset(df: pd.DataFrame, expected_seeds: list) -> pd.DataFrame:
+# TODO: Make this resistant to the additional constraint of scenarios
+def find_common_subset(df: pd.DataFrame, expected_seeds: list, has_scenarios: bool) -> pd.DataFrame:
     num_obs = df.shape[0]
 
     valid_groups = []
     df = df.reset_index(['random_seed'])
     for draw, g in df.groupby(['input_draw']):
-        if ((set(df['random_seed']) == set(expected_seeds))
-           & (len(df['scenario'].unique()) == 3)):
-            valid_groups.append(g)
+        if set(df['random_seed']) == set(expected_seeds):
+            if has_scenarios:  # We have an additional criterion
+                if len(df['scenario'].unique()) == project_globals.NUM_SCENARIOS:
+                    valid_groups.append(g)
+            else:  # no additional criteria, seeds are all we need to check
+                valid_groups.append(g)
 
     df = pd.concat(valid_groups, axis=0)
     df = df.set_index('random_seed', append=True)
@@ -102,17 +108,24 @@ def find_common_subset(df: pd.DataFrame, expected_seeds: list) -> pd.DataFrame:
 
 
 def load_data(results_path: Path) -> pd.DataFrame:
+    has_scenarios = False
+    if hasattr(project_globals, 'SCENARIO_COLUMN'):
+        has_scenarios = True
+
     expected_seeds = get_random_seeds(results_path)
     df = pd.read_hdf(results_path / 'output.hdf')
 
-    df = df.drop(columns=['random_seed', 'input_draw'])
+    df = df.drop(columns=['random_seed', 'input_draw'])  # FIXME these are unintended dupes
     df.index = df.index.set_names('input_draw', level=0)
-    df = df.rename(columns={'ltbi_treatment_scale_up.scenario': 'scenario'})
 
-    df = find_common_subset(df, expected_seeds)
+    if has_scenarios:
+        df = df.rename(columns={project_globals.SCENARIO_COLUMN: 'scenario'})
+
+    df = find_common_subset(df, expected_seeds, has_scenarios)
 
     df = df.reset_index()
     df = df.drop(columns=['random_seed'])
-    df = df.groupby(['input_draw', 'scenario']).sum()
+    idx_columns = ['input_draw', 'scenario'] if has_scenarios else ['input_draw']
+    df = df.groupby(idx_columns).sum()
 
     return df
