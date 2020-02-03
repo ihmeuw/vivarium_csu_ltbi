@@ -24,6 +24,9 @@ import click
 from jinja2 import Template
 from loguru import logger
 
+from vivarium_csu_ltbi.tools import results
+from vivarium_csu_ltbi import globals as ltbi_globals
+
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 Location = namedtuple('Location', ['proper', 'sanitized'])
@@ -162,3 +165,25 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
             outfile.write(jinja_temp.render(
                 location_proper=location.proper,
                 location_sanitized=location.sanitized))
+
+
+@click.command()
+@click.option('-m', '--model-version', type=click.STRING)
+@click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
+@click.option('-p', '--preceding-results', type=click.INT, default=0)
+@click.option('-s', '--model-outputs-path', type=click.Path(exists=True, dir_okay=True))
+@click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
+def make_results(model_version, location, preceding_results, model_outputs_path,
+                 output_path=None):
+    """Generate count-space measure information and final outputs tables in
+    *.hdf and *.csv format. In the event of unfinished results, draws deficient
+    in random seeds or scenarios are excluded from the analysis.
+
+    The results to be processed are the most recent outputs from the run defined
+    by MODEL_VERSION and LOCATION *or* the results present in MODEL_OUTPUTS_PATH.
+    The option PRECEDING_RESULTS defines the results to be processed counting
+    backwards from the most recent results. This only works if MODEL_VERSION and
+    LOCATION are specified.  The processed results are saved in OUTPUT_PATH if
+    specified, otherwise the current working directory.
+    """
+    results.main(model_version, location, preceding_results, model_outputs_path, output_path)
