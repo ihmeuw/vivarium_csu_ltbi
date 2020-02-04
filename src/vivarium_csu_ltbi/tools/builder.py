@@ -441,7 +441,10 @@ def write_population_attributable_fraction_data(art, location):
 
     # 6H is the only treatment in the baseline, so no 3HP
     coverage = art.load("risk_factor.ltbi_treatment.coverage").reset_index(['treatment_subgroup',
-                                                                                  'treatment_type'])
+                                                                            'treatment_type'])
+    # age start / end was introduced to implement a change in [0-2] y.o. w.r.t 3HP treatment.
+    # this does not apply to 6H, the coverage is the same across all ages in the baseline.
+    coverage = coverage.drop(['age_start', 'age_end'], axis=1).drop_duplicates()
     coverage = coverage.loc[coverage['treatment_type']=='6H'].drop(['treatment_type'], axis=1)
     hiv_coverage = (coverage
                     .loc[coverage['treatment_subgroup'] == "with_hiv"]
