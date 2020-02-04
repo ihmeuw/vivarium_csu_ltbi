@@ -286,6 +286,11 @@ def write_baseline_coverage_levels(art, loc):
     data = data.set_index(['location'])
     data['value'] /= 100.
 
+    data['sex'] = 'Male'
+    females = data.copy()
+    females['sex'] = 'Female'
+    data = pd.concat([data, females], axis=0)
+
     six_h = data.copy()
     six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
                             append=True)
@@ -319,6 +324,11 @@ def write_intevention_coverage_shift(artifact, location):
     data['year_end'] = data['year_start'] + 1
     data = data.set_index(['location'])
     data['value'] /= 100.
+
+    data['sex'] = 'Male'
+    females = data.copy()
+    females['sex'] = 'Female'
+    data = pd.concat([data, females], axis=0)
 
     data = data.set_index(
         ['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup', 'treatment_type', 'scenario'],
