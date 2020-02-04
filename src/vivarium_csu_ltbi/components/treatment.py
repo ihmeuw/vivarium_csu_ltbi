@@ -78,6 +78,13 @@ class LTBITreatmentCoverage:
         treatment_type = pd.Series(np.array(coverage.columns)[choice_index], index=pop.index)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
         pop.loc[newly_treated, 'treatment_type'] = treatment_type
+
+        # 3HP is not approved for use in children under the age of 2.
+        # We want to maintain all coverage information regarding 3HP,
+        # but swap the drug for 6H in this group, e.g. lower efficacy
+        # and adherence.
+        pop.loc[(pop['age'] < 2.0) & (pop['treatment_type'] == '3HP'), 'treatment_type'] = '6H'
+
         pop.loc[newly_treated, 'treatment_date'] = self.clock()
         self.population_view.update(pop)
 
