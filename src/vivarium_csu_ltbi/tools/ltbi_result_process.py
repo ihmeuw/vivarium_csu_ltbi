@@ -104,5 +104,4 @@ if __name__ == '__main__':
         for measure, pattern in measure_pattern.items():
             process_data(locDf, country, measure, pattern)
 
-    #pd.DataFrame(data).to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/result/averted_result.csv')
-    pd.DataFrame(data).to_csv('/ihme/homes/yaqiw/Yaqi_pro/averted_result_100_10_test.csv')
+    pd.DataFrame(data).to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/result/averted_result_100_10.csv')
