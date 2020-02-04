@@ -286,19 +286,11 @@ def write_baseline_coverage_levels(art, loc):
     data = data.set_index(['location'])
     data['value'] /= 100.
 
-    demog = get_demographic_dimensions(loc)
-    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
-    demog = demog.reset_index().drop(['year'], axis=1)
-    demog = demog.drop_duplicates()
-    demog = demog.set_index(['location'])
-
-    duplicated = pd.merge(demog, data, left_index=True, right_index=True)
-
-    six_h = duplicated.copy()
+    six_h = data.copy()
     six_h = six_h.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
                             append=True)
 
-    three_hp = duplicated.copy()
+    three_hp = data.copy()
     three_hp['value'] = 0.0
     three_hp = three_hp.set_index(['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup'],
                                   append=True)
@@ -328,13 +320,6 @@ def write_intevention_coverage_shift(artifact, location):
     data = data.set_index(['location'])
     data['value'] /= 100.
 
-    demog = get_demographic_dimensions(location)
-    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
-    demog = demog.reset_index().drop(['year'], axis=1)
-    demog = demog.drop_duplicates()
-    demog = demog.set_index(['location'])
-
-    data = pd.merge(demog, data, left_index=True, right_index=True)
     data = data.set_index(
         ['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup', 'treatment_type', 'scenario'],
         append=True)
