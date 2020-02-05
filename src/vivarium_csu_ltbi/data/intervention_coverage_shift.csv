@@ -1,421 +1,841 @@
-location,treatment_subgroup,year,medication,scenario,value
-South Africa,under_five_hhtb,2019,6H,baseline,0.0
-South Africa,under_five_hhtb,2020,6H,baseline,0.0
-South Africa,under_five_hhtb,2021,6H,baseline,0.0
-South Africa,under_five_hhtb,2022,6H,baseline,0.0
-South Africa,under_five_hhtb,2023,6H,baseline,0.0
-South Africa,under_five_hhtb,2024,6H,baseline,0.0
-South Africa,under_five_hhtb,2025,6H,baseline,0.0
-India,under_five_hhtb,2019,6H,baseline,0.0
-India,under_five_hhtb,2020,6H,baseline,0.0
-India,under_five_hhtb,2021,6H,baseline,0.0
-India,under_five_hhtb,2022,6H,baseline,0.0
-India,under_five_hhtb,2023,6H,baseline,0.0
-India,under_five_hhtb,2024,6H,baseline,0.0
-India,under_five_hhtb,2025,6H,baseline,0.0
-Philippines,under_five_hhtb,2019,6H,baseline,0.0
-Philippines,under_five_hhtb,2020,6H,baseline,0.0
-Philippines,under_five_hhtb,2021,6H,baseline,0.0
-Philippines,under_five_hhtb,2022,6H,baseline,0.0
-Philippines,under_five_hhtb,2023,6H,baseline,0.0
-Philippines,under_five_hhtb,2024,6H,baseline,0.0
-Philippines,under_five_hhtb,2025,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2019,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2020,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2021,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2022,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2023,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2024,6H,baseline,0.0
-Ethiopia,under_five_hhtb,2025,6H,baseline,0.0
-Peru,under_five_hhtb,2019,6H,baseline,0.0
-Peru,under_five_hhtb,2020,6H,baseline,0.0
-Peru,under_five_hhtb,2021,6H,baseline,0.0
-Peru,under_five_hhtb,2022,6H,baseline,0.0
-Peru,under_five_hhtb,2023,6H,baseline,0.0
-Peru,under_five_hhtb,2024,6H,baseline,0.0
-Peru,under_five_hhtb,2025,6H,baseline,0.0
-South Africa,with_hiv,2019,6H,baseline,0.0
-South Africa,with_hiv,2020,6H,baseline,0.0
-South Africa,with_hiv,2021,6H,baseline,0.0
-South Africa,with_hiv,2022,6H,baseline,0.0
-South Africa,with_hiv,2023,6H,baseline,0.0
-South Africa,with_hiv,2024,6H,baseline,0.0
-South Africa,with_hiv,2025,6H,baseline,0.0
-India,with_hiv,2019,6H,baseline,0.0
-India,with_hiv,2020,6H,baseline,0.0
-India,with_hiv,2021,6H,baseline,0.0
-India,with_hiv,2022,6H,baseline,0.0
-India,with_hiv,2023,6H,baseline,0.0
-India,with_hiv,2024,6H,baseline,0.0
-India,with_hiv,2025,6H,baseline,0.0
-Philippines,with_hiv,2019,6H,baseline,0.0
-Philippines,with_hiv,2020,6H,baseline,0.0
-Philippines,with_hiv,2021,6H,baseline,0.0
-Philippines,with_hiv,2022,6H,baseline,0.0
-Philippines,with_hiv,2023,6H,baseline,0.0
-Philippines,with_hiv,2024,6H,baseline,0.0
-Philippines,with_hiv,2025,6H,baseline,0.0
-Ethiopia,with_hiv,2019,6H,baseline,0.0
-Ethiopia,with_hiv,2020,6H,baseline,0.0
-Ethiopia,with_hiv,2021,6H,baseline,0.0
-Ethiopia,with_hiv,2022,6H,baseline,0.0
-Ethiopia,with_hiv,2023,6H,baseline,0.0
-Ethiopia,with_hiv,2024,6H,baseline,0.0
-Ethiopia,with_hiv,2025,6H,baseline,0.0
-Peru,with_hiv,2019,6H,baseline,0.0
-Peru,with_hiv,2020,6H,baseline,0.0
-Peru,with_hiv,2021,6H,baseline,0.0
-Peru,with_hiv,2022,6H,baseline,0.0
-Peru,with_hiv,2023,6H,baseline,0.0
-Peru,with_hiv,2024,6H,baseline,0.0
-Peru,with_hiv,2025,6H,baseline,0.0
-South Africa,under_five_hhtb,2019,3HP,baseline,0.0
-South Africa,under_five_hhtb,2020,3HP,baseline,0.0
-South Africa,under_five_hhtb,2021,3HP,baseline,0.0
-South Africa,under_five_hhtb,2022,3HP,baseline,0.0
-South Africa,under_five_hhtb,2023,3HP,baseline,0.0
-South Africa,under_five_hhtb,2024,3HP,baseline,0.0
-South Africa,under_five_hhtb,2025,3HP,baseline,0.0
-India,under_five_hhtb,2019,3HP,baseline,0.0
-India,under_five_hhtb,2020,3HP,baseline,0.0
-India,under_five_hhtb,2021,3HP,baseline,0.0
-India,under_five_hhtb,2022,3HP,baseline,0.0
-India,under_five_hhtb,2023,3HP,baseline,0.0
-India,under_five_hhtb,2024,3HP,baseline,0.0
-India,under_five_hhtb,2025,3HP,baseline,0.0
-Philippines,under_five_hhtb,2019,3HP,baseline,0.0
-Philippines,under_five_hhtb,2020,3HP,baseline,0.0
-Philippines,under_five_hhtb,2021,3HP,baseline,0.0
-Philippines,under_five_hhtb,2022,3HP,baseline,0.0
-Philippines,under_five_hhtb,2023,3HP,baseline,0.0
-Philippines,under_five_hhtb,2024,3HP,baseline,0.0
-Philippines,under_five_hhtb,2025,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2019,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2020,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2021,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2022,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2023,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2024,3HP,baseline,0.0
-Ethiopia,under_five_hhtb,2025,3HP,baseline,0.0
-Peru,under_five_hhtb,2019,3HP,baseline,0.0
-Peru,under_five_hhtb,2020,3HP,baseline,0.0
-Peru,under_five_hhtb,2021,3HP,baseline,0.0
-Peru,under_five_hhtb,2022,3HP,baseline,0.0
-Peru,under_five_hhtb,2023,3HP,baseline,0.0
-Peru,under_five_hhtb,2024,3HP,baseline,0.0
-Peru,under_five_hhtb,2025,3HP,baseline,0.0
-South Africa,with_hiv,2019,3HP,baseline,0.0
-South Africa,with_hiv,2020,3HP,baseline,0.0
-South Africa,with_hiv,2021,3HP,baseline,0.0
-South Africa,with_hiv,2022,3HP,baseline,0.0
-South Africa,with_hiv,2023,3HP,baseline,0.0
-South Africa,with_hiv,2024,3HP,baseline,0.0
-South Africa,with_hiv,2025,3HP,baseline,0.0
-India,with_hiv,2019,3HP,baseline,0.0
-India,with_hiv,2020,3HP,baseline,0.0
-India,with_hiv,2021,3HP,baseline,0.0
-India,with_hiv,2022,3HP,baseline,0.0
-India,with_hiv,2023,3HP,baseline,0.0
-India,with_hiv,2024,3HP,baseline,0.0
-India,with_hiv,2025,3HP,baseline,0.0
-Philippines,with_hiv,2019,3HP,baseline,0.0
-Philippines,with_hiv,2020,3HP,baseline,0.0
-Philippines,with_hiv,2021,3HP,baseline,0.0
-Philippines,with_hiv,2022,3HP,baseline,0.0
-Philippines,with_hiv,2023,3HP,baseline,0.0
-Philippines,with_hiv,2024,3HP,baseline,0.0
-Philippines,with_hiv,2025,3HP,baseline,0.0
-Ethiopia,with_hiv,2019,3HP,baseline,0.0
-Ethiopia,with_hiv,2020,3HP,baseline,0.0
-Ethiopia,with_hiv,2021,3HP,baseline,0.0
-Ethiopia,with_hiv,2022,3HP,baseline,0.0
-Ethiopia,with_hiv,2023,3HP,baseline,0.0
-Ethiopia,with_hiv,2024,3HP,baseline,0.0
-Ethiopia,with_hiv,2025,3HP,baseline,0.0
-Peru,with_hiv,2019,3HP,baseline,0.0
-Peru,with_hiv,2020,3HP,baseline,0.0
-Peru,with_hiv,2021,3HP,baseline,0.0
-Peru,with_hiv,2022,3HP,baseline,0.0
-Peru,with_hiv,2023,3HP,baseline,0.0
-Peru,with_hiv,2024,3HP,baseline,0.0
-Peru,with_hiv,2025,3HP,baseline,0.0
-South Africa,under_five_hhtb,2019,6H,6H_scale_up,0.0
-South Africa,under_five_hhtb,2020,6H,6H_scale_up,15.5
-South Africa,under_five_hhtb,2021,6H,6H_scale_up,31.0
-South Africa,under_five_hhtb,2022,6H,6H_scale_up,32.25
-South Africa,under_five_hhtb,2023,6H,6H_scale_up,33.5
-South Africa,under_five_hhtb,2024,6H,6H_scale_up,34.75
-South Africa,under_five_hhtb,2025,6H,6H_scale_up,36.0
-India,under_five_hhtb,2019,6H,6H_scale_up,0.0
-India,under_five_hhtb,2020,6H,6H_scale_up,50.0
-India,under_five_hhtb,2021,6H,6H_scale_up,60.0
-India,under_five_hhtb,2022,6H,6H_scale_up,70.0
-India,under_five_hhtb,2023,6H,6H_scale_up,80.0
-India,under_five_hhtb,2024,6H,6H_scale_up,82.5
-India,under_five_hhtb,2025,6H,6H_scale_up,85.0
-Philippines,under_five_hhtb,2019,6H,6H_scale_up,0.0
-Philippines,under_five_hhtb,2020,6H,6H_scale_up,25.33
-Philippines,under_five_hhtb,2021,6H,6H_scale_up,50.67
-Philippines,under_five_hhtb,2022,6H,6H_scale_up,76.0
-Philippines,under_five_hhtb,2023,6H,6H_scale_up,77.67
-Philippines,under_five_hhtb,2024,6H,6H_scale_up,79.34
-Philippines,under_five_hhtb,2025,6H,6H_scale_up,81.0
-Ethiopia,under_five_hhtb,2019,6H,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2020,6H,6H_scale_up,8.0
-Ethiopia,under_five_hhtb,2021,6H,6H_scale_up,11.0
-Ethiopia,under_five_hhtb,2022,6H,6H_scale_up,7.25
-Ethiopia,under_five_hhtb,2023,6H,6H_scale_up,3.5
-Ethiopia,under_five_hhtb,2024,6H,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2025,6H,6H_scale_up,0.0
-Peru,under_five_hhtb,2019,6H,6H_scale_up,0.0
-Peru,under_five_hhtb,2020,6H,6H_scale_up,8.0
-Peru,under_five_hhtb,2021,6H,6H_scale_up,16.0
-Peru,under_five_hhtb,2022,6H,6H_scale_up,24.0
-Peru,under_five_hhtb,2023,6H,6H_scale_up,32.0
-Peru,under_five_hhtb,2024,6H,6H_scale_up,39.0
-Peru,under_five_hhtb,2025,6H,6H_scale_up,48.0
-South Africa,with_hiv,2019,6H,6H_scale_up,0.0
-South Africa,with_hiv,2020,6H,6H_scale_up,0.45000000000000284
-South Africa,with_hiv,2021,6H,6H_scale_up,0.9000000000000057
-South Africa,with_hiv,2022,6H,6H_scale_up,0.0
-South Africa,with_hiv,2023,6H,6H_scale_up,0.0
-South Africa,with_hiv,2024,6H,6H_scale_up,0.0
-South Africa,with_hiv,2025,6H,6H_scale_up,0.0
-India,with_hiv,2019,6H,6H_scale_up,0.0
-India,with_hiv,2020,6H,6H_scale_up,30.98
-India,with_hiv,2021,6H,6H_scale_up,34.83
-India,with_hiv,2022,6H,6H_scale_up,38.68
-India,with_hiv,2023,6H,6H_scale_up,42.53
-India,with_hiv,2024,6H,6H_scale_up,38.88
-India,with_hiv,2025,6H,6H_scale_up,35.23
-Philippines,with_hiv,2019,6H,6H_scale_up,0.0
-Philippines,with_hiv,2020,6H,6H_scale_up,15.670000000000002
-Philippines,with_hiv,2021,6H,6H_scale_up,31.33
-Philippines,with_hiv,2022,6H,6H_scale_up,47.0
-Philippines,with_hiv,2023,6H,6H_scale_up,48.67
-Philippines,with_hiv,2024,6H,6H_scale_up,50.34
-Philippines,with_hiv,2025,6H,6H_scale_up,52.0
-Ethiopia,with_hiv,2019,6H,6H_scale_up,0.0
-Ethiopia,with_hiv,2020,6H,6H_scale_up,19.0
-Ethiopia,with_hiv,2021,6H,6H_scale_up,21.0
-Ethiopia,with_hiv,2022,6H,6H_scale_up,20.75
-Ethiopia,with_hiv,2023,6H,6H_scale_up,20.5
-Ethiopia,with_hiv,2024,6H,6H_scale_up,20.25
-Ethiopia,with_hiv,2025,6H,6H_scale_up,20.0
-Peru,with_hiv,2019,6H,6H_scale_up,0.0
-Peru,with_hiv,2020,6H,6H_scale_up,14.329999999999998
-Peru,with_hiv,2021,6H,6H_scale_up,28.67
-Peru,with_hiv,2022,6H,6H_scale_up,43.0
-Peru,with_hiv,2023,6H,6H_scale_up,57.33
-Peru,with_hiv,2024,6H,6H_scale_up,71.67
-Peru,with_hiv,2025,6H,6H_scale_up,86.0
-South Africa,under_five_hhtb,2019,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2020,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2021,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2022,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2023,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2024,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2025,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2019,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2020,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2021,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2022,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2023,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2024,3HP,6H_scale_up,0.0
-India,under_five_hhtb,2025,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2019,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2020,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2021,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2022,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2023,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2024,3HP,6H_scale_up,0.0
-Philippines,under_five_hhtb,2025,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2019,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2020,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2021,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2022,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2023,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2024,3HP,6H_scale_up,0.0
-Ethiopia,under_five_hhtb,2025,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2019,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2020,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2021,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2022,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2023,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2024,3HP,6H_scale_up,0.0
-Peru,under_five_hhtb,2025,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2019,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2020,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2021,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2022,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2023,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2024,3HP,6H_scale_up,0.0
-South Africa,with_hiv,2025,3HP,6H_scale_up,0.0
-India,with_hiv,2019,3HP,6H_scale_up,0.0
-India,with_hiv,2020,3HP,6H_scale_up,0.0
-India,with_hiv,2021,3HP,6H_scale_up,0.0
-India,with_hiv,2022,3HP,6H_scale_up,0.0
-India,with_hiv,2023,3HP,6H_scale_up,0.0
-India,with_hiv,2024,3HP,6H_scale_up,0.0
-India,with_hiv,2025,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2019,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2020,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2021,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2022,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2023,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2024,3HP,6H_scale_up,0.0
-Philippines,with_hiv,2025,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2019,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2020,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2021,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2022,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2023,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2024,3HP,6H_scale_up,0.0
-Ethiopia,with_hiv,2025,3HP,6H_scale_up,0.0
-Peru,with_hiv,2019,3HP,6H_scale_up,0.0
-Peru,with_hiv,2020,3HP,6H_scale_up,0.0
-Peru,with_hiv,2021,3HP,6H_scale_up,0.0
-Peru,with_hiv,2022,3HP,6H_scale_up,0.0
-Peru,with_hiv,2023,3HP,6H_scale_up,0.0
-Peru,with_hiv,2024,3HP,6H_scale_up,0.0
-Peru,with_hiv,2025,3HP,6H_scale_up,0.0
-South Africa,under_five_hhtb,2019,6H,3HP_scale_up,0.0
-South Africa,under_five_hhtb,2020,6H,3HP_scale_up,-59.0
-South Africa,under_five_hhtb,2021,6H,3HP_scale_up,-59.0
-South Africa,under_five_hhtb,2022,6H,3HP_scale_up,-59.0
-South Africa,under_five_hhtb,2023,6H,3HP_scale_up,-59.0
-South Africa,under_five_hhtb,2024,6H,3HP_scale_up,-59.0
-South Africa,under_five_hhtb,2025,6H,3HP_scale_up,-59.0
-India,under_five_hhtb,2019,6H,3HP_scale_up,0.0
-India,under_five_hhtb,2020,6H,3HP_scale_up,-10.0
-India,under_five_hhtb,2021,6H,3HP_scale_up,-10.0
-India,under_five_hhtb,2022,6H,3HP_scale_up,-10.0
-India,under_five_hhtb,2023,6H,3HP_scale_up,-10.0
-India,under_five_hhtb,2024,6H,3HP_scale_up,-10.0
-India,under_five_hhtb,2025,6H,3HP_scale_up,-10.0
-Philippines,under_five_hhtb,2019,6H,3HP_scale_up,0.0
-Philippines,under_five_hhtb,2020,6H,3HP_scale_up,-14.0
-Philippines,under_five_hhtb,2021,6H,3HP_scale_up,-14.0
-Philippines,under_five_hhtb,2022,6H,3HP_scale_up,-14.0
-Philippines,under_five_hhtb,2023,6H,3HP_scale_up,-14.0
-Philippines,under_five_hhtb,2024,6H,3HP_scale_up,-14.0
-Philippines,under_five_hhtb,2025,6H,3HP_scale_up,-14.0
-Ethiopia,under_five_hhtb,2019,6H,3HP_scale_up,0.0
-Ethiopia,under_five_hhtb,2020,6H,3HP_scale_up,-44.0
-Ethiopia,under_five_hhtb,2021,6H,3HP_scale_up,-55.0
-Ethiopia,under_five_hhtb,2022,6H,3HP_scale_up,-66.0
-Ethiopia,under_five_hhtb,2023,6H,3HP_scale_up,-77.0
-Ethiopia,under_five_hhtb,2024,6H,3HP_scale_up,-88.0
-Ethiopia,under_five_hhtb,2025,6H,3HP_scale_up,-95.0
-Peru,under_five_hhtb,2019,6H,3HP_scale_up,0.0
-Peru,under_five_hhtb,2020,6H,3HP_scale_up,-47.0
-Peru,under_five_hhtb,2021,6H,3HP_scale_up,-47.0
-Peru,under_five_hhtb,2022,6H,3HP_scale_up,-47.0
-Peru,under_five_hhtb,2023,6H,3HP_scale_up,-47.0
-Peru,under_five_hhtb,2024,6H,3HP_scale_up,-47.0
-Peru,under_five_hhtb,2025,6H,3HP_scale_up,-47.0
-South Africa,with_hiv,2019,6H,3HP_scale_up,0.0
-South Africa,with_hiv,2020,6H,3HP_scale_up,-80.80000000000001
-South Africa,with_hiv,2021,6H,3HP_scale_up,-89.1
-South Africa,with_hiv,2022,6H,3HP_scale_up,-95.0
-South Africa,with_hiv,2023,6H,3HP_scale_up,-95.0
-South Africa,with_hiv,2024,6H,3HP_scale_up,-95.0
-South Africa,with_hiv,2025,6H,3HP_scale_up,-95.0
-India,with_hiv,2019,6H,3HP_scale_up,0.0
-India,with_hiv,2020,6H,3HP_scale_up,-29.019999999999996
-India,with_hiv,2021,6H,3HP_scale_up,-35.17
-India,with_hiv,2022,6H,3HP_scale_up,-41.31999999999999
-India,with_hiv,2023,6H,3HP_scale_up,-47.47
-India,with_hiv,2024,6H,3HP_scale_up,-53.620000000000005
-India,with_hiv,2025,6H,3HP_scale_up,-59.77000000000001
-Philippines,with_hiv,2019,6H,3HP_scale_up,0.0
-Philippines,with_hiv,2020,6H,3HP_scale_up,-43.0
-Philippines,with_hiv,2021,6H,3HP_scale_up,-43.0
-Philippines,with_hiv,2022,6H,3HP_scale_up,-43.0
-Philippines,with_hiv,2023,6H,3HP_scale_up,-43.000000000000014
-Philippines,with_hiv,2024,6H,3HP_scale_up,-43.0
-Philippines,with_hiv,2025,6H,3HP_scale_up,-43.0
-Ethiopia,with_hiv,2019,6H,3HP_scale_up,0.0
-Ethiopia,with_hiv,2020,6H,3HP_scale_up,-55.0
-Ethiopia,with_hiv,2021,6H,3HP_scale_up,-59.0
-Ethiopia,with_hiv,2022,6H,3HP_scale_up,-63.0
-Ethiopia,with_hiv,2023,6H,3HP_scale_up,-67.0
-Ethiopia,with_hiv,2024,6H,3HP_scale_up,-71.0
-Ethiopia,with_hiv,2025,6H,3HP_scale_up,-75.0
-Peru,with_hiv,2019,6H,3HP_scale_up,0.0
-Peru,with_hiv,2020,6H,3HP_scale_up,-9.0
-Peru,with_hiv,2021,6H,3HP_scale_up,-9.0
-Peru,with_hiv,2022,6H,3HP_scale_up,-9.0
-Peru,with_hiv,2023,6H,3HP_scale_up,-9.0
-Peru,with_hiv,2024,6H,3HP_scale_up,-9.0
-Peru,with_hiv,2025,6H,3HP_scale_up,-9.0
-South Africa,under_five_hhtb,2019,3HP,3HP_scale_up,0.0
-South Africa,under_five_hhtb,2020,3HP,3HP_scale_up,74.5
-South Africa,under_five_hhtb,2021,3HP,3HP_scale_up,90.0
-South Africa,under_five_hhtb,2022,3HP,3HP_scale_up,91.25
-South Africa,under_five_hhtb,2023,3HP,3HP_scale_up,92.5
-South Africa,under_five_hhtb,2024,3HP,3HP_scale_up,93.75
-South Africa,under_five_hhtb,2025,3HP,3HP_scale_up,95.0
-India,under_five_hhtb,2019,3HP,3HP_scale_up,0.0
-India,under_five_hhtb,2020,3HP,3HP_scale_up,60.0
-India,under_five_hhtb,2021,3HP,3HP_scale_up,70.0
-India,under_five_hhtb,2022,3HP,3HP_scale_up,80.0
-India,under_five_hhtb,2023,3HP,3HP_scale_up,90.0
-India,under_five_hhtb,2024,3HP,3HP_scale_up,92.5
-India,under_five_hhtb,2025,3HP,3HP_scale_up,95.0
-Philippines,under_five_hhtb,2019,3HP,3HP_scale_up,0.0
-Philippines,under_five_hhtb,2020,3HP,3HP_scale_up,39.33
-Philippines,under_five_hhtb,2021,3HP,3HP_scale_up,64.67
-Philippines,under_five_hhtb,2022,3HP,3HP_scale_up,90.0
-Philippines,under_five_hhtb,2023,3HP,3HP_scale_up,91.67
-Philippines,under_five_hhtb,2024,3HP,3HP_scale_up,93.34
-Philippines,under_five_hhtb,2025,3HP,3HP_scale_up,95.0
-Ethiopia,under_five_hhtb,2019,3HP,3HP_scale_up,0.0
-Ethiopia,under_five_hhtb,2020,3HP,3HP_scale_up,52.0
-Ethiopia,under_five_hhtb,2021,3HP,3HP_scale_up,66.0
-Ethiopia,under_five_hhtb,2022,3HP,3HP_scale_up,73.25
-Ethiopia,under_five_hhtb,2023,3HP,3HP_scale_up,80.5
-Ethiopia,under_five_hhtb,2024,3HP,3HP_scale_up,87.75
-Ethiopia,under_five_hhtb,2025,3HP,3HP_scale_up,95.0
-Peru,under_five_hhtb,2019,3HP,3HP_scale_up,0.0
-Peru,under_five_hhtb,2020,3HP,3HP_scale_up,55.0
-Peru,under_five_hhtb,2021,3HP,3HP_scale_up,63.0
-Peru,under_five_hhtb,2022,3HP,3HP_scale_up,71.0
-Peru,under_five_hhtb,2023,3HP,3HP_scale_up,79.0
-Peru,under_five_hhtb,2024,3HP,3HP_scale_up,86.0
-Peru,under_five_hhtb,2025,3HP,3HP_scale_up,95.0
-South Africa,with_hiv,2019,3HP,3HP_scale_up,0.0
-South Africa,with_hiv,2020,3HP,3HP_scale_up,81.25
-South Africa,with_hiv,2021,3HP,3HP_scale_up,90.0
-South Africa,with_hiv,2022,3HP,3HP_scale_up,95.0
-South Africa,with_hiv,2023,3HP,3HP_scale_up,95.0
-South Africa,with_hiv,2024,3HP,3HP_scale_up,95.0
-South Africa,with_hiv,2025,3HP,3HP_scale_up,95.0
-India,with_hiv,2019,3HP,3HP_scale_up,0.0
-India,with_hiv,2020,3HP,3HP_scale_up,60.0
-India,with_hiv,2021,3HP,3HP_scale_up,70.0
-India,with_hiv,2022,3HP,3HP_scale_up,80.0
-India,with_hiv,2023,3HP,3HP_scale_up,90.0
-India,with_hiv,2024,3HP,3HP_scale_up,92.5
-India,with_hiv,2025,3HP,3HP_scale_up,95.0
-Philippines,with_hiv,2019,3HP,3HP_scale_up,0.0
-Philippines,with_hiv,2020,3HP,3HP_scale_up,58.67
-Philippines,with_hiv,2021,3HP,3HP_scale_up,74.33
-Philippines,with_hiv,2022,3HP,3HP_scale_up,90.0
-Philippines,with_hiv,2023,3HP,3HP_scale_up,91.67
-Philippines,with_hiv,2024,3HP,3HP_scale_up,93.34
-Philippines,with_hiv,2025,3HP,3HP_scale_up,95.0
-Ethiopia,with_hiv,2019,3HP,3HP_scale_up,0.0
-Ethiopia,with_hiv,2020,3HP,3HP_scale_up,74.0
-Ethiopia,with_hiv,2021,3HP,3HP_scale_up,80.0
-Ethiopia,with_hiv,2022,3HP,3HP_scale_up,83.75
-Ethiopia,with_hiv,2023,3HP,3HP_scale_up,87.5
-Ethiopia,with_hiv,2024,3HP,3HP_scale_up,91.25
-Ethiopia,with_hiv,2025,3HP,3HP_scale_up,95.0
-Peru,with_hiv,2019,3HP,3HP_scale_up,0.0
-Peru,with_hiv,2020,3HP,3HP_scale_up,23.33
-Peru,with_hiv,2021,3HP,3HP_scale_up,37.67
-Peru,with_hiv,2022,3HP,3HP_scale_up,52.0
-Peru,with_hiv,2023,3HP,3HP_scale_up,66.33
-Peru,with_hiv,2024,3HP,3HP_scale_up,80.67
-Peru,with_hiv,2025,3HP,3HP_scale_up,95.0
+location,treatment_subgroup,year,medication,scenario,value,age_start,age_end
+South Africa,under_five_hhtb,2019,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2021,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2022,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2023,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2024,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2025,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2019,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2020,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2021,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2022,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2023,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2024,6H,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2025,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2019,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2021,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2022,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2023,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2024,6H,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2025,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2023,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2024,6H,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2025,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2021,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2022,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2023,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2024,6H,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2025,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2019,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2020,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2021,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2022,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2023,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2024,6H,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2025,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2019,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2020,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2021,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2022,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2023,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2024,6H,baseline,0.0,0.0,2.0
+India,with_hiv,2025,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2019,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2020,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2021,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2022,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2023,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2024,6H,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2025,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2019,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2021,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2022,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2023,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2024,6H,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2025,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2019,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2020,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2021,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2022,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2023,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2024,6H,baseline,0.0,0.0,2.0
+Peru,with_hiv,2025,6H,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2019,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2021,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2022,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2023,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2024,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2025,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2019,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2020,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2021,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2022,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2023,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2024,3HP,baseline,0.0,0.0,2.0
+India,under_five_hhtb,2025,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2019,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2021,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2022,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2023,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2024,3HP,baseline,0.0,0.0,2.0
+Philippines,under_five_hhtb,2025,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2023,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2024,3HP,baseline,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2025,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2021,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2022,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2023,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2024,3HP,baseline,0.0,0.0,2.0
+Peru,under_five_hhtb,2025,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2019,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2020,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2021,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2022,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2023,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2024,3HP,baseline,0.0,0.0,2.0
+South Africa,with_hiv,2025,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2019,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2020,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2021,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2022,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2023,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2024,3HP,baseline,0.0,0.0,2.0
+India,with_hiv,2025,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2019,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2020,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2021,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2022,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2023,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2024,3HP,baseline,0.0,0.0,2.0
+Philippines,with_hiv,2025,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2019,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2021,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2022,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2023,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2024,3HP,baseline,0.0,0.0,2.0
+Ethiopia,with_hiv,2025,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2019,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2020,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2021,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2022,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2023,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2024,3HP,baseline,0.0,0.0,2.0
+Peru,with_hiv,2025,3HP,baseline,0.0,0.0,2.0
+South Africa,under_five_hhtb,2019,6H,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,6H,6H_scale_up,15.5,0.0,2.0
+South Africa,under_five_hhtb,2021,6H,6H_scale_up,31.0,0.0,2.0
+South Africa,under_five_hhtb,2022,6H,6H_scale_up,32.25,0.0,2.0
+South Africa,under_five_hhtb,2023,6H,6H_scale_up,33.5,0.0,2.0
+South Africa,under_five_hhtb,2024,6H,6H_scale_up,34.75,0.0,2.0
+South Africa,under_five_hhtb,2025,6H,6H_scale_up,36.0,0.0,2.0
+India,under_five_hhtb,2019,6H,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2020,6H,6H_scale_up,50.0,0.0,2.0
+India,under_five_hhtb,2021,6H,6H_scale_up,60.0,0.0,2.0
+India,under_five_hhtb,2022,6H,6H_scale_up,70.0,0.0,2.0
+India,under_five_hhtb,2023,6H,6H_scale_up,80.0,0.0,2.0
+India,under_five_hhtb,2024,6H,6H_scale_up,82.5,0.0,2.0
+India,under_five_hhtb,2025,6H,6H_scale_up,85.0,0.0,2.0
+Philippines,under_five_hhtb,2019,6H,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,6H,6H_scale_up,25.33,0.0,2.0
+Philippines,under_five_hhtb,2021,6H,6H_scale_up,50.67,0.0,2.0
+Philippines,under_five_hhtb,2022,6H,6H_scale_up,76.0,0.0,2.0
+Philippines,under_five_hhtb,2023,6H,6H_scale_up,77.67,0.0,2.0
+Philippines,under_five_hhtb,2024,6H,6H_scale_up,79.34,0.0,2.0
+Philippines,under_five_hhtb,2025,6H,6H_scale_up,81.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,6H,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,6H,6H_scale_up,8.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,6H,6H_scale_up,11.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,6H,6H_scale_up,7.25,0.0,2.0
+Ethiopia,under_five_hhtb,2023,6H,6H_scale_up,3.5,0.0,2.0
+Ethiopia,under_five_hhtb,2024,6H,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2025,6H,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,6H,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,6H,6H_scale_up,8.0,0.0,2.0
+Peru,under_five_hhtb,2021,6H,6H_scale_up,16.0,0.0,2.0
+Peru,under_five_hhtb,2022,6H,6H_scale_up,24.0,0.0,2.0
+Peru,under_five_hhtb,2023,6H,6H_scale_up,32.0,0.0,2.0
+Peru,under_five_hhtb,2024,6H,6H_scale_up,39.0,0.0,2.0
+Peru,under_five_hhtb,2025,6H,6H_scale_up,48.0,0.0,2.0
+South Africa,with_hiv,2019,6H,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2020,6H,6H_scale_up,0.4500000000000029,0.0,2.0
+South Africa,with_hiv,2021,6H,6H_scale_up,0.9000000000000057,0.0,2.0
+South Africa,with_hiv,2022,6H,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2023,6H,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2024,6H,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2025,6H,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2019,6H,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2020,6H,6H_scale_up,30.98,0.0,2.0
+India,with_hiv,2021,6H,6H_scale_up,34.83,0.0,2.0
+India,with_hiv,2022,6H,6H_scale_up,38.68,0.0,2.0
+India,with_hiv,2023,6H,6H_scale_up,42.53,0.0,2.0
+India,with_hiv,2024,6H,6H_scale_up,38.88,0.0,2.0
+India,with_hiv,2025,6H,6H_scale_up,35.23,0.0,2.0
+Philippines,with_hiv,2019,6H,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2020,6H,6H_scale_up,15.670000000000002,0.0,2.0
+Philippines,with_hiv,2021,6H,6H_scale_up,31.33,0.0,2.0
+Philippines,with_hiv,2022,6H,6H_scale_up,47.0,0.0,2.0
+Philippines,with_hiv,2023,6H,6H_scale_up,48.67,0.0,2.0
+Philippines,with_hiv,2024,6H,6H_scale_up,50.34,0.0,2.0
+Philippines,with_hiv,2025,6H,6H_scale_up,52.0,0.0,2.0
+Ethiopia,with_hiv,2019,6H,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,6H,6H_scale_up,19.0,0.0,2.0
+Ethiopia,with_hiv,2021,6H,6H_scale_up,21.0,0.0,2.0
+Ethiopia,with_hiv,2022,6H,6H_scale_up,20.75,0.0,2.0
+Ethiopia,with_hiv,2023,6H,6H_scale_up,20.5,0.0,2.0
+Ethiopia,with_hiv,2024,6H,6H_scale_up,20.25,0.0,2.0
+Ethiopia,with_hiv,2025,6H,6H_scale_up,20.0,0.0,2.0
+Peru,with_hiv,2019,6H,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2020,6H,6H_scale_up,14.329999999999998,0.0,2.0
+Peru,with_hiv,2021,6H,6H_scale_up,28.67,0.0,2.0
+Peru,with_hiv,2022,6H,6H_scale_up,43.0,0.0,2.0
+Peru,with_hiv,2023,6H,6H_scale_up,57.33,0.0,2.0
+Peru,with_hiv,2024,6H,6H_scale_up,71.67,0.0,2.0
+Peru,with_hiv,2025,6H,6H_scale_up,86.0,0.0,2.0
+South Africa,under_five_hhtb,2019,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2021,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2022,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2023,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2024,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2025,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2019,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2020,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2021,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2022,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2023,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2024,3HP,6H_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2025,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2019,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2020,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2021,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2022,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2023,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2024,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2025,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2019,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2020,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2021,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2022,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2023,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2024,3HP,6H_scale_up,0.0,0.0,2.0
+India,with_hiv,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2025,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2019,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2020,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2021,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2022,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2023,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2024,3HP,6H_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2025,3HP,6H_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2019,6H,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,6H,3HP_scale_up,15.5,0.0,2.0
+South Africa,under_five_hhtb,2021,6H,3HP_scale_up,31.0,0.0,2.0
+South Africa,under_five_hhtb,2022,6H,3HP_scale_up,32.25,0.0,2.0
+South Africa,under_five_hhtb,2023,6H,3HP_scale_up,33.5,0.0,2.0
+South Africa,under_five_hhtb,2024,6H,3HP_scale_up,34.75,0.0,2.0
+South Africa,under_five_hhtb,2025,6H,3HP_scale_up,36.0,0.0,2.0
+India,under_five_hhtb,2019,6H,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2020,6H,3HP_scale_up,50.0,0.0,2.0
+India,under_five_hhtb,2021,6H,3HP_scale_up,60.0,0.0,2.0
+India,under_five_hhtb,2022,6H,3HP_scale_up,70.0,0.0,2.0
+India,under_five_hhtb,2023,6H,3HP_scale_up,80.0,0.0,2.0
+India,under_five_hhtb,2024,6H,3HP_scale_up,82.5,0.0,2.0
+India,under_five_hhtb,2025,6H,3HP_scale_up,85.0,0.0,2.0
+Philippines,under_five_hhtb,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,6H,3HP_scale_up,25.33,0.0,2.0
+Philippines,under_five_hhtb,2021,6H,3HP_scale_up,50.67,0.0,2.0
+Philippines,under_five_hhtb,2022,6H,3HP_scale_up,76.0,0.0,2.0
+Philippines,under_five_hhtb,2023,6H,3HP_scale_up,77.67,0.0,2.0
+Philippines,under_five_hhtb,2024,6H,3HP_scale_up,79.34,0.0,2.0
+Philippines,under_five_hhtb,2025,6H,3HP_scale_up,81.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,6H,3HP_scale_up,8.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,6H,3HP_scale_up,11.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,6H,3HP_scale_up,7.25,0.0,2.0
+Ethiopia,under_five_hhtb,2023,6H,3HP_scale_up,3.5,0.0,2.0
+Ethiopia,under_five_hhtb,2024,6H,3HP_scale_up,-0.25,0.0,2.0
+Ethiopia,under_five_hhtb,2025,6H,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,6H,3HP_scale_up,8.0,0.0,2.0
+Peru,under_five_hhtb,2021,6H,3HP_scale_up,16.0,0.0,2.0
+Peru,under_five_hhtb,2022,6H,3HP_scale_up,24.0,0.0,2.0
+Peru,under_five_hhtb,2023,6H,3HP_scale_up,32.0,0.0,2.0
+Peru,under_five_hhtb,2024,6H,3HP_scale_up,39.0,0.0,2.0
+Peru,under_five_hhtb,2025,6H,3HP_scale_up,48.0,0.0,2.0
+South Africa,with_hiv,2019,6H,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2020,6H,3HP_scale_up,0.4499999999999744,0.0,2.0
+South Africa,with_hiv,2021,6H,3HP_scale_up,0.9000000000000057,0.0,2.0
+South Africa,with_hiv,2022,6H,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2023,6H,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2024,6H,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2025,6H,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2019,6H,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2020,6H,3HP_scale_up,30.98,0.0,2.0
+India,with_hiv,2021,6H,3HP_scale_up,34.83,0.0,2.0
+India,with_hiv,2022,6H,3HP_scale_up,38.68000000000001,0.0,2.0
+India,with_hiv,2023,6H,3HP_scale_up,42.53,0.0,2.0
+India,with_hiv,2024,6H,3HP_scale_up,38.87999999999999,0.0,2.0
+India,with_hiv,2025,6H,3HP_scale_up,35.22999999999999,0.0,2.0
+Philippines,with_hiv,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2020,6H,3HP_scale_up,15.670000000000002,0.0,2.0
+Philippines,with_hiv,2021,6H,3HP_scale_up,31.33,0.0,2.0
+Philippines,with_hiv,2022,6H,3HP_scale_up,47.0,0.0,2.0
+Philippines,with_hiv,2023,6H,3HP_scale_up,48.66999999999998,0.0,2.0
+Philippines,with_hiv,2024,6H,3HP_scale_up,50.34,0.0,2.0
+Philippines,with_hiv,2025,6H,3HP_scale_up,52.0,0.0,2.0
+Ethiopia,with_hiv,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,6H,3HP_scale_up,19.0,0.0,2.0
+Ethiopia,with_hiv,2021,6H,3HP_scale_up,21.0,0.0,2.0
+Ethiopia,with_hiv,2022,6H,3HP_scale_up,20.75,0.0,2.0
+Ethiopia,with_hiv,2023,6H,3HP_scale_up,20.5,0.0,2.0
+Ethiopia,with_hiv,2024,6H,3HP_scale_up,20.25,0.0,2.0
+Ethiopia,with_hiv,2025,6H,3HP_scale_up,20.0,0.0,2.0
+Peru,with_hiv,2019,6H,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2020,6H,3HP_scale_up,14.329999999999998,0.0,2.0
+Peru,with_hiv,2021,6H,3HP_scale_up,28.67,0.0,2.0
+Peru,with_hiv,2022,6H,3HP_scale_up,43.0,0.0,2.0
+Peru,with_hiv,2023,6H,3HP_scale_up,57.33,0.0,2.0
+Peru,with_hiv,2024,6H,3HP_scale_up,71.67,0.0,2.0
+Peru,with_hiv,2025,6H,3HP_scale_up,86.0,0.0,2.0
+South Africa,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+India,under_five_hhtb,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,under_five_hhtb,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,under_five_hhtb,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,under_five_hhtb,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,with_hiv,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+India,with_hiv,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Philippines,with_hiv,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Ethiopia,with_hiv,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2019,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2020,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2021,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2022,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2023,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2024,3HP,3HP_scale_up,0.0,0.0,2.0
+Peru,with_hiv,2025,3HP,3HP_scale_up,0.0,0.0,2.0
+South Africa,under_five_hhtb,2019,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2021,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2022,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2023,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2024,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2025,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2019,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2020,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2021,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2022,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2023,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2024,6H,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2025,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2019,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2021,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2022,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2023,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2024,6H,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2025,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2023,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2024,6H,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2025,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2019,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2021,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2022,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2023,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2024,6H,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2025,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2019,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2020,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2021,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2022,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2023,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2024,6H,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2025,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2019,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2020,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2021,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2022,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2023,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2024,6H,baseline,0.0,2.0,125.0
+India,with_hiv,2025,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2019,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2020,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2021,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2022,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2023,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2024,6H,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2025,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2019,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2021,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2022,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2023,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2024,6H,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2025,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2019,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2020,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2021,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2022,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2023,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2024,6H,baseline,0.0,2.0,125.0
+Peru,with_hiv,2025,6H,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2019,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2021,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2022,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2023,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2024,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2025,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2019,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2020,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2021,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2022,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2023,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2024,3HP,baseline,0.0,2.0,125.0
+India,under_five_hhtb,2025,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2019,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2021,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2022,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2023,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2024,3HP,baseline,0.0,2.0,125.0
+Philippines,under_five_hhtb,2025,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2023,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2024,3HP,baseline,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2025,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2019,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2021,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2022,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2023,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2024,3HP,baseline,0.0,2.0,125.0
+Peru,under_five_hhtb,2025,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2019,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2020,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2021,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2022,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2023,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2024,3HP,baseline,0.0,2.0,125.0
+South Africa,with_hiv,2025,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2019,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2020,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2021,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2022,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2023,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2024,3HP,baseline,0.0,2.0,125.0
+India,with_hiv,2025,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2019,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2020,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2021,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2022,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2023,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2024,3HP,baseline,0.0,2.0,125.0
+Philippines,with_hiv,2025,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2019,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2021,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2022,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2023,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2024,3HP,baseline,0.0,2.0,125.0
+Ethiopia,with_hiv,2025,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2019,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2020,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2021,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2022,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2023,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2024,3HP,baseline,0.0,2.0,125.0
+Peru,with_hiv,2025,3HP,baseline,0.0,2.0,125.0
+South Africa,under_five_hhtb,2019,6H,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,6H,6H_scale_up,15.5,2.0,125.0
+South Africa,under_five_hhtb,2021,6H,6H_scale_up,31.0,2.0,125.0
+South Africa,under_five_hhtb,2022,6H,6H_scale_up,32.25,2.0,125.0
+South Africa,under_five_hhtb,2023,6H,6H_scale_up,33.5,2.0,125.0
+South Africa,under_five_hhtb,2024,6H,6H_scale_up,34.75,2.0,125.0
+South Africa,under_five_hhtb,2025,6H,6H_scale_up,36.0,2.0,125.0
+India,under_five_hhtb,2019,6H,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2020,6H,6H_scale_up,50.0,2.0,125.0
+India,under_five_hhtb,2021,6H,6H_scale_up,60.0,2.0,125.0
+India,under_five_hhtb,2022,6H,6H_scale_up,70.0,2.0,125.0
+India,under_five_hhtb,2023,6H,6H_scale_up,80.0,2.0,125.0
+India,under_five_hhtb,2024,6H,6H_scale_up,82.5,2.0,125.0
+India,under_five_hhtb,2025,6H,6H_scale_up,85.0,2.0,125.0
+Philippines,under_five_hhtb,2019,6H,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,6H,6H_scale_up,25.33,2.0,125.0
+Philippines,under_five_hhtb,2021,6H,6H_scale_up,50.67,2.0,125.0
+Philippines,under_five_hhtb,2022,6H,6H_scale_up,76.0,2.0,125.0
+Philippines,under_five_hhtb,2023,6H,6H_scale_up,77.67,2.0,125.0
+Philippines,under_five_hhtb,2024,6H,6H_scale_up,79.34,2.0,125.0
+Philippines,under_five_hhtb,2025,6H,6H_scale_up,81.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,6H,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,6H,6H_scale_up,8.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,6H,6H_scale_up,11.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,6H,6H_scale_up,7.25,2.0,125.0
+Ethiopia,under_five_hhtb,2023,6H,6H_scale_up,3.5,2.0,125.0
+Ethiopia,under_five_hhtb,2024,6H,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2025,6H,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2019,6H,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,6H,6H_scale_up,8.0,2.0,125.0
+Peru,under_five_hhtb,2021,6H,6H_scale_up,16.0,2.0,125.0
+Peru,under_five_hhtb,2022,6H,6H_scale_up,24.0,2.0,125.0
+Peru,under_five_hhtb,2023,6H,6H_scale_up,32.0,2.0,125.0
+Peru,under_five_hhtb,2024,6H,6H_scale_up,39.0,2.0,125.0
+Peru,under_five_hhtb,2025,6H,6H_scale_up,48.0,2.0,125.0
+South Africa,with_hiv,2019,6H,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2020,6H,6H_scale_up,0.4500000000000029,2.0,125.0
+South Africa,with_hiv,2021,6H,6H_scale_up,0.9000000000000057,2.0,125.0
+South Africa,with_hiv,2022,6H,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2023,6H,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2024,6H,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2025,6H,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2019,6H,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2020,6H,6H_scale_up,30.98,2.0,125.0
+India,with_hiv,2021,6H,6H_scale_up,34.83,2.0,125.0
+India,with_hiv,2022,6H,6H_scale_up,38.68,2.0,125.0
+India,with_hiv,2023,6H,6H_scale_up,42.53,2.0,125.0
+India,with_hiv,2024,6H,6H_scale_up,38.88,2.0,125.0
+India,with_hiv,2025,6H,6H_scale_up,35.23,2.0,125.0
+Philippines,with_hiv,2019,6H,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2020,6H,6H_scale_up,15.670000000000002,2.0,125.0
+Philippines,with_hiv,2021,6H,6H_scale_up,31.33,2.0,125.0
+Philippines,with_hiv,2022,6H,6H_scale_up,47.0,2.0,125.0
+Philippines,with_hiv,2023,6H,6H_scale_up,48.67,2.0,125.0
+Philippines,with_hiv,2024,6H,6H_scale_up,50.34,2.0,125.0
+Philippines,with_hiv,2025,6H,6H_scale_up,52.0,2.0,125.0
+Ethiopia,with_hiv,2019,6H,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,6H,6H_scale_up,19.0,2.0,125.0
+Ethiopia,with_hiv,2021,6H,6H_scale_up,21.0,2.0,125.0
+Ethiopia,with_hiv,2022,6H,6H_scale_up,20.75,2.0,125.0
+Ethiopia,with_hiv,2023,6H,6H_scale_up,20.5,2.0,125.0
+Ethiopia,with_hiv,2024,6H,6H_scale_up,20.25,2.0,125.0
+Ethiopia,with_hiv,2025,6H,6H_scale_up,20.0,2.0,125.0
+Peru,with_hiv,2019,6H,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2020,6H,6H_scale_up,14.329999999999998,2.0,125.0
+Peru,with_hiv,2021,6H,6H_scale_up,28.67,2.0,125.0
+Peru,with_hiv,2022,6H,6H_scale_up,43.0,2.0,125.0
+Peru,with_hiv,2023,6H,6H_scale_up,57.33,2.0,125.0
+Peru,with_hiv,2024,6H,6H_scale_up,71.67,2.0,125.0
+Peru,with_hiv,2025,6H,6H_scale_up,86.0,2.0,125.0
+South Africa,under_five_hhtb,2019,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2021,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2022,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2023,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2024,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2025,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2019,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2020,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2021,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2022,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2023,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2024,3HP,6H_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2025,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2019,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2020,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2021,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2022,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2023,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2024,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2025,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2019,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2020,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2021,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2022,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2023,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2024,3HP,6H_scale_up,0.0,2.0,125.0
+India,with_hiv,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2025,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2019,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2020,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2021,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2022,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2023,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2024,3HP,6H_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2025,3HP,6H_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2019,6H,3HP_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,6H,3HP_scale_up,-59.0,2.0,125.0
+South Africa,under_five_hhtb,2021,6H,3HP_scale_up,-59.0,2.0,125.0
+South Africa,under_five_hhtb,2022,6H,3HP_scale_up,-59.0,2.0,125.0
+South Africa,under_five_hhtb,2023,6H,3HP_scale_up,-59.0,2.0,125.0
+South Africa,under_five_hhtb,2024,6H,3HP_scale_up,-59.0,2.0,125.0
+South Africa,under_five_hhtb,2025,6H,3HP_scale_up,-59.0,2.0,125.0
+India,under_five_hhtb,2019,6H,3HP_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2020,6H,3HP_scale_up,-10.0,2.0,125.0
+India,under_five_hhtb,2021,6H,3HP_scale_up,-10.0,2.0,125.0
+India,under_five_hhtb,2022,6H,3HP_scale_up,-10.0,2.0,125.0
+India,under_five_hhtb,2023,6H,3HP_scale_up,-10.0,2.0,125.0
+India,under_five_hhtb,2024,6H,3HP_scale_up,-10.0,2.0,125.0
+India,under_five_hhtb,2025,6H,3HP_scale_up,-10.0,2.0,125.0
+Philippines,under_five_hhtb,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,6H,3HP_scale_up,-14.0,2.0,125.0
+Philippines,under_five_hhtb,2021,6H,3HP_scale_up,-14.0,2.0,125.0
+Philippines,under_five_hhtb,2022,6H,3HP_scale_up,-14.0,2.0,125.0
+Philippines,under_five_hhtb,2023,6H,3HP_scale_up,-14.0,2.0,125.0
+Philippines,under_five_hhtb,2024,6H,3HP_scale_up,-14.0,2.0,125.0
+Philippines,under_five_hhtb,2025,6H,3HP_scale_up,-14.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,6H,3HP_scale_up,-44.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,6H,3HP_scale_up,-55.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,6H,3HP_scale_up,-66.0,2.0,125.0
+Ethiopia,under_five_hhtb,2023,6H,3HP_scale_up,-77.0,2.0,125.0
+Ethiopia,under_five_hhtb,2024,6H,3HP_scale_up,-88.0,2.0,125.0
+Ethiopia,under_five_hhtb,2025,6H,3HP_scale_up,-95.0,2.0,125.0
+Peru,under_five_hhtb,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,6H,3HP_scale_up,-47.0,2.0,125.0
+Peru,under_five_hhtb,2021,6H,3HP_scale_up,-47.0,2.0,125.0
+Peru,under_five_hhtb,2022,6H,3HP_scale_up,-47.0,2.0,125.0
+Peru,under_five_hhtb,2023,6H,3HP_scale_up,-47.0,2.0,125.0
+Peru,under_five_hhtb,2024,6H,3HP_scale_up,-47.0,2.0,125.0
+Peru,under_five_hhtb,2025,6H,3HP_scale_up,-47.0,2.0,125.0
+South Africa,with_hiv,2019,6H,3HP_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2020,6H,3HP_scale_up,-80.80000000000003,2.0,125.0
+South Africa,with_hiv,2021,6H,3HP_scale_up,-89.1,2.0,125.0
+South Africa,with_hiv,2022,6H,3HP_scale_up,-95.0,2.0,125.0
+South Africa,with_hiv,2023,6H,3HP_scale_up,-95.0,2.0,125.0
+South Africa,with_hiv,2024,6H,3HP_scale_up,-95.0,2.0,125.0
+South Africa,with_hiv,2025,6H,3HP_scale_up,-95.0,2.0,125.0
+India,with_hiv,2019,6H,3HP_scale_up,0.0,2.0,125.0
+India,with_hiv,2020,6H,3HP_scale_up,-29.02,2.0,125.0
+India,with_hiv,2021,6H,3HP_scale_up,-35.17,2.0,125.0
+India,with_hiv,2022,6H,3HP_scale_up,-41.31999999999999,2.0,125.0
+India,with_hiv,2023,6H,3HP_scale_up,-47.47,2.0,125.0
+India,with_hiv,2024,6H,3HP_scale_up,-53.62000000000001,2.0,125.0
+India,with_hiv,2025,6H,3HP_scale_up,-59.77000000000001,2.0,125.0
+Philippines,with_hiv,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2020,6H,3HP_scale_up,-43.0,2.0,125.0
+Philippines,with_hiv,2021,6H,3HP_scale_up,-43.0,2.0,125.0
+Philippines,with_hiv,2022,6H,3HP_scale_up,-43.0,2.0,125.0
+Philippines,with_hiv,2023,6H,3HP_scale_up,-43.00000000000002,2.0,125.0
+Philippines,with_hiv,2024,6H,3HP_scale_up,-43.0,2.0,125.0
+Philippines,with_hiv,2025,6H,3HP_scale_up,-43.0,2.0,125.0
+Ethiopia,with_hiv,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,6H,3HP_scale_up,-55.0,2.0,125.0
+Ethiopia,with_hiv,2021,6H,3HP_scale_up,-59.0,2.0,125.0
+Ethiopia,with_hiv,2022,6H,3HP_scale_up,-63.0,2.0,125.0
+Ethiopia,with_hiv,2023,6H,3HP_scale_up,-67.0,2.0,125.0
+Ethiopia,with_hiv,2024,6H,3HP_scale_up,-71.0,2.0,125.0
+Ethiopia,with_hiv,2025,6H,3HP_scale_up,-75.0,2.0,125.0
+Peru,with_hiv,2019,6H,3HP_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2020,6H,3HP_scale_up,-9.0,2.0,125.0
+Peru,with_hiv,2021,6H,3HP_scale_up,-9.0,2.0,125.0
+Peru,with_hiv,2022,6H,3HP_scale_up,-9.0,2.0,125.0
+Peru,with_hiv,2023,6H,3HP_scale_up,-9.0,2.0,125.0
+Peru,with_hiv,2024,6H,3HP_scale_up,-9.0,2.0,125.0
+Peru,with_hiv,2025,6H,3HP_scale_up,-9.0,2.0,125.0
+South Africa,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+South Africa,under_five_hhtb,2020,3HP,3HP_scale_up,74.5,2.0,125.0
+South Africa,under_five_hhtb,2021,3HP,3HP_scale_up,90.0,2.0,125.0
+South Africa,under_five_hhtb,2022,3HP,3HP_scale_up,91.25,2.0,125.0
+South Africa,under_five_hhtb,2023,3HP,3HP_scale_up,92.5,2.0,125.0
+South Africa,under_five_hhtb,2024,3HP,3HP_scale_up,93.75,2.0,125.0
+South Africa,under_five_hhtb,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+India,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+India,under_five_hhtb,2020,3HP,3HP_scale_up,60.0,2.0,125.0
+India,under_five_hhtb,2021,3HP,3HP_scale_up,70.0,2.0,125.0
+India,under_five_hhtb,2022,3HP,3HP_scale_up,80.0,2.0,125.0
+India,under_five_hhtb,2023,3HP,3HP_scale_up,90.0,2.0,125.0
+India,under_five_hhtb,2024,3HP,3HP_scale_up,92.5,2.0,125.0
+India,under_five_hhtb,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Philippines,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Philippines,under_five_hhtb,2020,3HP,3HP_scale_up,39.33,2.0,125.0
+Philippines,under_five_hhtb,2021,3HP,3HP_scale_up,64.67,2.0,125.0
+Philippines,under_five_hhtb,2022,3HP,3HP_scale_up,90.0,2.0,125.0
+Philippines,under_five_hhtb,2023,3HP,3HP_scale_up,91.67,2.0,125.0
+Philippines,under_five_hhtb,2024,3HP,3HP_scale_up,93.34,2.0,125.0
+Philippines,under_five_hhtb,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Ethiopia,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Ethiopia,under_five_hhtb,2020,3HP,3HP_scale_up,52.0,2.0,125.0
+Ethiopia,under_five_hhtb,2021,3HP,3HP_scale_up,66.0,2.0,125.0
+Ethiopia,under_five_hhtb,2022,3HP,3HP_scale_up,73.25,2.0,125.0
+Ethiopia,under_five_hhtb,2023,3HP,3HP_scale_up,80.5,2.0,125.0
+Ethiopia,under_five_hhtb,2024,3HP,3HP_scale_up,87.75,2.0,125.0
+Ethiopia,under_five_hhtb,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Peru,under_five_hhtb,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Peru,under_five_hhtb,2020,3HP,3HP_scale_up,55.0,2.0,125.0
+Peru,under_five_hhtb,2021,3HP,3HP_scale_up,63.0,2.0,125.0
+Peru,under_five_hhtb,2022,3HP,3HP_scale_up,71.0,2.0,125.0
+Peru,under_five_hhtb,2023,3HP,3HP_scale_up,79.0,2.0,125.0
+Peru,under_five_hhtb,2024,3HP,3HP_scale_up,86.0,2.0,125.0
+Peru,under_five_hhtb,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+South Africa,with_hiv,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+South Africa,with_hiv,2020,3HP,3HP_scale_up,81.25,2.0,125.0
+South Africa,with_hiv,2021,3HP,3HP_scale_up,90.0,2.0,125.0
+South Africa,with_hiv,2022,3HP,3HP_scale_up,95.0,2.0,125.0
+South Africa,with_hiv,2023,3HP,3HP_scale_up,95.0,2.0,125.0
+South Africa,with_hiv,2024,3HP,3HP_scale_up,95.0,2.0,125.0
+South Africa,with_hiv,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+India,with_hiv,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+India,with_hiv,2020,3HP,3HP_scale_up,60.0,2.0,125.0
+India,with_hiv,2021,3HP,3HP_scale_up,70.0,2.0,125.0
+India,with_hiv,2022,3HP,3HP_scale_up,80.0,2.0,125.0
+India,with_hiv,2023,3HP,3HP_scale_up,90.0,2.0,125.0
+India,with_hiv,2024,3HP,3HP_scale_up,92.5,2.0,125.0
+India,with_hiv,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Philippines,with_hiv,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Philippines,with_hiv,2020,3HP,3HP_scale_up,58.67,2.0,125.0
+Philippines,with_hiv,2021,3HP,3HP_scale_up,74.33,2.0,125.0
+Philippines,with_hiv,2022,3HP,3HP_scale_up,90.0,2.0,125.0
+Philippines,with_hiv,2023,3HP,3HP_scale_up,91.67,2.0,125.0
+Philippines,with_hiv,2024,3HP,3HP_scale_up,93.34,2.0,125.0
+Philippines,with_hiv,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Ethiopia,with_hiv,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Ethiopia,with_hiv,2020,3HP,3HP_scale_up,74.0,2.0,125.0
+Ethiopia,with_hiv,2021,3HP,3HP_scale_up,80.0,2.0,125.0
+Ethiopia,with_hiv,2022,3HP,3HP_scale_up,83.75,2.0,125.0
+Ethiopia,with_hiv,2023,3HP,3HP_scale_up,87.5,2.0,125.0
+Ethiopia,with_hiv,2024,3HP,3HP_scale_up,91.25,2.0,125.0
+Ethiopia,with_hiv,2025,3HP,3HP_scale_up,95.0,2.0,125.0
+Peru,with_hiv,2019,3HP,3HP_scale_up,0.0,2.0,125.0
+Peru,with_hiv,2020,3HP,3HP_scale_up,23.33,2.0,125.0
+Peru,with_hiv,2021,3HP,3HP_scale_up,37.67,2.0,125.0
+Peru,with_hiv,2022,3HP,3HP_scale_up,52.0,2.0,125.0
+Peru,with_hiv,2023,3HP,3HP_scale_up,66.33,2.0,125.0
+Peru,with_hiv,2024,3HP,3HP_scale_up,80.67,2.0,125.0
+Peru,with_hiv,2025,3HP,3HP_scale_up,95.0,2.0,125.0

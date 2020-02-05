@@ -78,6 +78,7 @@ class LTBITreatmentCoverage:
         treatment_type = pd.Series(np.array(coverage.columns)[choice_index], index=pop.index)
         newly_treated = treatment_type != 'untreated'  # those actually selected for treatment
         pop.loc[newly_treated, 'treatment_type'] = treatment_type
+
         pop.loc[newly_treated, 'treatment_date'] = self.clock()
         self.population_view.update(pop)
 
