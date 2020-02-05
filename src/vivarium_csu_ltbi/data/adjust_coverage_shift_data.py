@@ -40,10 +40,6 @@ def expand_to_age(df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    baseline = read_data("baseline_coverage_raw.csv")
-    baseline_expanded = expand_to_age(baseline)
-    write_data(baseline, "baseline_coverage.csv")
-
     coverage_shift = read_data("intervention_coverage_shift_raw.csv")
     coverage_shift_expanded = expand_to_age(coverage_shift)
     coverage_shift_adjusted = eliminate_3hp_under_two(coverage_shift_expanded)
