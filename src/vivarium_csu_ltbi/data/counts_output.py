@@ -220,3 +220,4 @@ def split_measures(data: pd.DataFrame) -> MeasureData:
     ylds = get_measure(data, 'ylds')
     tb_cases = get_tb_events(data)
     return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds, tb_cases)
+
