@@ -35,10 +35,10 @@ def process_latest_results(model_versions: Tuple[str] = None, location: str = No
         # TODO: Generalize to all non-draw columns?
         idx_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
         model_sum = model_1.set_index(idx_cols).add(model_2.set_index(idx_cols), fill_value=0.).reset_index()
-        count_aggregates = counts_output.make_aggregates(model_sum)
+        count_aggregates = counts_output.get_raw_counts(model_sum)
     else:
         data = load_data(results_paths[model_versions[0]])
-        count_aggregates = counts_output.make_aggregates(data)
+        count_aggregates = counts_output.get_raw_counts(data)
 
     measure_data = counts_output.split_measures(count_aggregates)
 
