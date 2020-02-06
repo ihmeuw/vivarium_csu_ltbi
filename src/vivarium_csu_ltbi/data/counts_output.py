@@ -61,6 +61,7 @@ def format_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_raw_counts(data: pd.DataFrame) -> pd.DataFrame:
+    data = format_data(data)
     labels = {'0_to_5': ['early_neonatal', 'late_neonatal', 'post_neonatal', '1_to_4'],
               '5_to_15': ['5_to_9', '10_to_14'],
               '15_to_60': ['15_to_19', '20_to_24', '25_to_29',
@@ -185,7 +186,7 @@ def aggregate_measure_by_cause(data: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([tb, hiv_other, other], ignore_index=True)
 
 
-def split_and_aggregate_person_time(data: pd.DataFrame) -> pd.DataFrame:
+def split_and_aggregate_person_time(data: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     drop = ['cause']
     groupby = ['draw', 'scenario', 'sex', 'year', 'age', 'treatment_group', 'risk_group']
 
@@ -212,8 +213,6 @@ def sort_data(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def split_measures(data: pd.DataFrame) -> MeasureData:
-    data = format_data(data)
-    data = get_raw_counts(data)
     deaths = get_measure(data, 'death')
     person_time, ltbi_person_time = get_person_time(data)
     ylls = get_measure(data, 'ylls')
