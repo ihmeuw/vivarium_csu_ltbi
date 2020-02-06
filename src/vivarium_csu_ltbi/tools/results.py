@@ -42,7 +42,7 @@ def main(model_version: str = None, location: str = None, preceding_results_num:
     logger.info("Calculating data for the final results table.")
     final_tables = table_output.make_tables(measure_data, location)
 
-    logger.info("Writing data for the final results table to csf and hdf formats.")
+    logger.info("Writing data for the final results table to csv and hdf formats.")
     final_tables.to_hdf(str(output_path / f"{model_version}_{location}_final_results.hdf"), mode='w', key='data')
     final_tables.to_csv(str(output_path / f"{model_version}_{location}_final_results.csv"))
 
