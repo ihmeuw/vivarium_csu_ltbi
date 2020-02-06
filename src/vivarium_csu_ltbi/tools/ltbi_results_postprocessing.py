@@ -4,15 +4,17 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from typing import NamedTuple
+from db_queries import get_ids
+from db_queries import get_population
 
 output_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
 
 def make_raw_aggregates(data):
     labels = {'0_to_5': ['early_neonatal', 'late_neonatal', 'post_neonatal', '1_to_4'],
               '5_to_15': ['5_to_9', '10_to_14'],
-              '15_to_60':['15_to_19', '20_to_24', '25_to_29',
-                          '30_to_34', '35_to_39', '40_to_44', 
-                          '45_to_49', '50_to_54', '55_to_59',],
+              '15_to_60': ['15_to_19', '20_to_24', '25_to_29',
+                           '30_to_34', '35_to_39', '40_to_44', 
+                           '45_to_49', '50_to_54', '55_to_59',],
               '60+': ['60_to_64', '65_to_69', '70_to_74', '75_to_79',
                       '80_to_84', '85_to_89', '90_to_94', '95_plus']}
     age_aggregates = []
@@ -50,6 +52,56 @@ def make_raw_aggregates(data):
     
     return data
 
+def get_national_population(location):
+    age_group_ids = list(range(2, 21)) + [30, 31, 32, 235]
+    age_table = get_ids('age_group')
+    age_table = age_table[age_table.age_group_id.isin(age_group_ids)]
+    age_table['age_group_name'] = age_table.age_group_name.map(lambda x: x.replace(' ', '_').lower())
+    age_group_dict = dict(zip(age_table.age_group_id, age_table.age_group_name))
+    
+    location_dict = {'ethiopia': 179, 'india': 163, 'peru': 123, 'philippines': 16, 'south_africa': 196}
+    pop = get_population(location_id=location_dict[location],
+                         age_group_id=age_group_ids,
+                         sex_id=[1,2],
+                         gbd_round_id=5)
+    pop['age'] = pop.age_group_id.map(age_group_dict)
+    pop['sex'] = pop.sex_id.map({1: 'male', 2: 'female'})
+    data = pop[['age', 'sex', 'population']]
+    
+    labels = {'0_to_5': ['early_neonatal', 'late_neonatal', 'post_neonatal', '1_to_4'],
+              '5_to_15': ['5_to_9', '10_to_14'],
+              '15_to_60': ['15_to_19', '20_to_24', '25_to_29',
+                           '30_to_34', '35_to_39', '40_to_44', 
+                           '45_to_49', '50_to_54', '55_to_59',],
+              '60+': ['60_to_64', '65_to_69', '70_to_74', '75_to_79',
+                      '80_to_84', '85_to_89', '90_to_94', '95_plus']}
+    age_aggregates = []
+    for group, ages in labels.items():
+        age_group = data[data.age.isin(ages)]
+        age_group = (age_group
+                     .groupby(['sex'])
+                     .sum()
+                     .reset_index())
+        age_group['age'] = group
+        age_aggregates.append(age_group)
+    data = pd.concat(age_aggregates)
+    
+    all_ages = (data
+                .groupby(['sex'])
+                .sum()
+                .reset_index())
+    all_ages['age'] = 'all'
+    data = pd.concat([data, all_ages])
+    
+    both_sexes = (data
+                  .groupby(['age'])
+                  .sum()
+                  .reset_index())
+    both_sexes['sex'] = 'all'
+    data = pd.concat([data, both_sexes])
+    
+    data['location'] = location
+    return data
 
 class MeasureData(NamedTuple):
     deaths: pd.DataFrame
@@ -58,6 +110,7 @@ class MeasureData(NamedTuple):
     ylls: pd.DataFrame
     ylds: pd.DataFrame
     tb_cases: pd.DataFrame
+    national_population: pd.DataFrame
     location: str
     
     
@@ -67,7 +120,8 @@ def split_measures(data, location):
     ylls = get_measure(data, 'ylls')
     ylds = get_measure(data, 'ylds')
     tb_cases = get_tb_events(data)
-    return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds, tb_cases, location)
+    national_population = get_national_population(location)
+    return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds, tb_cases, national_population, location)
     
 
 def get_measure(data, measure):
@@ -240,19 +294,12 @@ def make_coverage_table(mdata: MeasureData):
 def make_tb_table(mdata: MeasureData):
     counts = mdata.tb_cases
     counts['location'] = mdata.location
-    counts['outcome'] = 'actb_incidence_count'
-    counts = aggregate_over_treatment_group(counts)  # FIXME: need to get the national count, not the simulation count
-    
+    counts['outcome'] = 'actb_incidence_rate'
+    counts = aggregate_over_treatment_group(counts)
+
     delta_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'treatment_group', 'draw']
     delta = get_delta(counts, delta_join_columns)
-    
-    index_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'scenario', 'treatment_group']
-    raw_summary = pivot_and_summarize(counts, index_columns)
-    delta_summary = pivot_and_summarize(delta, index_columns, prefix='averted_')
-    counts_summary = pd.concat([raw_summary, delta_summary], axis=1)
-    
-    counts['outcome'] = 'actb_incidence_rate'
-    delta['outcome'] = 'actb_incidence_rate'
+
     pt = mdata.person_time.drop(columns='cause')
     pt['location'] = mdata.location
     pt['outcome'] = 'actb_incidence_rate'
@@ -267,8 +314,20 @@ def make_tb_table(mdata: MeasureData):
     delta_scaled_summary = pivot_and_summarize(delta_scaled, index_columns, prefix='averted_')
     scaled_summary = pd.concat([raw_scaled_summary, delta_scaled_summary], axis=1)
     
+    population = mdata.national_population
+    value_columns = ['mean', 'ub', 'lb', 'averted_mean', 'averted_ub', 'averted_lb']
+    counts_summary = scaled_summary.reset_index()
+    counts_summary['outcome'] = 'actb_incidence_count'
+    counts_summary = pd.merge(counts_summary,
+                              population,
+                              how='inner',
+                              on=['location', 'age', 'sex'])
+    counts_summary[value_columns] = (counts_summary[value_columns]
+                                     .mul(counts_summary['population'], axis='index')
+                                     .div(100_000))
+    counts_summary = counts_summary.drop(columns='population').set_index(index_columns)
+    
     return pd.concat([counts_summary, scaled_summary])
-
 
 def make_deaths_table(mdata: MeasureData):
     counts = mdata.deaths
