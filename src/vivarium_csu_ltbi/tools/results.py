@@ -21,7 +21,7 @@ def process_latest_results(model_versions: Tuple[str] = None, location: str = No
                            preceding_results_num: int = 0, output_path: str = None):
     validate_process_latest_results_args(model_versions, location)
 
-    location = location.lower()  # TODO(chorst): use sanitizing function
+    location = project_globals.formatted_location(location)
     results_paths = {mv: find_most_recent_results(mv, location, preceding_results_num) for mv in model_versions}
     output_path = get_output_path(model_versions, location, results_paths, output_path)
 
