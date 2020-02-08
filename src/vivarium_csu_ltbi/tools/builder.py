@@ -317,7 +317,7 @@ def write_baseline_coverage_levels(art, loc):
     write(art, 'risk_factor.ltbi_treatment.coverage', all_coverage, skip_interval_processing=True)
 
 
-def write_intevention_coverage_shift(artifact, location):
+def write_intervention_coverage_shift(artifact, location):
     import vivarium_csu_ltbi
     data_path = Path(vivarium_csu_ltbi.__file__).parent / 'data'
     logger.info(f"Reading intervention coverage shift from {data_path}")
@@ -328,13 +328,11 @@ def write_intevention_coverage_shift(artifact, location):
     data = data.set_index(['location'])
     data['value'] /= 100.
 
-    demog = get_demographic_dimensions(location)
-    demog = split_interval(demog, interval_column='age', split_column_prefix='age')
-    demog = demog.reset_index().drop(['year'], axis=1)
-    demog = demog.drop_duplicates()
-    demog = demog.set_index(['location'])
+    data['sex'] = 'Male'
+    females = data.copy()
+    females['sex'] = 'Female'
+    data = pd.concat([data, females], axis=0)
 
-    data = pd.merge(demog, data, left_index=True, right_index=True)
     data = data.set_index(
         ['sex', 'age_start', 'age_end', 'year_start', 'year_end', 'treatment_subgroup', 'treatment_type', 'scenario'],
         append=True)
@@ -446,8 +444,8 @@ def write_population_attributable_fraction_data(art, location):
 
     # 6H is the only treatment in the baseline, so no 3HP
     coverage = art.load("risk_factor.ltbi_treatment.coverage").reset_index(['treatment_subgroup',
-                                                                                  'treatment_type'])
-    coverage = coverage.loc[coverage['treatment_type']=='6H'].drop(['treatment_type'], axis=1)
+                                                                            'treatment_type'])
+    coverage = coverage.loc[coverage['treatment_type'] == '6H'].drop(['treatment_type'], axis=1)
     hiv_coverage = (coverage
                     .loc[coverage['treatment_subgroup'] == "with_hiv"]
                     .drop(['treatment_subgroup'], axis=1))
@@ -663,7 +661,7 @@ def build_ltbi_artifact(loc, output_dir=None):
     write_exposure_risk_data(art, data)
     write_baseline_coverage_levels(art, loc)
     write_adherence_data(art, loc)
-    write_intevention_coverage_shift(art, loc)
+    write_intervention_coverage_shift(art, loc)
     write_treatment_relative_risk_data(art, loc)
 
     # This depends on coverage, adherence, relative risk and hhtb exposure
