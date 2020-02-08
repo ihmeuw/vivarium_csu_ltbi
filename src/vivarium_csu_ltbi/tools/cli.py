@@ -25,7 +25,7 @@ from jinja2 import Template
 from loguru import logger
 
 from vivarium_csu_ltbi.tools import results
-from vivarium_csu_ltbi import globals as ltbi_globals
+from vivarium_csu_ltbi import globals as project_globals
 
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
@@ -169,7 +169,7 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
 
 @click.command()
 @click.argument('model_versions', nargs=-1, type=click.STRING, required=True)
-@click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
+@click.option('-l', '--location', type=click.Choice(project_globals.LOCATIONS))
 @click.option('-p', '--preceding-results', type=click.INT, default=0)
 @click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
 def make_results(model_versions, location, preceding_results, output_path):
