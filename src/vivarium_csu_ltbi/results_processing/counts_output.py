@@ -277,7 +277,7 @@ def sort_data(data: pd.DataFrame) -> pd.DataFrame:
     return data.set_index(column_order).sort_index().reset_index()
 
 
-def split_measures(data: pd.DataFrame) -> MeasureData:
+def split_measures(data: pd.DataFrame, location: str) -> MeasureData:
     deaths = get_measure(data, 'death')
     person_time, ltbi_person_time = get_person_time(data)
     ylls = get_measure(data, 'ylls')
