@@ -11,6 +11,11 @@ class MeasureData(NamedTuple):
     ylds: pd.DataFrame
     tb_cases: pd.DataFrame
 
+    def dump(self, output_path):
+        for name, df in self._asdict().items():
+            df.to_hdf(str(output_path / f"{name}_count_data.hdf"), mode='w', key='data')
+            df.to_csv(str(output_path / f"{name}_count_data.csv"))
+
 
 def get_year_from_template(template_string: str) -> str:
     return template_string.split('_among_')[0].split('_')[-1]
@@ -60,8 +65,13 @@ def format_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def sum_model_results(df: pd.DataFrame, other: pd.DataFrame) -> pd.DataFrame:
+    index_cols = ['draw', 'scenario', 'treatment_group', 'hhtb', 'age', 'sex', 'year', 'measure']
+    summation = df.set_index(index_cols).add(other.set_index(index_cols), fill_value=0).reset_index()
+    return summation
+
+
 def get_raw_counts(data: pd.DataFrame) -> pd.DataFrame:
-    data = format_data(data)
     labels = {'0_to_5': ['early_neonatal', 'late_neonatal', 'post_neonatal', '1_to_4'],
               '5_to_15': ['5_to_9', '10_to_14'],
               '15_to_60': ['15_to_19', '20_to_24', '25_to_29',

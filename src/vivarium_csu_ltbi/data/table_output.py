@@ -1,4 +1,5 @@
 import warnings
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -195,10 +196,24 @@ def make_person_time_table(mdata: MeasureData, location: str):
     return pd.concat([raw_summary, delta_summary], axis=1)
 
 
-def make_tables(measure_data: pd.DataFrame, location: str) -> pd.DataFrame:
-    loc_data = []
-    # TODO: Push into a function in the final table gen code
-    for f in [make_coverage_table, make_tb_table, make_deaths_table, make_dalys_table, make_person_time_table]:
-        loc_data.append(f(measure_data, location))
-    final_table = pd.concat(loc_data)
-    return final_table
+class FinalData(NamedTuple):
+    coverage: pd.DataFrame
+    tb: pd.DataFrame
+    deaths: pd.DataFrame
+    dalys: pd.DataFrame
+    person_time: pd.DataFrame
+
+    def dump(self, output_path):
+        for name, df in self._asdict().items():
+            df.to_hdf(str(output_path / f"{name}_final_table.hdf"), mode='w', key='data')
+            df.to_csv(str(output_path / f"{name}_final_table.csv"))
+
+
+def make_tables(measure_data: MeasureData, location: str) -> FinalData:
+    return FinalData(
+        coverage=make_coverage_table(measure_data, location),
+        tb=make_tb_table(measure_data, location),
+        deaths=make_deaths_table(measure_data, location),
+        dalys=make_dalys_table(measure_data, location),
+        person_time=make_person_time_table(measure_data, location)
+    )

@@ -172,7 +172,7 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
 @click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
 @click.option('-p', '--preceding-results', type=click.INT, default=0)
 @click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
-def make_latest_results(model_versions, location, preceding_results, output_path):
+def make_results(model_versions, location, preceding_results, output_path):
     """Generate count-space measure information and final outputs tables in
     *.hdf and *.csv format. In the event of unfinished results, draws deficient
     in random seeds or scenarios are excluded from the analysis.
@@ -206,4 +206,4 @@ def make_specific_results(model_output_paths, output_path=None):
 
     This is not currently implemented.
     """
-    results.process_specific_results(model_output_paths,  output_path)
+    raise NotImplementedError
