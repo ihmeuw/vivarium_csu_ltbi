@@ -24,6 +24,9 @@ import click
 from jinja2 import Template
 from loguru import logger
 
+from vivarium_csu_ltbi.tools import results
+from vivarium_csu_ltbi import globals as ltbi_globals
+
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 Location = namedtuple('Location', ['proper', 'sanitized'])
@@ -162,3 +165,45 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
             outfile.write(jinja_temp.render(
                 location_proper=location.proper,
                 location_sanitized=location.sanitized))
+
+
+@click.command()
+@click.argument('model_versions', nargs=-1, type=click.STRING, required=True)
+@click.option('-l', '--location', type=click.Choice(ltbi_globals.LOCATIONS))
+@click.option('-p', '--preceding-results', type=click.INT, default=0)
+@click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
+def make_results(model_versions, location, preceding_results, output_path):
+    """Generate count-space measure information and final outputs tables in
+    *.hdf and *.csv format. In the event of unfinished results, draws deficient
+    in random seeds or scenarios are excluded from the analysis.
+
+    The results to be processed are the most recent outputs from the run defined
+    by MODEL_VERSIONS and LOCATION. MODEL_VERSIONS is 1 or 2 arguments which are
+    names of model runs as found in the root results directory. If two are
+    passed, the model results are summed before processing. The option
+    PRECEDING_RESULTS defines the results to be processed counting backwards
+    from the most recent results. The processed results are saved in OUTPUT_PATH
+    if specified, otherwise the current working directory.
+
+    """
+    results.process_latest_results(model_versions, location, preceding_results,
+                                   output_path)
+
+
+@click.command()
+@click.argument('model_output_paths', nargs=-1, type=click.Path(exists=True))
+@click.option('-o', '--output-path', type=click.Path(exists=True, dir_okay=True))
+def make_specific_results(model_output_paths, output_path=None):
+    """Generate count-space measure information and final outputs tables in
+    *.hdf and *.csv format. In the event of unfinished results, draws deficient
+    in random seeds or scenarios are excluded from the analysis.
+
+    The results to be processed are those found in MODEL_OUTPUT_PATHS. This
+    should be one or two paths to model outputs, e.g. the directory containing
+    output.hdf If two are passed, the model results are summed before
+    processing.The processed results are saved in OUTPUT_PATH if specified,
+    otherwise the current working directory.
+
+    This is not currently implemented.
+    """
+    raise NotImplementedError
