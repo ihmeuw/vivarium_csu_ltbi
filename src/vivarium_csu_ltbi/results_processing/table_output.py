@@ -9,6 +9,19 @@ from vivarium_csu_ltbi.results_processing.counts_output import MeasureData
 warnings.filterwarnings('ignore')
 
 
+class FinalData(NamedTuple):
+    coverage: pd.DataFrame
+    tb: pd.DataFrame
+    deaths: pd.DataFrame
+    dalys: pd.DataFrame
+    person_time: pd.DataFrame
+
+    def dump(self, output_path):
+        for name, df in self._asdict().items():
+            df.to_hdf(str(output_path / f"{name}_final_table.hdf"), mode='w', key='data')
+            df.to_csv(str(output_path / f"{name}_final_table.csv"))
+
+
 def get_delta(data, join_columns):
     baseline = (data[data.scenario == 'baseline']
                 .drop(columns='scenario')
@@ -194,19 +207,6 @@ def make_person_time_table(mdata: MeasureData, location: str):
     delta_summary = pivot_and_summarize(delta, index_columns, prefix='averted_')
 
     return pd.concat([raw_summary, delta_summary], axis=1)
-
-
-class FinalData(NamedTuple):
-    coverage: pd.DataFrame
-    tb: pd.DataFrame
-    deaths: pd.DataFrame
-    dalys: pd.DataFrame
-    person_time: pd.DataFrame
-
-    def dump(self, output_path):
-        for name, df in self._asdict().items():
-            df.to_hdf(str(output_path / f"{name}_final_table.hdf"), mode='w', key='data')
-            df.to_csv(str(output_path / f"{name}_final_table.csv"))
 
 
 def make_tables(measure_data: MeasureData, location: str) -> FinalData:
