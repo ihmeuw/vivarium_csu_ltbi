@@ -7,7 +7,7 @@ from loguru import logger
 
 import vivarium_csu_ltbi.paths as ltbi_paths
 from vivarium_csu_ltbi import globals as project_globals
-from vivarium_csu_ltbi.data import counts_output, table_output
+from vivarium_csu_ltbi.results_processing import counts_output, table_output
 
 
 def validate_process_latest_results_args(model_versions: Tuple[str], location: str):

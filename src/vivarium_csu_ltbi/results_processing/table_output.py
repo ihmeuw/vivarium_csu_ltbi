@@ -4,7 +4,7 @@ from typing import NamedTuple
 import numpy as np
 import pandas as pd
 
-from vivarium_csu_ltbi.data.counts_output import MeasureData
+from vivarium_csu_ltbi.results_processing.counts_output import MeasureData
 
 warnings.filterwarnings('ignore')
 
