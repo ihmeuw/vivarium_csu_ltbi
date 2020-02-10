@@ -13,12 +13,11 @@ from vivarium_csu_ltbi.results_processing import counts_output, table_output
 def validate_process_latest_results_args(model_versions: Tuple[str], location: str):
     if not (len(model_versions) == 1 or len(model_versions) == 2):
         raise ValueError("Please pass either one or two model versions")
-    if (model_versions and location is None) or (location and model_versions is None):
-        raise ValueError("Please pass both model version(s) and a location")
 
 
-def process_latest_results(model_versions: Tuple[str] = None, location: str = None,
+def process_latest_results(model_versions: Tuple[str], location: str,
                            preceding_results_num: int = 0, output_path: str = None):
+    """Implements the make_results click entrypoint. model_versions and location are required arguments."""
     validate_process_latest_results_args(model_versions, location)
 
     location = project_globals.formatted_location(location)
