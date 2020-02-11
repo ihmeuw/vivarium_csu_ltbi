@@ -98,8 +98,7 @@ def load_data(results_path: Path) -> pd.DataFrame:
     df = pd.read_hdf(results_path / 'output.hdf')
     df = df.reset_index(drop=True)  # the index is duplicated in columns
     df = df.rename(columns={project_globals.SCENARIO_COLUMN: 'scenario'})
-    df = df.set_index(['input_draw', 'random_seed', 'scenario'])
-    return df.reset_index()
+    return df
 
 
 def get_output_path(model_versions: Tuple[str], location: str,
