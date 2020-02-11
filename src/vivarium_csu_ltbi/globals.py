@@ -73,6 +73,8 @@ TOTAL_YLLS_COLUMN = 'years_of_life_lost'
 TOTAL_YLDS_COLUMN = 'years_lived_with_disability'
 RANDOM_SEED_COLUMN = 'random_seed'
 INPUT_DRAW_COLUMN = 'input_draw'
+SCENARIO_COLUMN = "ltbi_treatment_scale_up.scenario"
+NUM_SCENARIOS = 3
 
 
 STANDARD_COLUMNS = {'total_population': TOTAL_POP_COLUMN,
