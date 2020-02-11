@@ -78,8 +78,8 @@ def get_common_seeds(df: pd.DataFrame) -> set:
     seed_sets = []
     for draw, g in df.groupby(['input_draw']):
         if 'scenario' in g.columns:  # We have an additional criterion
-            if len(df['scenario'].unique()) == project_globals.NUM_SCENARIOS:
-                seed_sets.append(set(g['random_seed'].unique()))
+            seed_list = [set(g_scenario['random_seed']) for _, g_scenario in g.groupby(['scenario'])]
+            seed_sets.append(set.intersection(*seed_list))
         else:  # no additional criteria, seeds are all we need to check
             seed_sets.append(set(g['random_seed'].unique()))
     common_seeds = set.intersection(*seed_sets)
