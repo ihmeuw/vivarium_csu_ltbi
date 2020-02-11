@@ -6,8 +6,13 @@ def mergeCountry(df1, df2):
         del df1['random_seed']
     if "random_seed" in df2.columns:
         del df2['random_seed']
-    df = pd.merge(df1.reset_index(), df2.reset_index(), on = ["input_draw_number", "random_seed", "ltbi_treatment_scale_up.scenario"], how = 'outer')
-    return df
+    df = (df1.reset_index().set_index(['input_draw_number', 'random_seed', 'ltbi_treatment_scale_up.scenario'])
+              .add(
+              df2.reset_index().set_index(['input_draw_number', 'random_seed', 'ltbi_treatment_scale_up.scenario']),
+                  fill_value=0,
+          ))
+    assert not np.any(df.isnull())
+    return df.reset_index()
 
 def clean(data):
     del data['random_seed']
@@ -15,7 +20,7 @@ def clean(data):
     new_data.drop(list(new_data.filter(like = 'person_time')), axis = 1, inplace = True)
     return new_data
 
-def process(country, df, data, location_dict, location_year):
+def process(country, df, data, location_dict):
     df_data = df.filter(like = "hhtb", axis = 1)
     new_data = df_data.stack().reset_index().rename(columns = {0:'value', 'level_2' : 'information'})
     new_data['age_group'] = new_data["information"].str.extract('^.*age_group_([a-z]*_?[a-z]*[0-9]*_?t?o?_?[0-9]*)', expand=True)
@@ -26,7 +31,8 @@ def process(country, df, data, location_dict, location_year):
     num_u5_hhtb = df_u5.loc[df_u5["hh_status"] == "exposed","value"][0]
     hhtb_prop = num_u5_hhtb/num_u5
     #rescale to national level
-    pop = get_population(location_id= location_dict.get(country),age_group_id=1,sex_id=3,gbd_round_id=5, year_id = location_year.get(country)).population[0]
+    pop = get_population(location_id= location_dict.get(country),age_group_id=1,sex_id=3,gbd_round_id=5,
+	year_id = 2017).population[0]
     num_u5_pop = pop*hhtb_prop
     data.get("country").append(country)
     data.get("num_u5_pop").append(num_u5_pop)
@@ -49,7 +55,6 @@ if __name__ == '__main__':
         'southAfrica_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26/output.hdf'
     }
     location_dict = {'ethiopia': 179, 'india': 163, 'peru': 123, 'philippines': 16, 'southAfrica': 196}
-    location_year = {'ethiopia': 2016, 'india': 2015, 'peru': 2012, 'philippines': 2013, 'southAfrica': 2011}
     data = {"country": [], "num_u5_pop": [], "hhtb_prop(%)": []}
     loc_df = {}
     for location_100, filePath_100 in loc_100_filePath.items():
@@ -61,5 +66,5 @@ if __name__ == '__main__':
                 df_merged = mergeCountry(df_100, df_10)
                 loc_df[location] = df_merged
     for location, df in loc_df.items():
-        process(location, clean(df), data, location_dict, location_year)
+        process(location, clean(df), data, location_dict)
     pd.DataFrame(data).to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/result/count_percent_u5_hh_AcTB.csv')
