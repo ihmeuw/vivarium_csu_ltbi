@@ -33,6 +33,9 @@ def process_latest_results(model_versions: Tuple[str], location: str,
     logger.info("Filtering to common subset of seeds.")
     complete_seeds_by_result = {mv: get_common_seeds(df) for mv, df in raw_model_data.items()}
     seed_intersection = set.intersection(*complete_seeds_by_result.values())
+    if len(seed_intersection) == 0:
+        logger.error("Not enough results to process at this time.")
+        raise RuntimeError
     subset_model_data = {mv: df.loc[df['random_seed'].isin(seed_intersection)] for mv, df in raw_model_data.items()}
 
     logger.info("Summing across seeds.")
@@ -78,6 +81,9 @@ def get_common_seeds(df: pd.DataFrame) -> set:
     seed_sets = []
     for draw, g in df.groupby(['input_draw']):
         if 'scenario' in g.columns:  # We have an additional criterion
+            if len(g['scenario'].unique()) != project_globals.NUM_SCENARIOS:
+                # we don't have all scenarios present for this draw, avoid the groupby
+                continue
             seed_list = [set(g_scenario['random_seed']) for _, g_scenario in g.groupby(['scenario'])]
             seed_sets.append(set.intersection(*seed_list))
         else:  # no additional criteria, seeds are all we need to check
@@ -91,6 +97,7 @@ def sum_over_seeds(df: pd.DataFrame):
     df = df.reset_index()
     df = df.drop(columns=['random_seed'])
     df = df.groupby(['input_draw', 'scenario']).sum()
+
     return df
 
 
@@ -98,6 +105,7 @@ def load_data(results_path: Path) -> pd.DataFrame:
     df = pd.read_hdf(results_path / 'output.hdf')
     df = df.reset_index(drop=True)  # the index is duplicated in columns
     df = df.rename(columns={project_globals.SCENARIO_COLUMN: 'scenario'})
+
     return df
 
 
