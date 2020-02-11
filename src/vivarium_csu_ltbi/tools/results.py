@@ -46,7 +46,7 @@ def process_latest_results(model_versions: Tuple[str], location: str,
 
     logger.info("Generating and dumping count-space data.")
     count_space_data = counts_output.get_raw_counts(summed_model_data)
-    measure_data = counts_output.split_measures(count_space_data)
+    measure_data = counts_output.split_measures(count_space_data, location)
     measure_data.dump(output_path)
 
     logger.info("Generating and dumping final output table data.")

@@ -1,6 +1,8 @@
 from typing import Tuple, NamedTuple
 
 import pandas as pd
+from db_queries import get_ids
+from db_queries import get_population
 
 
 class MeasureData(NamedTuple):
@@ -10,6 +12,7 @@ class MeasureData(NamedTuple):
     ylls: pd.DataFrame
     ylds: pd.DataFrame
     tb_cases: pd.DataFrame
+    national_population: pd.DataFrame
 
     def dump(self, output_path):
         for name, df in self._asdict().items():
@@ -152,6 +155,58 @@ def get_tb_events(data: pd.DataFrame) -> pd.DataFrame:
     return sort_data(data).drop(columns=['cause'])
 
 
+def get_national_population(location):
+    age_group_ids = list(range(2, 21)) + [30, 31, 32, 235]
+    age_table = get_ids('age_group')
+    age_table = age_table[age_table.age_group_id.isin(age_group_ids)]
+    age_table['age_group_name'] = age_table.age_group_name.map(lambda x: x.replace(' ', '_').lower())
+    age_group_dict = dict(zip(age_table.age_group_id, age_table.age_group_name))
+
+    location_dict = {'ethiopia': 179, 'india': 163, 'peru': 123, 'philippines': 16, 'south_africa': 196}
+    pop = get_population(location_id=location_dict[location],
+                         age_group_id=age_group_ids,
+                         sex_id=[1, 2],
+                         gbd_round_id=5)
+    pop['age'] = pop.age_group_id.map(age_group_dict)
+    pop['sex'] = pop.sex_id.map({1: 'male', 2: 'female'})
+    data = pop[['age', 'sex', 'population']]
+
+    labels = {'0_to_5': ['early_neonatal', 'late_neonatal', 'post_neonatal', '1_to_4'],
+              '5_to_15': ['5_to_9', '10_to_14'],
+              '15_to_60': ['15_to_19', '20_to_24', '25_to_29',
+                           '30_to_34', '35_to_39', '40_to_44',
+                           '45_to_49', '50_to_54', '55_to_59', ],
+              '60+': ['60_to_64', '65_to_69', '70_to_74', '75_to_79',
+                      '80_to_84', '85_to_89', '90_to_94', '95_plus']}
+    age_aggregates = []
+    for group, ages in labels.items():
+        age_group = data[data.age.isin(ages)]
+        age_group = (age_group
+                     .groupby(['sex'])
+                     .sum()
+                     .reset_index())
+        age_group['age'] = group
+        age_aggregates.append(age_group)
+    data = pd.concat(age_aggregates)
+
+    all_ages = (data
+                .groupby(['sex'])
+                .sum()
+                .reset_index())
+    all_ages['age'] = 'all'
+    data = pd.concat([data, all_ages])
+
+    both_sexes = (data
+                  .groupby(['age'])
+                  .sum()
+                  .reset_index())
+    both_sexes['sex'] = 'all'
+    data = pd.concat([data, both_sexes])
+
+    data['location'] = location
+    return data
+
+
 def aggregate_risk_groups(data: pd.DataFrame) -> pd.DataFrame:
     pop_filter = {
         'all_population': pd.Series(True, index=data.index),
@@ -222,10 +277,12 @@ def sort_data(data: pd.DataFrame) -> pd.DataFrame:
     return data.set_index(column_order).sort_index().reset_index()
 
 
-def split_measures(data: pd.DataFrame) -> MeasureData:
+def split_measures(data: pd.DataFrame, location: str) -> MeasureData:
     deaths = get_measure(data, 'death')
     person_time, ltbi_person_time = get_person_time(data)
     ylls = get_measure(data, 'ylls')
     ylds = get_measure(data, 'ylds')
     tb_cases = get_tb_events(data)
-    return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds, tb_cases)
+    national_population = get_national_population(location)
+    return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds,
+                       tb_cases, national_population)
