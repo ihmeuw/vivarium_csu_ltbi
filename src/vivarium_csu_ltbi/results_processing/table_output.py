@@ -94,7 +94,7 @@ def make_coverage_table(mdata: MeasureData, location: str):
 def make_tb_table(mdata: MeasureData, location: str):
     counts = mdata.tb_cases
     counts['location'] = location
-    counts['outcome'] = 'actb_incidence_count'
+    counts['outcome'] = 'actb_incidence_rate'
     counts = aggregate_over_treatment_group(counts)
 
     delta_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'treatment_group', 'draw']
@@ -121,6 +121,19 @@ def make_tb_table(mdata: MeasureData, location: str):
     raw_scaled_summary = pivot_and_summarize(raw_scaled, index_columns)
     delta_scaled_summary = pivot_and_summarize(delta_scaled, index_columns, prefix='averted_')
     scaled_summary = pd.concat([raw_scaled_summary, delta_scaled_summary], axis=1)
+
+    population = mdata.national_population
+    value_columns = ['mean', 'ub', 'lb', 'averted_mean', 'averted_ub', 'averted_lb']
+    counts_summary = scaled_summary.reset_index()
+    counts_summary['outcome'] = 'actb_incidence_count'
+    counts_summary = pd.merge(counts_summary,
+                              population,
+                              how='inner',
+                              on=['location', 'age', 'sex'])
+    counts_summary[value_columns] = (counts_summary[value_columns]
+                                     .mul(counts_summary['population'], axis='index')
+                                     .div(100_000))
+    counts_summary = counts_summary.drop(columns='population').set_index(index_columns)
 
     return pd.concat([counts_summary, scaled_summary])
 
