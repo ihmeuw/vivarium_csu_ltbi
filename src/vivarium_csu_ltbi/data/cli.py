@@ -6,12 +6,13 @@ from loguru import logger
 from vivarium import Artifact
 from vivarium_cluster_tools.psimulate.utilities import get_drmaa
 
-from vivarium_csu_ltbi import paths as ltbi_paths
-from vivarium_csu_ltbi import globals as ltbi_globals
-from vivarium_csu_ltbi.data import ltbi_incidence_model
 import vivarium_csu_ltbi.data.ltbi_incidence_scripts as ltbi_script
-from vivarium_csu_ltbi.data import household_tb_model
 import vivarium_csu_ltbi.data.household_tb_scripts as hh_tb_script
+from vivarium_csu_ltbi import paths as ltbi_paths
+from vivarium_csu_ltbi import globals as project_globals
+from vivarium_csu_ltbi.data import ltbi_incidence_model
+from vivarium_csu_ltbi.data import household_tb_model
+
 
 drmaa = get_drmaa()
 
@@ -21,13 +22,13 @@ def get_ltbi_incidence_input_data():
     """Collect the data necessary to model incidence using dismod and save
     it to an Artifact. This severs our database dependency and avoids
     num_locations * 1k simultaneous requests."""
-    for location in ltbi_globals.LOCATIONS:
+    for location in project_globals.LOCATIONS:
         logger.info(f"Removing old LTBI incidence input data for {location}.")  # to avoid stale data
         input_artifact_path = ltbi_paths.get_ltbi_inc_input_artifact_path(location)
         if input_artifact_path.is_file():
             input_artifact_path.unlink()
 
-    for location in ltbi_globals.LOCATIONS:
+    for location in project_globals.LOCATIONS:
         logger.info(f"Processing {location}.")
         input_artifact_path = ltbi_paths.get_ltbi_inc_input_artifact_path(location)
         art = Artifact(str(input_artifact_path))
@@ -42,7 +43,7 @@ def get_ltbi_incidence_input_data():
 
 
 @click.command()
-@click.argument("location", type=click.Choice(ltbi_globals.LOCATIONS))
+@click.argument("location", type=click.Choice(project_globals.LOCATIONS))
 def get_ltbi_incidence_parallel(location):
     """Launch jobs to calculate 1k draws of LTBI incidence for ``location``
     and collect it in a single artifact.
@@ -55,12 +56,12 @@ def get_ltbi_incidence_parallel(location):
     if output_artifact_path.is_file():
         output_artifact_path.unlink()
 
-    formatted_location = ltbi_globals.formatted_location(location)
+    formatted_location = project_globals.formatted_location(location)
     with drmaa.Session() as s:
         jt = s.createJobTemplate()
         jt.remoteCommand = shutil.which('python')
         jt.args = [ltbi_script.__file__, "estimate_ltbi_incidence", location]
-        jt.nativeSpecification = (f"-V -b y -P {ltbi_globals.CLUSTER_PROJECT} -q all.q -l fmem=1G -l fthread=1 "
+        jt.nativeSpecification = (f"-V -b y -P {project_globals.CLUSTER_PROJECT} -q all.q -l fmem=1G -l fthread=1 "
                                   f"-l h_rt=5:00:00 -N {formatted_location}_gltbi_inc")
         jids = s.runBulkJobs(jt, 1, 1000, 1)
         parent_jid = jids[0].split('.')[0]
@@ -71,7 +72,7 @@ def get_ltbi_incidence_parallel(location):
         jt.workingDirectory = os.getcwd()
         jt.remoteCommand = shutil.which('python')
         jt.args = [ltbi_script.__file__, "collect_ltbi_incidence", location]
-        jt.nativeSpecification = (f"-V -b y -P {ltbi_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
+        jt.nativeSpecification = (f"-V -b y -P {project_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
                                   f"-l h_rt=5:00:00 -N {formatted_location}_cltbi_inc -hold_jid {parent_jid}")
         jid = s.runJob(jt)
         logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {location}.")
@@ -79,7 +80,7 @@ def get_ltbi_incidence_parallel(location):
 
 
 @click.command()
-@click.argument("location", type=click.Choice(ltbi_globals.LOCATIONS))
+@click.argument("location", type=click.Choice(project_globals.LOCATIONS))
 def restart_ltbi_incidence_parallel(location):
     """Examine existing LTBI incidence data for ``location`` and submit jobs for
     any missing draws that may be present."""
@@ -96,7 +97,7 @@ def restart_ltbi_incidence_parallel(location):
         return
 
     logger.info(f"Missing draws identified: {missing}.")
-    formatted_location = ltbi_globals.formatted_location(location)
+    formatted_location = project_globals.formatted_location(location)
     with drmaa.Session() as s:
         jids = []
 
@@ -104,7 +105,7 @@ def restart_ltbi_incidence_parallel(location):
         jt.remoteCommand = shutil.which('python')
         jt.args = [ltbi_script.__file__, "estimate_ltbi_incidence", location]
         for draw in missing:
-            jt.nativeSpecification = (f"-v TASK_ID={int(draw)+1} -b y -P {ltbi_globals.CLUSTER_PROJECT} -q all.q "
+            jt.nativeSpecification = (f"-v TASK_ID={int(draw)+1} -b y -P {project_globals.CLUSTER_PROJECT} -q all.q "
                                       f"-l fmem=1G -l fthread=1 -l h_rt=5:00:00 "
                                       f"-N {formatted_location}_gltbi_inc")
             jid = s.runJob(jt)
@@ -116,7 +117,7 @@ def restart_ltbi_incidence_parallel(location):
         jt.workingDirectory = os.getcwd()
         jt.remoteCommand = shutil.which('python')
         jt.args = [ltbi_script.__file__, "collect_ltbi_incidence", location]
-        jt.nativeSpecification = (f"-V -b y -P {ltbi_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
+        jt.nativeSpecification = (f"-V -b y -P {project_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
                                   f"-l h_rt=5:00:00 -N {formatted_location}_cltbi_inc -hold_jid {','.join(jids)}")
         jid = s.runJob(jt)
         logger.info(f"Submitted hold job ({jid}) for aggregating LTBI incidence in {location}.")
@@ -125,13 +126,13 @@ def restart_ltbi_incidence_parallel(location):
 
 @click.command()
 def get_household_tb_input_data():
-    for location in ltbi_globals.LOCATIONS:
+    for location in project_globals.LOCATIONS:
         logger.info(f"Removing old household TB input data for {location}.")  # to avoid stale data
         input_artifact_path = ltbi_paths.get_hh_tb_input_artifact_path(location)
         if input_artifact_path.is_file():
             input_artifact_path.unlink()
 
-    for location in ltbi_globals.LOCATIONS:
+    for location in project_globals.LOCATIONS:
         logger.info(f"Processing {location}.")
         input_artifact_path = ltbi_paths.get_hh_tb_input_artifact_path(location)
         art = Artifact(str(input_artifact_path))
@@ -146,7 +147,7 @@ def get_household_tb_input_data():
 
 
 @click.command()
-@click.argument("location", type=click.Choice(ltbi_globals.LOCATIONS))
+@click.argument("location", type=click.Choice(project_globals.LOCATIONS))
 def get_household_tb_parallel(location):
     logger.info(f"Removing old household TB results for {location}.")  # to avoid stale data
     intermediate_output_path = ltbi_paths.get_hh_tb_intermediate_output_dir_path(location)
@@ -156,12 +157,12 @@ def get_household_tb_parallel(location):
     if output_artifact_path.is_file():
         output_artifact_path.unlink()
 
-    formatted_location = ltbi_globals.formatted_location(location)
+    formatted_location = project_globals.formatted_location(location)
     with drmaa.Session() as s:
         jt = s.createJobTemplate()
         jt.remoteCommand = shutil.which('python')
         jt.args = [hh_tb_script.__file__, "estimate_household_tb", location]
-        jt.nativeSpecification = (f"-V -b y -P {ltbi_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
+        jt.nativeSpecification = (f"-V -b y -P {project_globals.CLUSTER_PROJECT} -q all.q -l fmem=4G -l fthread=1 "
                                   f"-l h_rt=2:00:00 -N {formatted_location}_ghh_tb_exp")
         jids = s.runBulkJobs(jt, 1, 1000, 1)
         parent_jid = jids[0].split('.')[0]
