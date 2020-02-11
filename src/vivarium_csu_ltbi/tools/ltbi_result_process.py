@@ -12,8 +12,13 @@ def mergeCountry(df1, df2):
         del df1['random_seed']
     if "random_seed" in df2.columns:
         del df2['random_seed']
-    df = pd.merge(df1.reset_index(), df2.reset_index(), on = ["input_draw_number", "random_seed", "ltbi_treatment_scale_up.scenario"], how = 'outer')
-    return df
+    df = (df1.reset_index().set_index(['input_draw_number', 'random_seed', 'ltbi_treatment_scale_up.scenario'])
+              .add(
+              df2.reset_index().set_index(['input_draw_number', 'random_seed', 'ltbi_treatment_scale_up.scenario']),
+                  fill_value=0,
+          ))
+    assert not np.any(df.isnull())
+    return df.reset_index()
 
 def shape(data, pattern):
     df_data = data.filter(regex = pattern)
@@ -77,14 +82,14 @@ if __name__ == '__main__':
     'india_end_100': result_dir + 'updated-input-data-end-100/india/2020_01_03_14_23_42/output.hdf',
     'peru_end_100': result_dir + 'updated-input-data-end-100/peru/2020_01_03_14_23_33/output.hdf',
     'philippines_end_100': result_dir + 'updated-input-data-end-100/philippines/2020_01_03_14_23_28/output.hdf',
-    'south_africa_end_100': result_dir + 'updated-input-data-end-100/south_africa/2020_01_03_14_23_36/output.hdf'
+    'southAfrica_end_100': result_dir + 'updated-input-data-end-100/south_africa/2020_01_03_14_23_36/output.hdf'
     }
     loc_10_filePath = {
     'ethiopia_end_10': result_dir + 'updated-input-data-end-10/ethiopia/2020_01_02_17_00_21/output.hdf',
     'india_end_10': result_dir + 'updated-input-data-end-10/india/2020_01_02_17_00_23/output.hdf',
     'peru_end_10': result_dir + 'updated-input-data-end-10/peru/2020_01_02_17_01_17/output.hdf',
     'philippines_end_10': result_dir + 'updated-input-data-end-10/philippines/2020_01_02_17_01_17/output.hdf',
-    'south_africa_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26/output.hdf'
+    'southAfrica_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26/output.hdf'
     }
     measure_pattern = {"incidence": "^ltbi.*activetb", "death": "death_due_to_activetb",
                        "DALYs": "ylds_due_to_activetb|ylls_due_to_activetb"}
