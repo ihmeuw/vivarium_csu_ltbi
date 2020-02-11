@@ -31,8 +31,11 @@ def process_latest_results(model_versions: Tuple[str], location: str,
     raw_model_data = {mv: load_data(results_paths[mv]) for mv in model_versions}
 
     logger.info("Filtering to common subset of seeds.")
-    complete_seeds_by_result = {mv: get_common_seeds(df) for mv, df in raw_model_data.items()}
+    complete_seeds_by_result = {mv: get_complete_seeds(df) for mv, df in raw_model_data.items()}
     seed_intersection = set.intersection(*complete_seeds_by_result.values())
+    if len(seed_intersection) == 0:
+        logger.error("Not enough results to process at this time.")
+        raise RuntimeError
     subset_model_data = {mv: df.loc[df['random_seed'].isin(seed_intersection)] for mv, df in raw_model_data.items()}
 
     logger.info("Summing across seeds.")
@@ -74,23 +77,17 @@ def find_most_recent_results(model_version: str, location: str, preceding_result
     return most_recent_run_dir
 
 
-def get_common_seeds(df: pd.DataFrame) -> set:
-    seed_sets = []
-    for draw, g in df.groupby(['input_draw']):
-        if 'scenario' in g.columns:  # We have an additional criterion
-            seed_list = [set(g_scenario['random_seed']) for _, g_scenario in g.groupby(['scenario'])]
-            seed_sets.append(set.intersection(*seed_list))
-        else:  # no additional criteria, seeds are all we need to check
-            seed_sets.append(set(g['random_seed'].unique()))
-    common_seeds = set.intersection(*seed_sets)
-
-    return common_seeds
+def get_complete_seeds(df: pd.DataFrame) -> set:
+    """For each draw-seed combination, we keep only those seeds that have data for all scenarios."""
+    all_scenes = df.groupby(by=['input_draw', 'random_seed'])['scenario'].count() == project_globals.NUM_SCENARIOS
+    return set(all_scenes.reset_index()['random_seed'].unique())
 
 
 def sum_over_seeds(df: pd.DataFrame):
     df = df.reset_index()
     df = df.drop(columns=['random_seed'])
     df = df.groupby(['input_draw', 'scenario']).sum()
+
     return df
 
 
@@ -98,6 +95,7 @@ def load_data(results_path: Path) -> pd.DataFrame:
     df = pd.read_hdf(results_path / 'output.hdf')
     df = df.reset_index(drop=True)  # the index is duplicated in columns
     df = df.rename(columns={project_globals.SCENARIO_COLUMN: 'scenario'})
+
     return df
 
 
