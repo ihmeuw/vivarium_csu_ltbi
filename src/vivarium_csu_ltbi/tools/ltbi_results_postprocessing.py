@@ -120,7 +120,7 @@ def split_measures(data, location):
     ylls = get_measure(data, 'ylls')
     ylds = get_measure(data, 'ylds')
     tb_cases = get_tb_events(data)
-    national_population = get_national_population(location)
+    national_population = get_risk_specific_population(data, location)
     return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds, tb_cases, national_population, location)
     
 
@@ -144,6 +144,50 @@ def get_person_time(data):
     all_person_time, ltbi_person_time = split_and_aggregate_person_time(data)    
     return sort_data(all_person_time), sort_data(ltbi_person_time)
 
+def get_risk_specific_population(data, location):
+    pt, ltbi_pt = get_person_time(data)
+    pt['location'] = location
+    pt = aggregate_over_treatment_group(pt)
+    index_cols = ['location', 'year', 'age', 'sex', 'cause', 'risk_group', 'scenario', 'treatment_group']
+    pt = pivot_and_summarize(pt, index_cols)
+    # 2019 baseline mean person_time
+    pt = (pt
+          .reset_index()
+          .query('year == "2019" & scenario == "baseline"')
+          .filter(['location', 'age', 'sex', 'risk_group', 'mean']))
+    
+    pt_cols = ['location', 'age', 'sex']
+    pt_plwhiv = (pt
+                 .loc[pt.risk_group == 'plwhiv']
+                 .drop(columns='risk_group')
+                 .set_index(pt_cols))
+    pt_u5_hhtb = (pt
+                  .loc[pt.risk_group == 'u5_hhtb']
+                  .drop(columns='risk_group')
+                  .set_index(pt_cols))
+    pt_all_population = (pt
+                         .loc[pt.risk_group == 'all_population']
+                         .drop(columns='risk_group')
+                         .set_index(pt_cols))
+    
+    plwhiv_prop = pt_plwhiv / pt_all_population
+    u5_hhtb_prop = pt_u5_hhtb / pt_all_population.query('age == "0_to_5"')
+    
+    population = get_national_population(location)
+    population = population.rename(columns={'population': 'mean'}).set_index(pt_cols)
+    
+    plwhiv_pop = (plwhiv_prop * population).reset_index()
+    plwhiv_pop['risk_group'] = 'plwhiv'
+    
+    u5_hhtb_pop = (u5_hhtb_prop * population.query('age == "0_to_5"')).reset_index()
+    u5_hhtb_pop['risk_group'] = 'u5_hhtb'
+    
+    all_pop = population.reset_index()
+    all_pop['risk_group'] = 'all_population'
+    
+    df = pd.concat([all_pop, plwhiv_pop, u5_hhtb_pop], ignore_index=True)
+    df.rename(columns={'mean': 'population'}, inplace=True)
+    return df 
 
 def get_tb_events(data):
     event_counts = data[data.measure.str.contains('event_count')]
@@ -313,7 +357,7 @@ def make_tb_table(mdata: MeasureData):
     raw_scaled_summary = pivot_and_summarize(raw_scaled, index_columns)
     delta_scaled_summary = pivot_and_summarize(delta_scaled, index_columns, prefix='averted_')
     scaled_summary = pd.concat([raw_scaled_summary, delta_scaled_summary], axis=1)
-    
+
     population = mdata.national_population
     value_columns = ['mean', 'ub', 'lb', 'averted_mean', 'averted_ub', 'averted_lb']
     counts_summary = scaled_summary.reset_index()
@@ -321,11 +365,40 @@ def make_tb_table(mdata: MeasureData):
     counts_summary = pd.merge(counts_summary,
                               population,
                               how='inner',
-                              on=['location', 'age', 'sex'])
+                              on=['location', 'age', 'sex', 'risk_group'])
+    counts_summary = counts_summary.loc[
+        ~((counts_summary.year == 'all') | (counts_summary.age == 'all') | (counts_summary.sex == 'all'))
+    ]
     counts_summary[value_columns] = (counts_summary[value_columns]
                                      .mul(counts_summary['population'], axis='index')
                                      .div(100_000))
-    counts_summary = counts_summary.drop(columns='population').set_index(index_columns)
+    counts_summary.drop(columns='population', inplace=True)
+    
+    all_ages = (counts_summary
+                .groupby([c for c in index_columns if c != 'age'])
+                .sum()
+                .reset_index())
+    all_ages['age'] = 'all'
+    counts_summary = pd.concat([counts_summary, all_ages])
+
+    both_sexes = (counts_summary
+                  .groupby([c for c in index_columns if c != 'sex'])
+                  .sum()
+                  .reset_index())
+    both_sexes['sex'] = 'all'
+    counts_summary = pd.concat([counts_summary, both_sexes])
+
+    all_years = (counts_summary
+                 .groupby([c for c in index_columns if c != 'year'])
+                 .sum()
+                 .reset_index())
+    all_years['year'] = 'all'
+    counts_summary = pd.concat([counts_summary, all_years])
+    
+    counts_summary = counts_summary.loc[
+        ~((counts_summary.risk_group == 'u5_hhtb') & (counts_summary.age == 'all'))
+    ]
+    counts_summary = counts_summary.set_index(index_columns)[value_columns]
     
     return pd.concat([counts_summary, scaled_summary])
 
