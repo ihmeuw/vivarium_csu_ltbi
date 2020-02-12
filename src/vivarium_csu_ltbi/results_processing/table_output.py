@@ -15,6 +15,7 @@ class FinalData(NamedTuple):
     deaths: pd.DataFrame
     dalys: pd.DataFrame
     person_time: pd.DataFrame
+    aggregate: pd.DataFrame
 
     def dump(self, output_path):
         for name, df in self._asdict().items():
@@ -223,10 +224,18 @@ def make_person_time_table(mdata: MeasureData, location: str):
 
 
 def make_tables(measure_data: MeasureData, location: str) -> FinalData:
+    coverage = make_coverage_table(measure_data, location)
+    tb = make_tb_table(measure_data, location)
+    deaths = make_deaths_table(measure_data, location)
+    dalys = make_dalys_table(measure_data, location)
+    person_time = make_person_time_table(measure_data, location)
+    aggregate = pd.concat([coverage, tb, deaths, dalys, person_time], axis=0)
+
     return FinalData(
-        coverage=make_coverage_table(measure_data, location),
-        tb=make_tb_table(measure_data, location),
-        deaths=make_deaths_table(measure_data, location),
-        dalys=make_dalys_table(measure_data, location),
-        person_time=make_person_time_table(measure_data, location)
+        coverage=coverage,
+        tb=tb,
+        deaths=deaths,
+        dalys=dalys,
+        person_time=person_time,
+        aggregate=aggregate
     )
