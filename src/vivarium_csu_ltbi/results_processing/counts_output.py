@@ -155,7 +155,7 @@ def get_tb_events(data: pd.DataFrame) -> pd.DataFrame:
     return sort_data(data).drop(columns=['cause'])
 
 
-def get_national_population(location):
+def get_national_population(location: str) -> pd.DataFrame:
     age_group_ids = list(range(2, 21)) + [30, 31, 32, 235]
     age_table = get_ids('age_group')
     age_table = age_table[age_table.age_group_id.isin(age_group_ids)]
@@ -206,6 +206,50 @@ def get_national_population(location):
     data['location'] = location
     return data
 
+def get_risk_specific_population(data: pd.DataFrame, location: str) -> pd.DataFrame:
+    pt, ltbi_pt = get_person_time(data)
+    pt['location'] = location
+    pt = aggregate_over_treatment_group(pt)
+    index_cols = ['location', 'year', 'age', 'sex', 'cause', 'risk_group', 'scenario', 'treatment_group']
+    pt = pivot_and_summarize(pt, index_cols)
+    # 2019 baseline mean person_time
+    pt = (pt
+          .reset_index()
+          .query('year == "2019" & scenario == "baseline"')
+          .filter(['location', 'age', 'sex', 'risk_group', 'mean']))
+    
+    pt_cols = ['location', 'age', 'sex']
+    pt_plwhiv = (pt
+                 .loc[pt.risk_group == 'plwhiv']
+                 .drop(columns='risk_group')
+                 .set_index(pt_cols))
+    pt_u5_hhtb = (pt
+                  .loc[pt.risk_group == 'u5_hhtb']
+                  .drop(columns='risk_group')
+                  .set_index(pt_cols))
+    pt_all_population = (pt
+                         .loc[pt.risk_group == 'all_population']
+                         .drop(columns='risk_group')
+                         .set_index(pt_cols))
+    
+    plwhiv_prop = pt_plwhiv / pt_all_population
+    u5_hhtb_prop = pt_u5_hhtb / pt_all_population.query('age == "0_to_5"')
+    
+    population = get_national_population(location)
+    population = population.rename(columns={'population': 'mean'}).set_index(pt_cols)
+    
+    plwhiv_pop = (plwhiv_prop * population).reset_index()
+    plwhiv_pop['risk_group'] = 'plwhiv'
+    
+    u5_hhtb_pop = (u5_hhtb_prop * population.query('age == "0_to_5"')).reset_index()
+    u5_hhtb_pop['risk_group'] = 'u5_hhtb'
+    
+    all_pop = population.reset_index()
+    all_pop['risk_group'] = 'all_population'
+    
+    df = pd.concat([all_pop, plwhiv_pop, u5_hhtb_pop], ignore_index=True)
+    df.rename(columns={'mean': 'population'}, inplace=True)
+    return df
 
 def aggregate_risk_groups(data: pd.DataFrame) -> pd.DataFrame:
     pop_filter = {
