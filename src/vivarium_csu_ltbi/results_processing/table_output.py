@@ -101,23 +101,15 @@ def make_tb_table(mdata: MeasureData, location: str):
     delta_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'treatment_group', 'draw']
     delta = get_delta(counts, delta_join_columns)
 
-    index_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'scenario', 'treatment_group']
-    raw_summary = pivot_and_summarize(counts, index_columns)
-    delta_summary = pivot_and_summarize(delta, index_columns, prefix='averted_')
-    counts_summary = pd.concat([raw_summary, delta_summary], axis=1)
-
-    counts['outcome'] = 'actb_incidence_rate'
-    delta['outcome'] = 'actb_incidence_rate'
     pt = mdata.person_time.drop(columns='cause')
     pt['location'] = location
     pt['outcome'] = 'actb_incidence_rate'
     pt = aggregate_over_treatment_group(pt)
-
-    scale_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'treatment_group', 'draw',
-                          'scenario']
+    
+    scale_join_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group','treatment_group', 'draw', 'scenario']
     raw_scaled = scale_data(pt, counts, scale_join_columns, py_multiplier=100_000)
     delta_scaled = scale_data(pt, delta, scale_join_columns, py_multiplier=100_000)
-
+    
     index_columns = ['outcome', 'location', 'year', 'age', 'sex', 'risk_group', 'scenario', 'treatment_group']
     raw_scaled_summary = pivot_and_summarize(raw_scaled, index_columns)
     delta_scaled_summary = pivot_and_summarize(delta_scaled, index_columns, prefix='averted_')
@@ -130,12 +122,41 @@ def make_tb_table(mdata: MeasureData, location: str):
     counts_summary = pd.merge(counts_summary,
                               population,
                               how='inner',
-                              on=['location', 'age', 'sex'])
+                              on=['location', 'age', 'sex', 'risk_group'])
+    counts_summary = counts_summary.loc[
+        ~((counts_summary.year == 'all') | (counts_summary.age == 'all') | (counts_summary.sex == 'all'))
+    ]
     counts_summary[value_columns] = (counts_summary[value_columns]
                                      .mul(counts_summary['population'], axis='index')
                                      .div(100_000))
-    counts_summary = counts_summary.drop(columns='population').set_index(index_columns)
+    counts_summary.drop(columns='population', inplace=True)
+    
+    all_ages = (counts_summary
+                .groupby([c for c in index_columns if c != 'age'])
+                .sum()
+                .reset_index())
+    all_ages['age'] = 'all'
+    counts_summary = pd.concat([counts_summary, all_ages])
 
+    both_sexes = (counts_summary
+                  .groupby([c for c in index_columns if c != 'sex'])
+                  .sum()
+                  .reset_index())
+    both_sexes['sex'] = 'all'
+    counts_summary = pd.concat([counts_summary, both_sexes])
+
+    all_years = (counts_summary
+                 .groupby([c for c in index_columns if c != 'year'])
+                 .sum()
+                 .reset_index())
+    all_years['year'] = 'all'
+    counts_summary = pd.concat([counts_summary, all_years])
+    
+    counts_summary = counts_summary.loc[
+        ~((counts_summary.risk_group == 'u5_hhtb') & (counts_summary.age == 'all'))
+    ]
+    counts_summary = counts_summary.set_index(index_columns)[value_columns]
+    
     return pd.concat([counts_summary, scaled_summary])
 
 
