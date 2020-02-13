@@ -327,6 +327,6 @@ def split_measures(data: pd.DataFrame, location: str) -> MeasureData:
     ylls = get_measure(data, 'ylls')
     ylds = get_measure(data, 'ylds')
     tb_cases = get_tb_events(data)
-    national_population = get_national_population(location)
+    national_population = get_risk_specific_population(data, location)
     return MeasureData(deaths, person_time, ltbi_person_time, ylls, ylds,
                        tb_cases, national_population)
