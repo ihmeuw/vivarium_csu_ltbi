@@ -4,6 +4,8 @@ import pandas as pd
 from db_queries import get_ids
 from db_queries import get_population
 
+from vivarium_csu_ltbi.results_processing import utilities
+
 
 class MeasureData(NamedTuple):
     deaths: pd.DataFrame
@@ -206,12 +208,13 @@ def get_national_population(location: str) -> pd.DataFrame:
     data['location'] = location
     return data
 
+
 def get_risk_specific_population(data: pd.DataFrame, location: str) -> pd.DataFrame:
     pt, ltbi_pt = get_person_time(data)
     pt['location'] = location
-    pt = aggregate_over_treatment_group(pt)
+    pt = utilities.aggregate_over_treatment_group(pt)
     index_cols = ['location', 'year', 'age', 'sex', 'cause', 'risk_group', 'scenario', 'treatment_group']
-    pt = pivot_and_summarize(pt, index_cols)
+    pt = utilities.pivot_and_summarize(pt, index_cols)
     # 2019 baseline mean person_time
     pt = (pt
           .reset_index()
@@ -250,6 +253,7 @@ def get_risk_specific_population(data: pd.DataFrame, location: str) -> pd.DataFr
     df = pd.concat([all_pop, plwhiv_pop, u5_hhtb_pop], ignore_index=True)
     df.rename(columns={'mean': 'population'}, inplace=True)
     return df
+
 
 def aggregate_risk_groups(data: pd.DataFrame) -> pd.DataFrame:
     pop_filter = {
