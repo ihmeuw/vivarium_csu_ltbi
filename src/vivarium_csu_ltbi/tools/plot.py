@@ -32,7 +32,7 @@ def load_data(path: str, model_version: str):
         assert f in os.listdir(sub_dir), f'No such a file in {location}'
         df = pd.read_csv(sub_dir + '/' + f)
         output.append(df)
-    return pd.concat(output)
+    return pd.concat(output, ignore_index=True)
 
 def format_data(df: pd.DataFrame):
     outcomes = {
