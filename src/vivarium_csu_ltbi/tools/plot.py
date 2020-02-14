@@ -2,10 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+import os
+import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
-master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/interim2_results_plot/'
+master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/final_results_plot/'
 
 location_names = ['Ethiopia', 'India', 'Peru', 'Philippines', 'South Africa']
 age_groups = ['0 to 4', '5 to 14', '15 to 59', '60 plus']
@@ -19,7 +22,19 @@ outcomes = [
     'DALYs due to HIV resulting in other diseases (per 100,000 person-years)',
 ]
 
-def format_data(df):
+def load_data(path: str, model_version: str):
+    output = []
+    locations = ['ethiopia', 'india', 'peru', 'philippines', 'south_africa']
+    for location in locations:
+        master_dir = path + f'{model_version}_{location}_model_results/'
+        sub_dir = master_dir + os.listdir(master_dir)[0]
+        f = 'aggregate_final_table.csv'
+        assert f in os.listdir(sub_dir), f'No such a file in {location}'
+        df = pd.read_csv(sub_dir + '/' + f)
+        output.append(df)
+    return pd.concat(output)
+
+def format_data(df: pd.DataFrame):
     outcomes = {
         'treatment_coverage': 'Treatment Coverage (proportion)',
         'actb_incidence_count': 'Active TB Incidence count (cases)',
@@ -248,10 +263,12 @@ def plot_coverage(df, location, risk_group):
 
 if __name__ == '__main__':
     result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
+    model_version = 'no_3hp_babies_10_no_3hp_babies_100'
+    time = ''.join(str(datetime.date.today()).split('-'))
     age_end = 'merged_ages'
-    df = pd.read_csv(result_dir + f'ltbi_final_results_{age_end}.csv')
+    df = load_data(result_dir, model_version)
     df, t = format_data(df)
-    t.to_csv(result_dir + f'ltbi_final_results_end_{age_end}_formatted.csv', index=False)
+    t.to_csv(result_dir + f'{time}_ltbi_final_results_{age_end}_formatted.csv', index=False)
     # make plot for outcome by year
     for location in location_names:
         for risk_group in ['PLHIV', 'U5 HHC']:
