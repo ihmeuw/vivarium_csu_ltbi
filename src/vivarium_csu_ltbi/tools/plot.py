@@ -262,7 +262,7 @@ def plot_coverage(df, location, risk_group):
               bbox_inches='tight')
 
 if __name__ == '__main__':
-    result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/'
+    result_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/result/make_results/'
     model_version = 'no_3hp_babies_10_no_3hp_babies_100'
     time = ''.join(str(datetime.date.today()).split('-'))
     age_end = 'merged_ages'
