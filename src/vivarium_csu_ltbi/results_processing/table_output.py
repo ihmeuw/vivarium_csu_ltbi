@@ -249,10 +249,6 @@ def make_prop_under_five_hhtb_table(mdata: MeasureData, location: str):
     ], axis=0)
 
 
-def make_averted_table(mdata: MeasureData, location: str):
-    return mdata.person_time
-
-
 def make_tables(measure_data: MeasureData, location: str) -> FinalData:
     coverage = make_coverage_table(measure_data, location)
     tb = make_tb_table(measure_data, location)
@@ -260,7 +256,6 @@ def make_tables(measure_data: MeasureData, location: str) -> FinalData:
     dalys = make_dalys_table(measure_data, location)
     person_time = make_person_time_table(measure_data, location)
     u5_hhtb_percent = make_prop_under_five_hhtb_table(measure_data, location)
-    averted = make_averted_table(measure_data, location)
     aggregate = pd.concat([coverage, tb, deaths, dalys, person_time], axis=0)
 
     return FinalData(
@@ -270,6 +265,5 @@ def make_tables(measure_data: MeasureData, location: str) -> FinalData:
         dalys=dalys,
         person_time=person_time,
         u5_hhtb_percent=u5_hhtb_percent,
-        averted=averted,
-        aggregate = aggregate
+        aggregate=aggregate
     )
