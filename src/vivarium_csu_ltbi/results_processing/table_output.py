@@ -16,6 +16,8 @@ class FinalData(NamedTuple):
     deaths: pd.DataFrame
     dalys: pd.DataFrame
     person_time: pd.DataFrame
+    averted: pd.DataFrame
+    u5_hhtb_percent : pd.DataFrame
     aggregate: pd.DataFrame
 
     def dump(self, output_path):
@@ -218,12 +220,42 @@ def make_person_time_table(mdata: MeasureData, location: str):
     return pd.concat([raw_summary, delta_summary], axis=1)
 
 
+def make_prop_under_five_hhtb_table(mdata: MeasureData, location: str):
+    pt = mdata.person_time
+    pt['location'] = location
+
+    pt = pt.groupby(by=['scenario', 'location', 'risk_group',
+                        'age', 'sex', 'year', 'draw']).sum().reset_index()
+
+    pt = pt.loc[pt['age'] == '0_to_5']
+    pt = pt.loc[pt['sex'] == 'all']
+
+    pt = pt.set_index(['scenario', 'location', 'age', 'sex', 'year', 'draw'])
+
+    under_five_population = pt.loc[pt['risk_group'] == 'all_population', 'value']
+
+    under_five_prop_hhtb_population = pt.loc[pt['risk_group'] == 'u5_hhtb', 'value'] / under_five_population
+
+    under_five_population = under_five_population.reset_index()
+    under_five_population['outcome'] = 'under_five_population'
+
+    under_five_prop_hhtb_population = under_five_prop_hhtb_population.reset_index()
+    under_five_prop_hhtb_population['outcome'] = 'under_five_proportion_hhtb'
+
+    index_columns = ['scenario', 'location', 'year', 'age', 'sex', 'outcome']
+    return pd.concat([
+        utilities.pivot_and_summarize(under_five_population, index_columns=index_columns),
+        utilities.pivot_and_summarize(under_five_prop_hhtb_population, index_columns=index_columns)
+    ], axis=0)
+
+
 def make_tables(measure_data: MeasureData, location: str) -> FinalData:
     coverage = make_coverage_table(measure_data, location)
     tb = make_tb_table(measure_data, location)
     deaths = make_deaths_table(measure_data, location)
     dalys = make_dalys_table(measure_data, location)
     person_time = make_person_time_table(measure_data, location)
+    u5_hhtb_percent = make_prop_under_five_hhtb_table(measure_data, location)
     aggregate = pd.concat([coverage, tb, deaths, dalys, person_time], axis=0)
 
     return FinalData(
@@ -232,5 +264,6 @@ def make_tables(measure_data: MeasureData, location: str) -> FinalData:
         deaths=deaths,
         dalys=dalys,
         person_time=person_time,
+        u5_hhtb_percent=u5_hhtb_percent,
         aggregate=aggregate
     )
