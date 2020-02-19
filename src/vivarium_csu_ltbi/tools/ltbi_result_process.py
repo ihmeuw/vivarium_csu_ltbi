@@ -69,9 +69,9 @@ def hiv_calculation(df, data, country,  measure, people):
     return
 
 def process_data(df_total, country, measure, pattern):
-    df_100_incidence = shape(df_total, pattern)
-    u5_calculation(df_100_incidence, data, country, measure, "U5_hh")
-    hiv_calculation(df_100_incidence, data, country, measure, "PLWHIV")
+    df_outcome = shape(df_total, pattern)
+    u5_calculation(df_outcome, data, country, measure, "U5_hh")
+    hiv_calculation(df_outcome, data, country, measure, "PLWHIV")
     return
 
 
