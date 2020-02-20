@@ -16,8 +16,7 @@ class FinalData(NamedTuple):
     deaths: pd.DataFrame
     dalys: pd.DataFrame
     person_time: pd.DataFrame
-    averted: pd.DataFrame
-    u5_hhtb_percent : pd.DataFrame
+    u5_hhtb_percent: pd.DataFrame
     aggregate: pd.DataFrame
 
     def dump(self, output_path):
