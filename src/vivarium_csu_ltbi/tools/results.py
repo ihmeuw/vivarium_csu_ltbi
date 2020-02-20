@@ -1,4 +1,5 @@
 import functools
+import yaml
 from pathlib import Path
 from typing import Tuple, Dict
 
@@ -29,14 +30,17 @@ def process_latest_results(model_versions: Tuple[str], location: str,
     # results.
     logger.info("Loading model results.")
     raw_model_data = {mv: load_data(results_paths[mv]) for mv in model_versions}
+    merged_keyspace = get_keyspace_union(results_paths)
 
     logger.info("Filtering to common subset of seeds.")
-    complete_seeds_by_result = {mv: get_complete_seeds(df) for mv, df in raw_model_data.items()}
-    seed_intersection = set.intersection(*complete_seeds_by_result.values())
-    if len(seed_intersection) == 0:
-        logger.error("Not enough results to process at this time.")
-        raise RuntimeError
-    subset_model_data = {mv: df.loc[df['random_seed'].isin(seed_intersection)] for mv, df in raw_model_data.items()}
+    complete_data_by_result = {mv: get_complete_draws(data, merged_keyspace) for mv, data in raw_model_data.items()}
+
+    common_seeds, common_draws = merge_complete_data(complete_data_by_result, merged_keyspace)
+    if (len(common_seeds) == 0) or (len(common_draws) == 0):
+        logger.error("No overlapping results to process.")
+        raise RuntimeError("No overlapping results to process.")
+    subset_model_data = {mv: df.loc[(df['random_seed'].isin(common_seeds))
+                                    & (df['input_draw'].isin(common_draws))] for mv, df in raw_model_data.items()}
 
     logger.info("Summing across seeds.")
     summed_model_data = {mv: sum_over_seeds(df) for mv, df in subset_model_data.items()}
@@ -74,13 +78,37 @@ def find_most_recent_results(model_version: str, location: str, preceding_result
         raise FileNotFoundError(f"No data yet written for most recent run {most_recent_run_dir}f")
 
     logger.info(f"Most recent results found at {most_recent_run_dir}.")
+
     return most_recent_run_dir
 
 
-def get_complete_seeds(df: pd.DataFrame) -> set:
+def get_complete_draws(df: pd.DataFrame, merged_keyspace: dict) -> dict:
     """For each draw-seed combination, we keep only those seeds that have data for all scenarios."""
-    all_scenes = df.groupby(by=['input_draw', 'random_seed'])['scenario'].count() == project_globals.NUM_SCENARIOS
-    return set(all_scenes.reset_index()['random_seed'].unique())
+    complete_draws = {}
+    for draw in merged_keyspace[project_globals.INPUT_DRAW_COLUMN]:
+        draw_data = df.loc[df[project_globals.INPUT_DRAW_COLUMN] == draw]
+        scenario_count = draw_data.groupby(by=['random_seed'])['scenario'].count() == project_globals.NUM_SCENARIOS
+        scenario_count = scenario_count.loc[scenario_count]
+        if not scenario_count.empty:
+            complete_draws[draw] = set(scenario_count.reset_index()['random_seed'].unique())
+
+    return complete_draws
+
+
+def merge_complete_data(data: dict, merged_keyspace: dict) -> Tuple:
+    # get common draws
+    common_draws = set(merged_keyspace[project_globals.INPUT_DRAW_COLUMN])
+    for model in data.keys():
+        model_draws = set(data[model].keys())
+        common_draws = common_draws.intersection(model_draws)
+
+    # get intersection of seeds in common draws
+    common_seeds = set(merged_keyspace[project_globals.RANDOM_SEED_COLUMN])
+    for model in data.keys():
+        for draw in common_draws:
+            common_seeds = common_seeds.intersection(data[model][draw])
+
+    return common_seeds, common_draws
 
 
 def sum_over_seeds(df: pd.DataFrame):
@@ -97,6 +125,25 @@ def load_data(results_path: Path) -> pd.DataFrame:
     df = df.rename(columns={project_globals.SCENARIO_COLUMN: 'scenario'})
 
     return df
+
+
+def load_keyspace(results_path: Path) -> pd.DataFrame:
+    with (results_path / 'keyspace.yaml').open() as f:
+        keyspace = yaml.full_load(f)
+
+    return keyspace
+
+
+def get_keyspace_union(results_paths: dict) -> dict:
+    model_keyspaces = {m: load_keyspace(rp) for m, rp in results_paths.items()}
+    models = list(results_paths.keys())
+    keys = model_keyspaces[models[0]].keys()
+    merged = {}
+    for k in keys:
+        key_sets = [set(model_keyspaces[m][k]) for m in models]
+        merged[k] = set.union(*key_sets)
+
+    return merged
 
 
 def get_output_path(model_versions: Tuple[str], location: str,
