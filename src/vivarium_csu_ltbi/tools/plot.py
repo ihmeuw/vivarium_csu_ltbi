@@ -51,7 +51,7 @@ def format_data(df: pd.DataFrame):
     age_groups = {'0_to_5': '0 to 4', '5_to_15': '5 to 14', '15_to_60': '15 to 59', '60+': '60 plus', 'all': 'All Ages'}
     sexes = {'all': 'Both', 'female': 'Female', 'male': 'Male'}
     risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLHIV', 'u5_hhtb': 'U5 HHC'}
-    scenarios = {'3HP_scale_up': '3HP scale up', '6H_scale_up': '6H scale up', 'baseline': 'Baseline'}
+    scenarios = {'3HP_scale_up': '3HP scale up', '6H_scale_up': '6H scale up', 'baseline': 'Baseline (6H as planned)'}
     treatment_groups = {
         '3HP_adherent': '3HP adherent', '3HP_nonadherent': '3HP non-adherent',
         '6H_adherent': '6H adherent', '6H_nonadherent': '6H non-adherent',
@@ -90,9 +90,13 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
     
     if outcome_type == 'value':
         scenarios = ['3HP scale up', '6H scale up', 'Baseline']
+        prefix = ''
+        title = f'{location}, {risk_group}, {outcome_name} by Year
     else:
         scenarios = ['3HP scale up', '6H scale up']
-    
+        prefix = 'Averted'
+        title = f'{location}, {risk_group}, Averted {outcome_name} by Year, Compared to Baseline'
+
     for scenario in scenarios:
         t_scenario = t.loc[t['scenario'] == scenario]
         xx = t_scenario['year']
@@ -108,7 +112,6 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
         plt.plot(xx, yy, '-o', label=scenario)
         plt.fill_between(xx, lb, ub, alpha=.2)
     
-    prefix = 'Averted' if outcome_type == 'averted' else ''
     outcome_name = outcome.split(' (')[0]
     if outcome == 'Active TB Incidence count (cases)':
         outcome_metric = 'cases'
@@ -116,10 +119,10 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
         outcome_metric = f'cases per 100,000 {risk_group} person-years'
     else:
         outcome_metric = f'per 100,000 {risk_group} person-years'
-
+        
     plt.xlabel('Year', fontsize=12)
     plt.ylabel(f'{prefix} {outcome_name}\n({outcome_metric})', fontsize=12)
-    plt.title(f'{location}, {risk_group}, {prefix} {outcome_name} by Year', fontsize=12)
+    plt.title(title, fontsize=12)
     plt.legend(loc=(1.05, 0.05))
     plt.grid()
     fig.savefig(master_dir + f'{location}/' + \
@@ -163,7 +166,7 @@ def plot_averted_by_age(df, location, outcome):
     plt.xticks(xx+width/2, age_groups)
     plt.xlabel('Age Group', fontsize=12)
     plt.ylabel(f'Averted {outcome_name}\n({outcome_metric})', fontsize=12)
-    plt.title(f'{location}, PLHIV, Averted {outcome_name} by Age', fontsize=12)
+    plt.title(f'{location}, PLHIV, Averted {outcome_name} by Age, Compared to Baseline', fontsize=12)
     plt.legend(loc=(1.05, 0.05))
     plt.grid(axis='y', alpha=.5)
     fig.savefig(master_dir + f'{location}/' + \
@@ -232,7 +235,7 @@ def compare_across_countries(df, location_names, outcome, risk_group, scenario):
     
     plt.xlabel('Year', fontsize=12)
     plt.ylabel(f'Averted {outcome_name}\n({outcome_metric})', fontsize=12)
-    plt.title(f'{scenario}, {risk_group}, Averted {outcome_name} by Year', fontsize=12)
+    plt.title(f'{scenario} compared to Baseline, {risk_group}, Averted {outcome_name} by Year', fontsize=12)
     plt.legend(loc=(1.05, 0.05))
     plt.grid()
     fig.savefig(master_dir + f'{scenario} {risk_group} {outcome_name} averted by year.png',
