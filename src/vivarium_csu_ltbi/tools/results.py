@@ -85,10 +85,7 @@ def find_most_recent_results(model_version: str, location: str, preceding_result
 def get_complete_draws(df: pd.DataFrame, merged_keyspace: dict) -> dict:
     """For each draw-seed combination, we keep only those seeds that have data for all scenarios."""
     complete_draws = {}
-    # for draw in merged_keyspace[project_globals.INPUT_DRAW_COLUMN]:
-    # results are coming in slowly for draws 10-20, prohibiting results generation.
-    # we will subset to the first 10 draws, which are complete.
-    for draw in [946, 650, 232, 357, 394, 602, 629, 29, 680, 829]:
+    for draw in merged_keyspace[project_globals.INPUT_DRAW_COLUMN]:
         draw_data = df.loc[df[project_globals.INPUT_DRAW_COLUMN] == draw]
         scenario_count = draw_data.groupby(by=['random_seed'])['scenario'].count() == project_globals.NUM_SCENARIOS
         scenario_count = scenario_count.loc[scenario_count]
