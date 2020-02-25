@@ -12,7 +12,7 @@ master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/r
 
 location_names = ['Ethiopia', 'India', 'Peru', 'Philippines', 'South Africa']
 age_groups = ['0 to 4', '5 to 14', '15 to 59', '60 plus']
-scenarios = ['3HP scale up', '6H scale up', 'Baseline']
+scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as planned)']
 outcomes = [
     'Active TB Incidence count (cases)',
     'Active TB Incidence rate (cases per 100,000 person-years)',
@@ -51,7 +51,7 @@ def format_data(df: pd.DataFrame):
     age_groups = {'0_to_5': '0 to 4', '5_to_15': '5 to 14', '15_to_60': '15 to 59', '60+': '60 plus', 'all': 'All Ages'}
     sexes = {'all': 'Both', 'female': 'Female', 'male': 'Male'}
     risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLHIV', 'u5_hhtb': 'U5 HHC'}
-    scenarios = {'3HP_scale_up': '3HP scale up', '6H_scale_up': '6H scale up', 'baseline': 'Baseline (6H as planned)'}
+    scenarios = {'3HP_scale_up': 'Intervention 2 (3HP scale up)', '6H_scale_up': 'Intervention 1 (6H scale up)', 'baseline': 'Baseline (6H as planned)'}
     treatment_groups = {
         '3HP_adherent': '3HP adherent', '3HP_nonadherent': '3HP non-adherent',
         '6H_adherent': '6H adherent', '6H_nonadherent': '6H non-adherent',
@@ -89,11 +89,11 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
     fig = plt.figure(figsize=(10, 6), dpi=150)
     
     if outcome_type == 'value':
-        scenarios = ['3HP scale up', '6H scale up', 'Baseline']
+        scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as planned)']
         prefix = ''
         title = f'{location}, {risk_group}, {outcome_name} by Year
     else:
-        scenarios = ['3HP scale up', '6H scale up']
+        scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)']
         prefix = 'Averted'
         title = f'{location}, {risk_group}, Averted {outcome_name} by Year, Compared to Baseline'
 
@@ -141,8 +141,8 @@ def plot_averted_by_age(df, location, outcome):
     xx = np.arange(4)
     width = .4 
     
-    s_3hp = t.loc[t['scenario'] == '3HP scale up']
-    s_6h = t.loc[t['scenario'] == '6H scale up']
+    s_3hp = t.loc[t['scenario'] == 'Intervention 2 (3HP scale up)']
+    s_6h = t.loc[t['scenario'] == 'Intervention 1 (6H scale up)']
 
     yy_3hp = s_3hp['averted_mean']
     ll_3hp = yy_3hp - s_3hp['averted_lb']
@@ -152,8 +152,8 @@ def plot_averted_by_age(df, location, outcome):
     ll_6h = yy_6h - s_6h['averted_lb']
     uu_6h = s_6h['averted_ub'] - yy_6h
         
-    plt.bar(xx, yy_3hp, width, yerr=[ll_3hp, uu_3hp], label='3HP scale up')
-    plt.bar(xx+width, yy_6h, width, yerr=[ll_6h, uu_6h], label='6H scale up')
+    plt.bar(xx, yy_3hp, width, yerr=[ll_3hp, uu_3hp], label='Intervention 2 (3HP scale up)')
+    plt.bar(xx+width, yy_6h, width, yerr=[ll_6h, uu_6h], label='Intervention 1 (6H scale up)')
     
     outcome_name = outcome.split(' (')[0]
     if outcome == 'Active TB Incidence count (cases)':
@@ -289,7 +289,7 @@ if __name__ == '__main__':
     # make plot for comparison across countries
     for outcome in outcomes:
         for risk_group in ['PLHIV', 'U5 HHC']:
-            for scenario in ['3HP scale up', '6H scale up']:
+            for scenario in ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)']:
                 compare_across_countries(df, location_names, outcome, risk_group, scenario)
     # make plot for coverage by year
     for location in location_names:
