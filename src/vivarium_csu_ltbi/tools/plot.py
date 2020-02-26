@@ -12,7 +12,7 @@ master_dir = '/home/j/Project/simulation_science/latent_tuberculosis_infection/r
 
 location_names = ['Ethiopia', 'India', 'Peru', 'Philippines', 'South Africa']
 age_groups = ['0 to 4', '5 to 14', '15 to 59', '60 plus']
-scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as planned)']
+scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as projected)']
 outcomes = [
     'Active TB Incidence count (cases)',
     'Active TB Incidence rate (cases per 100,000 person-years)',
@@ -51,7 +51,7 @@ def format_data(df: pd.DataFrame):
     age_groups = {'0_to_5': '0 to 4', '5_to_15': '5 to 14', '15_to_60': '15 to 59', '60+': '60 plus', 'all': 'All Ages'}
     sexes = {'all': 'Both', 'female': 'Female', 'male': 'Male'}
     risk_groups = {'all_population': 'All Population', 'plwhiv': 'PLHIV', 'u5_hhtb': 'U5 HHC'}
-    scenarios = {'3HP_scale_up': 'Intervention 2 (3HP scale up)', '6H_scale_up': 'Intervention 1 (6H scale up)', 'baseline': 'Baseline (6H as planned)'}
+    scenarios = {'3HP_scale_up': 'Intervention 2 (3HP scale up)', '6H_scale_up': 'Intervention 1 (6H scale up)', 'baseline': 'Baseline (6H as projected)'}
     treatment_groups = {
         '3HP_adherent': '3HP adherent', '3HP_nonadherent': '3HP non-adherent',
         '6H_adherent': '6H adherent', '6H_nonadherent': '6H non-adherent',
@@ -97,7 +97,7 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
         outcome_metric = f'per 100,000 {risk_group} person-years'
 
     if outcome_type == 'value':
-        scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as planned)']
+        scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as projected)']
         prefix = ''
         title = f'{location}, {risk_group}, {outcome_name} by Year'
     else:
