@@ -110,7 +110,7 @@ def get_raw_counts(data: pd.DataFrame) -> pd.DataFrame:
     both_sexes['sex'] = 'all'
     data = pd.concat([data, both_sexes])
 
-    all_years = (data
+    all_years = (data[data.year.isin(['2020', '2021', '2022', '2023', '2024'])]
                  .groupby(['draw', 'scenario', 'treatment_group', 'hhtb', 'sex', 'age', 'measure'])
                  .value.sum()
                  .reset_index())

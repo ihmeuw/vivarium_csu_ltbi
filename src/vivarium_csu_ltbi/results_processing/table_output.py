@@ -120,7 +120,7 @@ def make_tb_table(mdata: MeasureData, location: str):
     both_sexes['sex'] = 'all'
     counts_summary = pd.concat([counts_summary, both_sexes])
 
-    all_years = (counts_summary
+    all_years = (counts_summary[counts_summary.year.isin(['2020', '2021', '2022', '2023', '2024'])]
                  .groupby([c for c in index_columns if c != 'year'])
                  .sum()
                  .reset_index())
