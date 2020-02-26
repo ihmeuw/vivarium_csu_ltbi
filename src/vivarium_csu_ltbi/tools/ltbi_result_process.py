@@ -78,18 +78,18 @@ def process_data(df_total, country, measure, pattern):
 if __name__ == '__main__':
     result_dir = '/ihme/costeffectiveness/results/vivarium_csu_ltbi/'
     loc_100_filePath = {
-    'ethiopia_end_100': result_dir + 'updated-input-data-end-100/ethiopia/2020_01_03_14_22_51/output.hdf',
-    'india_end_100': result_dir + 'updated-input-data-end-100/india/2020_01_03_14_23_42/output.hdf',
-    'peru_end_100': result_dir + 'updated-input-data-end-100/peru/2020_01_03_14_23_33/output.hdf',
-    'philippines_end_100': result_dir + 'updated-input-data-end-100/philippines/2020_01_03_14_23_28/output.hdf',
-    'southAfrica_end_100': result_dir + 'updated-input-data-end-100/south_africa/2020_01_03_14_23_36/output.hdf'
+    'ethiopia_end_100': result_dir + 'no_3hp_babies_100/ethiopia/2020_02_08_19_29_12/output.hdf',
+    'india_end_100': result_dir + 'no_3hp_babies_100/india/2020_02_08_19_29_54/output.hdf',
+    'peru_end_100': result_dir + 'no_3hp_babies_100/peru/2020_02_08_19_29_54/output.hdf',
+    'philippines_end_100': result_dir + 'no_3hp_babies_100/philippines/2020_02_08_19_29_58/output.hdf',
+    'southAfrica_end_100': result_dir + 'no_3hp_babies_100/south_africa/2020_02_08_19_30_00/output.hdf'
     }
     loc_10_filePath = {
-    'ethiopia_end_10': result_dir + 'updated-input-data-end-10/ethiopia/2020_01_02_17_00_21/output.hdf',
-    'india_end_10': result_dir + 'updated-input-data-end-10/india/2020_01_02_17_00_23/output.hdf',
-    'peru_end_10': result_dir + 'updated-input-data-end-10/peru/2020_01_02_17_01_17/output.hdf',
-    'philippines_end_10': result_dir + 'updated-input-data-end-10/philippines/2020_01_02_17_01_17/output.hdf',
-    'southAfrica_end_10': result_dir + 'updated-input-data-end-10/south_africa/2020_01_02_17_01_26/output.hdf'
+    'ethiopia_end_10': result_dir + 'no_3hp_babies_10/ethiopia/2020_02_10_15_35_24/output.hdf',
+    'india_end_10': result_dir + 'no_3hp_babies_10/india/2020_02_10_16_59_37/output.hdf',
+    'peru_end_10': result_dir + 'no_3hp_babies_10/peru/2020_02_11_12_39_10/output.hdf',
+    'philippines_end_10': result_dir + 'no_3hp_babies_10/philippines/2020_02_11_17_08_59/output.hdf',
+    'southAfrica_end_10': result_dir + 'no_3hp_babies_10/south_africa/2020_02_11_17_11_30/output.hdf'
     }
     measure_pattern = {"incidence": "^ltbi.*activetb", "death": "death_due_to_activetb",
                        "DALYs": "ylds_due_to_activetb|ylls_due_to_activetb"}
