@@ -88,10 +88,18 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
     
     fig = plt.figure(figsize=(10, 6), dpi=150)
     
+    outcome_name = outcome.split(' (')[0]
+    if outcome == 'Active TB Incidence count (cases)':
+        outcome_metric = 'cases'
+    elif outcome == 'Active TB Incidence rate (cases per 100,000 person-years)':
+        outcome_metric = f'cases per 100,000 {risk_group} person-years'
+    else:
+        outcome_metric = f'per 100,000 {risk_group} person-years'
+
     if outcome_type == 'value':
         scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)', 'Baseline (6H as planned)']
         prefix = ''
-        title = f'{location}, {risk_group}, {outcome_name} by Year
+        title = f'{location}, {risk_group}, {outcome_name} by Year'
     else:
         scenarios = ['Intervention 2 (3HP scale up)', 'Intervention 1 (6H scale up)']
         prefix = 'Averted'
@@ -111,14 +119,6 @@ def plot_outcome_by_year(df, location, risk_group, outcome, outcome_type):
         
         plt.plot(xx, yy, '-o', label=scenario)
         plt.fill_between(xx, lb, ub, alpha=.2)
-    
-    outcome_name = outcome.split(' (')[0]
-    if outcome == 'Active TB Incidence count (cases)':
-        outcome_metric = 'cases'
-    elif outcome == 'Active TB Incidence rate (cases per 100,000 person-years)':
-        outcome_metric = f'cases per 100,000 {risk_group} person-years'
-    else:
-        outcome_metric = f'per 100,000 {risk_group} person-years'
         
     plt.xlabel('Year', fontsize=12)
     plt.ylabel(f'{prefix} {outcome_name}\n({outcome_metric})', fontsize=12)
@@ -223,7 +223,7 @@ def compare_across_countries(df, location_names, outcome, risk_group, scenario):
         ub = t_location['averted_ub']
 
         plt.plot(xx, yy, '-o', label=location)
-        plt.fill_between(xx, lb, ub, alpha=.2)
+        # plt.fill_between(xx, lb, ub, alpha=.2)
 
     outcome_name = outcome.split(' (')[0]
     if outcome == 'Active TB Incidence count (cases)':
