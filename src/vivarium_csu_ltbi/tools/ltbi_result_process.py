@@ -26,7 +26,7 @@ def shape(data, pattern):
     new_data['age_group'] = new_data["information"].str.extract('^.*age_group_([a-z]*_?[a-z]*[0-9]*_?t?o?_?[0-9]*)', expand=True)
     new_data['hiv_status'] = new_data["information"].str.extract("activetb_([a-z]*)_hiv", expand=True)
     new_data['hh_status'] = new_data["information"].str.extract("^.*_([a-z]*)_to_hhtb", expand=True)
-	new_data['year'] = new_data["information"].str.extract("^.*in_([0-9]{4})", expand=True)
+    new_data['year'] = new_data["information"].str.extract("^.*in_([0-9]{4})", expand=True)
     return new_data
 
 def addElement(data, country, measure, people, scenario,mean, lower, upper):
