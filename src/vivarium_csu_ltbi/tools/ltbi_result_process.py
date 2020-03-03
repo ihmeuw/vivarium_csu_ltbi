@@ -25,7 +25,8 @@ def shape(data, pattern):
     new_data = df_data.stack().reset_index().rename(columns = {0:'value', 'level_2' : 'information'})
     new_data['age_group'] = new_data["information"].str.extract('^.*age_group_([a-z]*_?[a-z]*[0-9]*_?t?o?_?[0-9]*)', expand=True)
     new_data['hiv_status'] = new_data["information"].str.extract("activetb_([a-z]*)_hiv", expand=True)
-    new_data['hh_status'] = new_data["information"].str.extract("^.*_([a-z]*)_to_hhtb")
+    new_data['hh_status'] = new_data["information"].str.extract("^.*_([a-z]*)_to_hhtb", expand=True)
+    new_data['year'] = new_data["information"].str.extract("^.*in_([0-9]{4})", expand=True)
     return new_data
 
 def addElement(data, country, measure, people, scenario,mean, lower, upper):
@@ -45,7 +46,7 @@ def calculate_mean_ci(df, col_name):
     return mean, lower, upper
 
 def u5_calculation(df, data, country, measure, people):
-    df_u5= df[df['age_group'].isin(['early_neonatal_', 'late_neonatal_', 'post_neonatal_', '1_to_4']) & df['hh_status'].isin(['exposed'])]
+    df_u5= df[df['age_group'].isin(['early_neonatal_', 'late_neonatal_', 'post_neonatal_', '1_to_4']) & df['hh_status'].isin(['exposed']) & df['year'].isin(['2020', '2021', '2022', '2023', '2024'])]
     result = df_u5.groupby(['input_draw_number','ltbi_treatment_scale_up.scenario']).sum().reset_index(level = 1)
     result['3HP_averted'] = (result.loc[result['ltbi_treatment_scale_up.scenario'] == 'baseline', 'value'] - result.loc[result['ltbi_treatment_scale_up.scenario'] == '3HP_scale_up', 'value'])*100/result.loc[result['ltbi_treatment_scale_up.scenario'] == 'baseline', 'value']
     result['3HP_averted'].fillna(0, inplace = True) # in case 0 denominator 
@@ -57,7 +58,7 @@ def u5_calculation(df, data, country, measure, people):
     return
 
 def hiv_calculation(df, data, country,  measure, people):
-    df_hiv= df[df['hiv_status'].isin(['positive'])]
+    df_hiv= df[df['hiv_status'].isin(['positive']) & df['year'].isin(['2020', '2021', '2022', '2023', '2024'])]
     result = df_hiv.groupby(['input_draw_number','ltbi_treatment_scale_up.scenario']).sum().reset_index(level = 1)
     result['3HP_averted'] = (result.loc[result['ltbi_treatment_scale_up.scenario'] == 'baseline', 'value'] - result.loc[result['ltbi_treatment_scale_up.scenario'] == '3HP_scale_up', 'value'])*100/result.loc[result['ltbi_treatment_scale_up.scenario'] == 'baseline', 'value']
     result['3HP_averted'].fillna(0, inplace = True) # in case 0 denominator 
