@@ -3,7 +3,6 @@
 
 # In[1]:
 
-
 import numpy as np, matplotlib.pyplot as plt, pandas as pd
 pd.set_option('display.max_rows', 8)
 get_ipython().system('date')
@@ -225,7 +224,7 @@ g = sns.jointplot('RR_no_tx', 'RR_NA',
 # In[20]:
 
 
-results.to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/treatment_adherence_draws.csv')
+results.to_csv('./treatment_adherence_draws.csv')
 results
 
 
