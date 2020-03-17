@@ -36,5 +36,5 @@ Treatment Adherence Draws
 
 The treatment adherence and efficacy data was generated using an ipython notebook
 that has been exported to a script and placed here, called "ltbi_tx_efficacy_and_adherence_model.py".
-It save data in the same directory, called "treatment_adherence_draws.csv." This CSV
+It saves data in the same directory, called "treatment_adherence_draws.csv." This CSV
 is used directly in the artifact building procedure.
