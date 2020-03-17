@@ -158,7 +158,7 @@ def plot_multiple_locations(path_dict: dict, cause_names: list, gbd_names: list)
         gbd = get_gbd_results(location_id, gbd_names)
         gbd_new = filter_gbd_results(gbd, gbd_names)
         
-        with PdfPages(f'/home/j/Project/simulation_science/latent_tuberculosis_infection/validation/ltbi_cause_model_vv_in_{location}.pdf') as pdf:
+        with PdfPages(f'./ltbi_cause_model_vv_in_{location}.pdf') as pdf:
             for cause in causes:
                 for measure in measures:
                     make_plots(cause, results_w_pt, gbd_new, location, measure)
