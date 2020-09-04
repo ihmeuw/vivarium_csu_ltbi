@@ -28,7 +28,7 @@ configuration:
     input_data:
         location: {{ location_proper }}
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_csu_ltbi/{{ location_sanitized }}.hdf
+        artifact_path: {{ artifact_root}}/{{ location_sanitized }}.hdf
     interpolation:
         order: 0
         extrapolate: True
