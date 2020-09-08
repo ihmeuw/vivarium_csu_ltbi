@@ -2,6 +2,9 @@
 vivarium_csu_ltbi
 ===============================
 
+.. image:: https://zenodo.org/badge/216921313.svg
+   :target: https://zenodo.org/badge/latestdoi/216921313
+
 Research repository for the vivarium_csu_ltbi project.
 
 .. contents::
