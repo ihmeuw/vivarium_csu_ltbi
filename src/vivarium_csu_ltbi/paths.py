@@ -2,10 +2,11 @@
 from pathlib import Path
 from typing import Union
 
+import vivarium_csu_ltbi
 from vivarium_csu_ltbi import globals as ltbi_globals
 
-
-ARTIFACT_ROOT = Path(f"/share/costeffectiveness/artifacts/{ltbi_globals.PROJECT_NAME}/")
+BASE_DIR = Path(vivarium_csu_ltbi.__file__).resolve().parent
+ARTIFACT_ROOT = BASE_DIR / 'artifacts'
 HOUSEHOLD_TB_ARTIFACT_ROOT = ARTIFACT_ROOT / "household_tb"
 LTBI_INCIDENCE_ARTIFACT_ROOT = ARTIFACT_ROOT / "ltbi_incidence"
 

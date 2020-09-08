@@ -25,7 +25,7 @@ from jinja2 import Template
 from loguru import logger
 
 from vivarium_csu_ltbi.tools import results
-from vivarium_csu_ltbi import globals as project_globals
+from vivarium_csu_ltbi import globals as project_globals, paths
 
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
@@ -164,7 +164,9 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
             logger.info(f'   Writing {filespec.name}')
             outfile.write(jinja_temp.render(
                 location_proper=location.proper,
-                location_sanitized=location.sanitized))
+                location_sanitized=location.sanitized,
+                artifact_root=paths.ARTIFACT_ROOT
+            ))
 
 
 @click.command()
