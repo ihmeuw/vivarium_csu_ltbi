@@ -1,0 +1,28 @@
+{
+    "creators": [
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation",
+            "name": "Cody Horst"
+        }, 
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation",
+            "name": "Kjell Swedin"
+        },
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation", 
+            "name": "Yongquan Xie"
+        }, 
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation", 
+            "name": "Yaqi Wang"
+        },
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation", 
+            "name": "Abraham Flaxman"
+        },
+        {
+            "affiliation": "Institute for Health Metrics and Evaluation", 
+            "name": "James Collins"
+        }
+    ]
+}
