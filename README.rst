@@ -78,32 +78,31 @@ You'll find five directories inside the main
   stored in this directory.
 
 
-  Running Simulations
-  -------------------
 
-  With your conda environment active, the first step to running simulations
-  is making the model specification files.  A model specification is a
-  complete description of a vivarium model. The command to generate model
-  specifications is installed with this repository and it can be run
-  from any directory.::
+Running Simulations
+-------------------
 
-    (vivarium-ltbi) $> make_specs
-      2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:69 - Writing model spec(s) to "/REPO_INSTALLATION_DIRECTORY/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications"
-      2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing india.yaml
-      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing south_africa.yaml
+With your conda environment active, the first step to running simulations
+is making the model specification files.  A model specification is a
+complete description of a vivarium model. The command to generate model
+specifications is installed with this repository and it can be run
+from any directory.::
 
-      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing philippines.yaml
-      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing peru.yaml
-      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing ethiopia.yaml
+  (vivarium_csu_ltbi) $> make_specs
+  2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:69 - Writing model spec(s) to "/REPO_INSTALLATION_DIRECTORY/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications"
+  2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing ethiopia.yaml
+  2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing india.yaml
+  2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing peru.yaml
+  2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing south_africa.yaml
+  2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing philippines.yaml
 
-  As the log message indicates, the model specifications will be written to
-  the ``model_specifications`` subdirectory in this repository. You can then
-  run simulations by, e.g.::
+As the log message indicates, the model specifications will be written to
+the ``model_specifications`` subdirectory in this repository. You can then
+run simulations by, e.g.::
 
-    (vivarium-ltbi) $> simulate run -v /<REPO_INSTALLATION_DIRECTORY>/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications/india.yaml
+   (vivarium_csu_ltbi) $> simulate run -v /<REPO_INSTALLATION_DIRECTORY>/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications/ethiopia.yaml
 
-   The ``-v`` flag will log verbosely, so you will get log messages every time
-   step. For more ways to run simulations, see the tutorials at
-   https://vivarium.readthedocs.io/en/latest/tutorials/running_a_simulation/index.html
-   and https://vivarium.readthedocs.io/en/latest/tutorials/exploration.html
-
+The ``-v`` flag will log verbosely, so you will get log messages every time
+step. For more ways to run simulations, see the tutorials at
+https://vivarium.readthedocs.io/en/latest/tutorials/running_a_simulation/index.html
+and https://vivarium.readthedocs.io/en/latest/tutorials/exploration.html
