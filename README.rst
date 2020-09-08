@@ -84,20 +84,20 @@ You'll find five directories inside the main
   specifications is installed with this repository and it can be run
   from any directory.::
 
-    (vivarium-htn) $> make_specs
+    (vivarium-ltbi) $> make_specs
       2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:69 - Writing model spec(s) to "/REPO_INSTALLATION_DIRECTORY/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications"
-      2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing china.yaml
-      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing italy.yaml
+      2019-11-18 21:30:41.429 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing india.yaml
+      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing south_africa.yaml
 
-      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing mexico.yaml
-      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing russian_federation.yaml
-      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing south_korea.yaml
+      2019-11-18 21:30:41.430 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing philippines.yaml
+      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing peru.yaml
+      2019-11-18 21:30:41.431 | INFO     | vivarium_csu_ltbi.cli:make_specs:74 -    Writing ethiopia.yaml
 
   As the log message indicates, the model specifications will be written to
   the ``model_specifications`` subdirectory in this repository. You can then
   run simulations by, e.g.::
 
-    (vivarium-htn) $> simulate run -v /<REPO_INSTALLATION_DIRECTORY>/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications/china.yaml
+    (vivarium-ltbi) $> simulate run -v /<REPO_INSTALLATION_DIRECTORY>/vivarium_csu_ltbi/src/vivarium_csu_ltbi/model_specifications/india.yaml
 
    The ``-v`` flag will log verbosely, so you will get log messages every time
    step. For more ways to run simulations, see the tutorials at
