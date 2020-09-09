@@ -10,37 +10,56 @@ Research repository for the vivarium_csu_ltbi project.
 .. contents::
    :depth: 1
 
-Model Documentation Resources
------------------------------
-
-**You should put links to the concept model documentation and any other**
-**relevant documentation here.**
-
 Installation
 ------------
 
-These models require data from GBD databases. You'll need several internal
-IHME packages and access to the IHME cluster.
+You will need ``git``, ``git-lfs`` and ``conda`` to get this repository
+and install all of its requirements.  You should follow the instructions for
+your operating system at the following places:
 
-To install the extra dependencies create a file called ~/.pip/pip.conf which
-looks like this::
+- `git <https://git-scm.com/downloads>`_
+- `git-lfs <https://git-lfs.github.com/>`_
+- `conda <https://docs.conda.io/en/latest/miniconda.html>`_
 
-    [global]
-    extra-index-url = http://pypi.services.ihme.washington.edu/simple
-    trusted-host = pypi.services.ihme.washington.edu
+Once you have all three installed, you should open up your normal shell
+(if you're on linux or OSX) or the ``git bash`` shell if you're on windows.
+You'll then make an environment, clone this repository, then install
+all necessary requirements as follows::
+
+  :~$ conda create --name=vivarium_csu_ltbi python=3.6
+  ...conda will download python and base dependencies...
+  :~$ conda activate vivarium_csu_ltbi
+  (vivarium_csu_ltbi) :~$ git clone https://github.com/ihmeuw/vivarium_csu_ltbi.git
+  ...git will copy the repository from github and place it in your current directory...
+  (vivarium_csu_ltbi) :~$ cd vivarium_csu_ltbi
+  (vivarium_csu_ltbi) :~$ pip install -e .
+  ...pip will install vivarium and other requirements...
 
 
-To set up a new research environment, open up a terminal on the cluster and
-run::
+Note the ``-e`` flag that follows pip install. This will install the python
+package in-place, which is important for making the model specifications later.
 
-    $> conda create --name=vivarium_csu_ltbi python=3.6
-    ...standard conda install stuff...
-    $> conda activate vivarium_csu_ltbi
-    (vivarium_csu_ltbi) $> conda install redis
-    (vivarium_csu_ltbi) $> git clone git@github.com:ihmeuw/vivarium_csu_ltbi.git
-    ...you may need to do username/password stuff here...
-    (vivarium_csu_ltbi) $> cd vivarium_csu_ltbi
-    (vivarium_csu_ltbi) $> pip install -e .
+Cloning the repository should take a fair bit of time as git must fetch
+the data artifact associated with the demo (about 4GB of data) from the
+large file system storage (``git-lfs``). **If your clone works quickly,
+you are likely only retrieving the checksum file that github holds onto,
+and your simulations will fail.** If you are only retrieving checksum
+files you can explicitly pull the data by executing ``git-lfs pull``.
+
+Vivarium uses the Hierarchical Data Format (HDF) as the backing storage
+for the data artifacts that supply data to the simulation. You may not have
+the needed libraries on your system to interact with these files, and this is
+not something that can be specified and installed with the rest of the package's
+dependencies via ``pip``. If you encounter HDF5-related errors, you should
+install hdf tooling from within your environment like so::
+
+  (vivarium_csu_ltbi) :~$ conda install hdf5
+
+The ``(vivarium_csu_ltbi)`` that precedes your shell prompt will probably show
+up by default, though it may not.  It's just a visual reminder that you
+are installing and running things in an isolated programming environment
+so it doesn't conflict with other source code and libraries on your
+system.
 
 
 Usage
