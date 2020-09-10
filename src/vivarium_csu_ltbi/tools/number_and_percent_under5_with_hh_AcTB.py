@@ -1,5 +1,5 @@
 import pandas as pd, numpy as np
-from db_queries import get_population
+
 
 def mergeCountry(df1, df2):
     if "random_seed" in df1.columns:
@@ -21,6 +21,8 @@ def clean(data):
     return new_data
 
 def process(country, df, data, location_dict):
+    from db_queries import get_population
+
     df_data = df.filter(like = "hhtb", axis = 1)
     new_data = df_data.stack().reset_index().rename(columns = {0:'value', 'level_2' : 'information'})
     new_data['age_group'] = new_data["information"].str.extract('^.*age_group_([a-z]*_?[a-z]*[0-9]*_?t?o?_?[0-9]*)', expand=True)
