@@ -19,8 +19,6 @@ if __name__ == "__main__":
     install_requirements = [
         'vivarium==0.9.3',
         'vivarium_public_health==0.10.2',
-        'vivarium_cluster_tools==1.1.2',
-        'vivarium_inputs[data]==3.1.0',
 
         # These are pinned for internal dependencies on IHME libraries
         'numpy<=1.15.4',
@@ -40,7 +38,9 @@ if __name__ == "__main__":
     ]
 
     data_requires = [
-        'dismod_mr==1.1.1'
+        'dismod_mr==1.1.1',
+        'vivarium_cluster_tools==1.1.2',
+        'vivarium_inputs[data]==3.1.0',
     ]
 
     setup(

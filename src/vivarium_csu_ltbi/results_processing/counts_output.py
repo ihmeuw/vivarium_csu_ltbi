@@ -1,8 +1,6 @@
 from typing import Tuple, NamedTuple
 
 import pandas as pd
-from db_queries import get_ids
-from db_queries import get_population
 
 from vivarium_csu_ltbi.results_processing import utilities
 
@@ -158,6 +156,8 @@ def get_tb_events(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_national_population(location: str) -> pd.DataFrame:
+    from db_queries import get_ids, get_population
+
     age_group_ids = list(range(2, 21)) + [30, 31, 32, 235]
     age_table = get_ids('age_group')
     age_table = age_table[age_table.age_group_id.isin(age_group_ids)]
