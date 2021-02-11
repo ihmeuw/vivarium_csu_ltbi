@@ -145,4 +145,4 @@ def get_estimates(location_id: int, draw: int):
     f['year_start'] = 2019
     f['year_end'] = 2020
     f['draw'] = draw
-    return output.set_index(['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']).reset_index()
+    return f.set_index(['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']).reset_index()
