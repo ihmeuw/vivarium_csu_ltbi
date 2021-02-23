@@ -42,13 +42,13 @@ def load_hh_data(location_id: int):
                                        '1 year': '1',
                                        '2 years': '2',
                                        '100+': '100'})
-        df['sex'] = df['sex'].str.capitalize()
         df = df[df.age != "not reported/missing"]
     else:
         df['hh_id'] = df['hh_id'].str.split().map(lambda x: int(''.join(x)))
-        df['sex'] = df['sex'].str.capitalize()
-        df['age'] = df['age'].replace({'95+': 95, '96+': 95})
-        df = df[~((df.age == "don't know") | (df.age == 'dk'))]
+        if country_name != 'Congo':
+            df['age'] = df['age'].replace({'95+': 95, '96+': 95, '97+': 95})
+            df = df[~((df.age == "don't know") | (df.age == "dk") | (df.age == "Don't know"))]
+    df['sex'] = df['sex'].str.capitalize()
     df['age'] = df['age'].astype(float)
     return df
 
@@ -131,7 +131,7 @@ def get_estimates(location_id: int, draw: int):
     df_hh = load_hh_data(location_id)
     hh_ids = df_hh.hh_id.unique()
     # boostrap HH data by resampling hh_id with replacement
-    sample_hhids = np.random.choice(hh_ids, size=len(hh_ids), replace=True)
+    sample_hhids = np.random.choice(hh_ids, size=min(len(hh_ids), 50000), replace=True)
     df_hh = df_hh.set_index("hh_id")
     df_hh_sample = df_hh.loc[sample_hhids].reset_index()
     prev_actb = format_actb_prevalence(pull_actb_prevalence(location_id))
