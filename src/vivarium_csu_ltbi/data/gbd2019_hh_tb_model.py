@@ -125,24 +125,39 @@ def calc_age_sex_specific_no_actb_prop(df: pd.DataFrame):
             result = pd.concat([result, age_sex_result], ignore_index=True)
     return result
 
-def get_estimates(location_id: int, draw: int):
+def get_estimates(draw: int):
     """calculate the prevalence of household contact"""
+    output = pd.DataFrame()
     cols = ['age_group_start', 'age_group_end', 'sex']
-    df_hh = load_hh_data(location_id)
-    hh_ids = df_hh.hh_id.unique()
-    # boostrap HH data by resampling hh_id with replacement
-    sample_hhids = np.random.choice(hh_ids, size=min(len(hh_ids), 50000), replace=True)
-    df_hh = df_hh.set_index("hh_id")
-    df_hh_sample = df_hh.loc[sample_hhids].reset_index()
-    prev_actb = format_actb_prevalence(pull_actb_prevalence(location_id))
-    data = interpolation(prev_actb, df_hh_sample, draw)
-    result = calc_age_sex_specific_no_actb_prop(data)
-    prev_actb_draw = prev_actb.query(f'draw == {draw}')
-    prev_actb_draw['value'] = 1 - prev_actb_draw['value']
-    # prev_hhc = 1 - pr_no_actb_in_hh / prev_susceptible_to_actb
-    f = (1 - result.set_index(cols).value / prev_actb_draw.set_index(cols).value).reset_index()
-    f['location'] = country_dict[location_id]
-    f['year_start'] = 2019
-    f['year_end'] = 2020
-    f['draw'] = draw
-    return f.set_index(['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']).reset_index()
+    for location_id in country_dict.keys():
+        df_hh = load_hh_data(location_id)
+        hh_ids = df_hh.hh_id.unique()
+        # boostrap HH data by resampling hh_id with replacement
+        sample_hhids = np.random.choice(hh_ids, size=min(len(hh_ids), 50000), replace=True)
+        df_hh = df_hh.set_index("hh_id")
+        df_hh_sample = df_hh.loc[sample_hhids].reset_index()
+        prev_actb = format_actb_prevalence(pull_actb_prevalence(location_id))
+        data = interpolation(prev_actb, df_hh_sample, draw)
+        result = calc_age_sex_specific_no_actb_prop(data)
+        prev_actb_draw = prev_actb.query(f'draw == {draw}')
+        prev_actb_draw['value'] = 1 - prev_actb_draw['value']
+        # prev_hhc = 1 - pr_no_actb_in_hh / prev_susceptible_to_actb
+        f = (1 - result.set_index(cols).value / prev_actb_draw.set_index(cols).value).reset_index()
+        f['location'] = country_dict[location_id]
+        output = pd.concat([output, f], ignore_index=True)
+    output['year_start'] = 2019
+    output['year_end'] = 2020
+    output['draw'] = draw
+    return output.set_index(['location', 'sex', 'age_group_start', 'year_start', 'age_group_end', 'year_end', 'draw']).reset_index()
+
+
+if __name__ == '__main__':
+    import sys
+    import os
+    try:
+        draw = int(os.environ['SGE_TASK_ID']) - 1
+    except (KeyError, ValueError):
+        draw = int(sys.argv[1])
+
+    output = get_estimates(draw)
+    output.to_hdf(f'/share/scratch/users/yongqx2/hhc_estimates/draw_{draw}.hdf', 'draw')
