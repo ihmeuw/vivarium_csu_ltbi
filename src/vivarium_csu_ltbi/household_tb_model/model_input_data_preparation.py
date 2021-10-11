@@ -115,6 +115,6 @@ def merge_location_data():
 
 
 if __name__ == '__main__':
-	hh_data, incidence_data = merge_location_data()
+    hh_data, incidence_data = merge_location_data()
     hh_data.to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/hh_model_input/hh_data.csv', index=False)
     incidence_data.to_csv('/home/j/Project/simulation_science/latent_tuberculosis_infection/hh_model_input/incidence_data.csv', index=False)
