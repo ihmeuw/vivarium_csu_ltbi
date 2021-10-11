@@ -36,17 +36,7 @@ country_dict = {
     214: 'Nigeria'
 }
 
-# GBD age group ids
-age_group_ids = [1, 23, 149, 150, 151, 152, 153, 154]
-age_group_names = ['0_to_5', '5_to_15'] + [f'{c}_to_{c+10}' for c in range(15, 65, 10)] + ['65_to_125'] 
-age_dict = dict(zip(age_group_ids, age_group_names))
-
-sex_dict = {
-    1: 'Male',
-    2: 'Female'
-}
-
-age_group_map = {
+age_dict = {
     1: '0_to_5',
     23: '5_to_15',
     8: '15_to_20',
@@ -62,16 +52,22 @@ age_group_map = {
     154: '65_to_125'
 }
 
+sex_dict = {
+    1: 'Male',
+    2: 'Female'
+}
+
+
 # GBD popualtion size by age and sex
 population = get_population(
     location_id=list(country_dict.keys()),
-    age_group_id=[1, 23] + list(range(8, 18)) + [154],
-    sex_id=[1,2],
+    age_group_id=list(age_dict.keys()),
+    sex_id=list(sex_dict.keys()),
     year_id=2019,
     gbd_round_id=6,
     decomp_step='step5'
 )
-population['age_group'] = population.age_group_id.map(age_group_map)
+population['age_group'] = population.age_group_id.map(age_dict)
 population['location'] = population.location_id.map(country_dict)
 population['sex'] = population.sex_id.map(sex_dict)
 population = (population
